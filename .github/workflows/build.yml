@@ -36,8 +36,8 @@ jobs:
 
       - name: Move files
         run: |
-          mv -f docsify/lib ./
-          mv -f docsify/themes ./
+          cp -Rf docsify/lib ./
+          cp -Rf docsify/themes ./
           rm -rf docsify
 
       - name: Commit
