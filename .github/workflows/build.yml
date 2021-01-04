@@ -1,0 +1,46 @@
+name: docsify-nightly
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # At 00:05
+    - cron: '5 0 * * *'
+
+jobs:
+  build:
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          git clone https://github.com/docsifyjs/docsify.git
+          cd docsify
+          npm run bootstrap
+
+      - name: Build docsify
+        run: |
+          cd docsify
+          npm run build
+
+      - name: Move files
+        run: |
+          cp -Rf docsify/lib ./
+          cp -Rf docsify/themes ./
+          rm -rf docsify
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Nightly release for docsify
