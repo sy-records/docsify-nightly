@@ -1,6 +1,11 @@
 name: docsify-nightly
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:schedule:
+    # At 00:05
+    - cron: '5 0 * * *'
 
 jobs:
   build:
@@ -30,8 +35,8 @@ jobs:
 
       - name: Move files
         run: |
-          mv docsify/lib -fui ./
-          mv docsify/themes -fui ./
+          mv -fu docsify/lib ./
+          mv -fu docsify/themes ./
           rm -rf docsify
 
       - name: Commit
