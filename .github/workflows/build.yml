@@ -24,4 +24,6 @@ jobs:
           npm run bootstrap
 
       - name: Build docsify
-        run: npm run build
+        run: |
+          cd docsify
+          npm run build
