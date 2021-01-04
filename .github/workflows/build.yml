@@ -3,7 +3,8 @@ name: docsify-nightly
 on:
   push:
   pull_request:
-  workflow_dispatch:schedule:
+  workflow_dispatch:
+  schedule:
     # At 00:05
     - cron: '5 0 * * *'
 
