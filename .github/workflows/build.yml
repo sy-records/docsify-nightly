@@ -27,3 +27,13 @@ jobs:
         run: |
           cd docsify
           npm run build
+
+      - name: Move files
+        run: |
+          mv -u docsify/lib ./
+          mv -u docsify/themes ./
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Nightly release for docsify
