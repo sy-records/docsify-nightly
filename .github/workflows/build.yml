@@ -36,9 +36,9 @@ jobs:
 
       - name: Move files
         run: |
-          mv -fu docsify/lib ./
-          mv -fu docsify/themes ./
-          rm -rf docsify
+          mv -fu -t docsify/lib ./
+          mv -fu -t docsify/themes ./
+          rm -rf -t docsify
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
