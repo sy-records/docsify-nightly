@@ -15,7 +15,7 @@ Build at `00:05` each day.
 see https://cdn.jsdelivr.net/gh/sy-records/docsify-nightly/
 
 ```html
-<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly/themes/vue.css" />
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly/lib/themes/vue.css" />
 
 <script src="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly/lib/docsify.min.js"></script>
 ```
