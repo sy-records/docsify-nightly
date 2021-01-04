@@ -43,4 +43,5 @@ jobs:
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
+          commit_user_email: 52o@qq52o.cn
           commit_message: Nightly release for docsify
