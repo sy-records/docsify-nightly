@@ -6,9 +6,9 @@ Nightly release for [docsify](https://github.com/docsifyjs/docsify/)
 
 ## Schedule
 
-Build at `00:05` UTC each day
+Runs at `03:37` UTC every day
 
-[![docsify-nightly schedule](https://github.com/sy-records/docsify-nightly/workflows/docsify-nightly/badge.svg?event=schedule)](https://github.com/sy-records/docsify-nightly/actions)
+[![docsify-nightly schedule](https://github.com/sy-records/docsify-nightly/workflows/docsify-nightly/badge.svg?event=schedule)](https://github.com/sy-records/docsify-nightly/actions?query=event%3Aschedule)
 
 ## Use
 
