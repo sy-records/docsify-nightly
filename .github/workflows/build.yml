@@ -32,13 +32,13 @@ jobs:
         run: |
           cd docsify
           npm run build
-          git status
 
       - name: Move files
         run: |
           cp -Rf docsify/lib ./
           cp -Rf docsify/themes ./
           rm -rf docsify
+          git status
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
