@@ -32,6 +32,7 @@ jobs:
         run: |
           cd docsify
           npm run build
+          git status
 
       - name: Move files
         run: |
