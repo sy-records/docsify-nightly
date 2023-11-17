@@ -220,7 +220,7 @@ main.hidden {
   top: 0;
   bottom: 0;
   left: 0;
-  transition: transform 250ms ease-out;
+  transition: transform 250ms ease-out, visibility 250ms;
   width: 300px;
   z-index: 20;
 }
@@ -403,6 +403,7 @@ body.sticky .sidebar-toggle {
   list-style-type: none;
 }
 body.close .sidebar {
+  visibility: hidden;
   transform: translateX(-300px);
 }
 body.close .sidebar-toggle {
@@ -437,8 +438,9 @@ body.close .content {
     overflow-x: hidden;
   }
   .sidebar {
+    visibility: hidden;
     left: -300px;
-    transition: transform 250ms ease-out;
+    transition: transform 250ms ease-out, visibility 250ms;
   }
   .content {
     left: 0;
@@ -457,6 +459,7 @@ body.close .content {
     padding: 30px 30px 10px 10px;
   }
   body.close .sidebar {
+    visibility: visible;
     transform: translateX(300px);
   }
   body.close .sidebar-toggle {
