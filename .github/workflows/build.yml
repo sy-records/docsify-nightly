@@ -1,11 +1,7 @@
 name: docsify-nightly
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: '37 3 * * *'
 
 jobs:
   build:
@@ -24,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          git clone https://github.com/docsifyjs/docsify.git
+          git clone https://github.com/docsifyjs/docsify.git -b master
           cd docsify
           npm ci --ignore-scripts
 
@@ -36,6 +32,7 @@ jobs:
       - name: Move files
         run: |
           cp -Rf docsify/lib ./
+          cp -Rf docsify/themes ./
           rm -rf docsify
           git status
 
