@@ -15,7 +15,7 @@ Runs at `03:37` UTC every day
 see https://cdn.jsdelivr.net/gh/sy-records/docsify-nightly/
 
 ```html
-<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly/lib/themes/vue.css" />
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@master/lib/themes/vue.css" />
 
-<script src="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly/lib/docsify.min.js"></script>
+<script src="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@master/lib/docsify.min.js"></script>
 ```
