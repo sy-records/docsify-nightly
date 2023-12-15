@@ -35,10 +35,7 @@ jobs:
 
       - name: Move files
         run: |
-          ls -la docsify/lib
           cp -Rf docsify/lib ./
-          ls -la docsify/themes
-          cp -Rf docsify/themes ./
           rm -rf docsify
           git status
 
