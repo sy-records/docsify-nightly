@@ -274,6 +274,9 @@ main.hidden {
   line-height: 2em;
   padding-bottom: 40px;
 }
+.sidebar li {
+  scroll-margin-bottom: 40px;
+}
 .sidebar li.collapse .app-sub-sidebar {
   display: none;
 }
