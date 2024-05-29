@@ -23,7 +23,7 @@
         return typeof obj === "function";
     }
     function isExternal(url) {
-        let match = url.match(/^([^:/?#]+:)?(?:\/{2,}([^/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
+        const match = url.match(/^([^:/?#]+:)?(?:\/{2,}([^/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
         if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) {
             return true;
         }
@@ -147,7 +147,7 @@
     const cleanPath = cached$1((path => path.replace(/^\/+/, "/").replace(/([^:])\/{2,}/g, "$1/")));
     const resolvePath = cached$1((path => {
         const segments = path.replace(/^\//, "").split("/");
-        let resolved = [];
+        const resolved = [];
         for (const segment of segments) {
             if (segment === "..") {
                 resolved.pop();
@@ -2470,7 +2470,7 @@
         return `\n    <section class="cover show" role="complementary" aria-label="cover" style="background: ${bgc}">\n      <div class="mask"></div>\n      <div class="cover-main">\x3c!--cover--\x3e</div>\n    </section>\n  `;
     }
     function tree(toc) {
-        let tpl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : `<ul class="app-sub-sidebar">{inner}</ul>`;
+        let tpl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '<ul class="app-sub-sidebar">{inner}</ul>';
         if (!toc || !toc.length) {
             return "";
         }
@@ -4535,7 +4535,7 @@
         let {renderer: renderer, contentBase: contentBase, router: router} = _ref;
         return renderer.image = (href, title, text) => {
             let url = href;
-            let attrs = [];
+            const attrs = [];
             const {str: str, config: config} = getAndRemoveConfig(title);
             title = str;
             if (config["no-zoom"]) {
@@ -5692,7 +5692,7 @@
         return renderer.link = function(href) {
             let title = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
             let text = arguments.length > 2 ? arguments[2] : undefined;
-            let attrs = [];
+            const attrs = [];
             const {str: str, config: config} = getAndRemoveConfig(title);
             linkTarget = config.target || linkTarget;
             linkRel = linkTarget === "_blank" ? compilerClass.config.externalLinkRel || "noopener" : "";
@@ -5926,7 +5926,7 @@
                     }
                 }
                 const tree$1 = this.cacheTree[currentPath] || genTree(toc, level);
-                html = tree(tree$1, `<ul>{inner}</ul>`);
+                html = tree(tree$1, "<ul>{inner}</ul>");
                 this.cacheTree[currentPath] = tree$1;
             }
             return html;
@@ -6381,7 +6381,7 @@
     }
     function prerenderEmbed(_ref2, done) {
         let {compiler: compiler, raw: raw = "", fetch: fetch} = _ref2;
-        let hit = cached[raw];
+        const hit = cached[raw];
         if (hit) {
             const copy = hit.slice();
             copy.links = hit.links;
@@ -6783,7 +6783,7 @@
             _fetch() {
                 let cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
                 const {query: query} = this.route;
-                let {path: path} = this.route;
+                const {path: path} = this.route;
                 if (isExternal(path)) {
                     history.replaceState(null, "", "#");
                     this.router.normalize();
