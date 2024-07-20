@@ -23,7 +23,7 @@
             config: config
         };
     }
-    function getAndRemoveDocisfyIgnoreConfig() {
+    function getAndRemoveDocsifyIgnoreConfig() {
         let content = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
         let ignoreAllSubs, ignoreSubHeading;
         if (/<!-- {docsify-ignore} -->/g.test(content)) {
@@ -110,7 +110,7 @@
         tokens.forEach(((token, tokenIndex) => {
             if (token.type === "heading" && token.depth <= depth) {
                 const {str: str, config: config} = getAndRemoveConfig(token.text);
-                const text = getAndRemoveDocisfyIgnoreConfig(token.text).content;
+                const text = getAndRemoveDocsifyIgnoreConfig(token.text).content;
                 if (config.id) {
                     slug = router.toURL(path, {
                         id: slugify(config.id)
@@ -121,7 +121,7 @@
                     });
                 }
                 if (str) {
-                    title = getAndRemoveDocisfyIgnoreConfig(str).content;
+                    title = getAndRemoveDocsifyIgnoreConfig(str).content;
                 }
                 index[slug] = {
                     slug: slug,
@@ -202,11 +202,11 @@
                         let start = 0;
                         let end = 0;
                         start = indexContent < 11 ? 0 : indexContent - 10;
-                        end = start === 0 ? 70 : indexContent + keyword.length + 60;
+                        end = start === 0 ? 100 : indexContent + keyword.length + 90;
                         if (postContent && end > postContent.length) {
                             end = postContent.length;
                         }
-                        const matchContent = handlePostContent && "..." + handlePostContent.substring(start, end).replace(regEx, (word => `<em class="search-keyword">${word}</em>`)) + "...";
+                        const matchContent = handlePostContent && handlePostContent.substring(start, end).replace(regEx, (word => `<mark>${word}</mark>`));
                         resultStr += matchContent;
                     }
                 }));
@@ -266,68 +266,49 @@
             }));
         }));
     }
+    var cssText = "/* prettier-ignore */\n:root {\n  --plugin-search-input-bg           : var(--form-element-bg);\n  --plugin-search-input-border-color : var(--sidebar-border-color);\n  --plugin-search-input-border-radius: var(--form-element-border-radius);\n  --plugin-search-input-color        : var(--form-element-color);\n  --plugin-search-kbd-bg             : var(--color-bg);\n  --plugin-search-kbd-border         : 1px solid var(--color-mono-3);\n  --plugin-search-kbd-border-radius  : 4px;\n  --plugin-search-kbd-color          : var(--color-mono-5);\n  --plugin-search-margin             : 10px;\n  --plugin-search-reset-bg           : var(--theme-color);\n  --plugin-search-reset-border       : transparent;\n  --plugin-search-reset-border-radius: var(--border-radius);\n  --plugin-search-reset-color        : #fff;\n}\n\n.search {\n  margin: var(--plugin-search-margin);\n}\n\n/* Input */\n/* ================================== */\n.search .input-wrap {\n  position: relative;\n}\n\n.search input {\n  width: 100%;\n  padding-inline-end: 36px;\n  border: 1px solid var(--plugin-search-input-border-color);\n  border-radius: var(--plugin-search-input-border-radius);\n  background: var(--plugin-search-input-bg);\n  color: var(--plugin-search-input-color);\n}\n\n.search input::-webkit-search-decoration,\n.search input::-webkit-search-cancel-button {\n  appearance: none;\n}\n\n.search .clear-button,\n.search .kbd-group {\n  visibility: hidden;\n  display: flex;\n  gap: 0.15em;\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  opacity: 0;\n  translate: 0 -50%;\n  transition-property: opacity, visibility;\n  transition-duration: var(--duration-medium);\n}\n\n/* Note: invalid = empty, valid = not empty */\n.search input:valid ~ .clear-button,\n.search input:invalid:where(:focus, :hover) ~ .kbd-group,\n.search .kbd-group:hover {\n  visibility: visible;\n  opacity: 1;\n}\n\n.search .clear-button {\n  --_button-size: 20px;\n  --_content-size: 12px;\n\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: var(--_button-size);\n  width: var(--_button-size);\n  border: var(--plugin-search-reset-border);\n  border-radius: var(--plugin-search-reset-border-radius);\n  background: var(--plugin-search-reset-bg);\n  cursor: pointer;\n}\n\n.search .clear-button::before,\n.search .clear-button::after {\n  content: '';\n  position: absolute;\n  height: 2px;\n  width: var(--_content-size);\n  color: var(--plugin-search-reset-color);\n  background: var(--plugin-search-reset-color);\n}\n\n.search .clear-button::before {\n  rotate: 45deg;\n}\n\n.search .clear-button::after {\n  rotate: -45deg;\n}\n\n.search kbd {\n  border: var(--plugin-search-kbd-border);\n  border-radius: var(--plugin-search-kbd-border-radius);\n  background: var(--plugin-search-kbd-bg);\n  color: var(--plugin-search-kbd-color);\n  font-size: var(--font-size-s);\n}\n\n/* Results */\n/* ================================== */\n.search a:hover {\n  color: var(--theme-color);\n}\n\n.search .results-panel:empty {\n  display: none;\n}\n\n/* Hide other sidebar items when results are shown */\n.search:has(.results-panel:not(:empty)) ~ * {\n  display: none;\n}\n\n/* Dim other sidebar items when no results are found */\n.search:where(:has(input:valid:focus), :has(.results-panel::empty)) ~ * {\n  opacity: 0.2;\n}\n\n.search .matching-post {\n  overflow: hidden;\n  padding: 1em 0 1.2em 0;\n  border-bottom: 1px solid var(--color-mono-2);\n}\n\n.search .matching-post:hover a {\n  text-decoration-color: transparent;\n}\n\n.search .matching-post:hover .title {\n  text-decoration: inherit;\n  text-decoration-color: var(--link-underline-color-hover);\n}\n\n.search .matching-post .title {\n  margin: 0 0 0.5em 0;\n  line-height: 1.4;\n}\n\n.search .matching-post .content {\n  margin: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status {\n  margin-bottom: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status:empty {\n  display: none;\n}\n";
     let NO_DATA_TEXT = "";
-    let options;
-    function style() {
-        const code = `\n.sidebar {\n  padding-top: 0;\n}\n\n.search {\n  margin-bottom: 20px;\n  padding: 6px;\n  border-bottom: 1px solid #eee;\n}\n\n.search .input-wrap {\n  display: flex;\n  align-items: center;\n}\n\n.search .results-status:not(:empty) {\n  margin-top: 10px;\n  font-size: smaller;\n}\n\n.search .results-panel {\n  display: none;\n}\n\n.search .results-panel.show {\n  display: block;\n}\n\n.search input {\n  outline: none;\n  border: none;\n  width: 100%;\n  padding: 0.6em 7px;\n  font-size: inherit;\n  border: 1px solid transparent;\n}\n\n.search input:focus {\n  box-shadow: 0 0 5px var(--theme-color, #42b983);\n  border: 1px solid var(--theme-color, #42b983);\n}\n\n.search input::-webkit-search-decoration,\n.search input::-webkit-search-cancel-button,\n.search input {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n\n.search input::-ms-clear {\n  display: none;\n  height: 0;\n  width: 0;\n}\n\n.search .clear-button {\n  cursor: pointer;\n  width: 36px;\n  text-align: right;\n  display: none;\n}\n\n.search .clear-button.show {\n  display: block;\n}\n\n.search .clear-button svg {\n  transform: scale(.5);\n}\n\n.search kbd {\n  position: absolute;\n  right: 8px;\n  margin: 0;\n}\n\n.search input:focus ~ kbd,\n.search input:not(:empty) ~ kbd {\n  display: none;\n}\n\n.search h2 {\n  font-size: 17px;\n  margin: 10px 0;\n}\n\n.search a {\n  text-decoration: none;\n  color: inherit;\n}\n\n.search .matching-post {\n  border-bottom: 1px solid #eee;\n}\n\n.search .matching-post:last-child {\n  border-bottom: 0;\n}\n\n.search p {\n  font-size: 14px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n}\n\n.search p.empty {\n  text-align: center;\n}\n\n.app-name.hide, .sidebar-nav.hide {\n  display: none;\n}`;
-        Docsify.dom.style(code);
-    }
-    function tpl() {
-        let defaultValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-        const html = `\n    <div class="input-wrap">\n      <input type="search" value="${defaultValue}" aria-keyshortcuts="/ control+k meta+k" />\n      <div class="clear-button">\n        <svg width="26" height="24">\n          <circle cx="12" cy="12" r="11" fill="#ccc" />\n          <path stroke="white" stroke-width="2" d="M8.25,8.25,15.75,15.75" />\n          <path stroke="white" stroke-width="2"d="M8.25,15.75,15.75,8.25" />\n        </svg>\n      </div>\n      <kbd title="Press / to search">/</kbd>\n    </div>\n    <div class="results-status" aria-live="polite"></div>\n    <div class="results-panel"></div>\n  `;
-        const el = Docsify.dom.create("div", html);
-        const aside = Docsify.dom.find("aside");
-        Docsify.dom.toggleClass(el, "search");
-        el.setAttribute("role", "search");
-        Docsify.dom.before(aside, el);
+    function tpl(vm) {
+        let defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+        const {insertAfter: insertAfter, insertBefore: insertBefore} = vm.config?.search || {};
+        const html = `\n    <div class="input-wrap">\n      <input type="search" value="${defaultValue}" required aria-keyshortcuts="/ control+k meta+k" />\n      <button class="clear-button" title="Clear search">\n        <span class="visually-hidden">Clear search</span>\n      </button>\n      <div class="kbd-group">\n        <kbd title="Press / to search">/</kbd>\n        <kbd title="Press Control+K to search">⌃K</kbd>\n      </div>\n    </div>\n    <p class="results-status" aria-live="polite"></p>\n    <div class="results-panel"></div>\n  `;
+        const sidebarElm = Docsify.dom.find(".sidebar");
+        const searchElm = Docsify.dom.create("section", html);
+        const insertElm = sidebarElm.querySelector(`:scope ${insertAfter || insertBefore || "> :first-child"}`);
+        searchElm.classList.add("search");
+        searchElm.setAttribute("role", "search");
+        sidebarElm.insertBefore(searchElm, insertAfter ? insertElm.nextSibling : insertElm);
     }
     function doSearch(value) {
-        const $search = Docsify.dom.find("div.search");
+        const $search = Docsify.dom.find(".search");
         const $panel = Docsify.dom.find($search, ".results-panel");
-        const $clearBtn = Docsify.dom.find($search, ".clear-button");
-        const $sidebarNav = Docsify.dom.find(".sidebar-nav");
-        const $status = Docsify.dom.find("div.search .results-status");
-        const $appName = Docsify.dom.find(".app-name");
+        const $status = Docsify.dom.find(".search .results-status");
         if (!value) {
-            $panel.classList.remove("show");
-            $clearBtn.classList.remove("show");
             $panel.innerHTML = "";
             $status.textContent = "";
-            if (options.hideOtherSidebarContent) {
-                $sidebarNav && $sidebarNav.classList.remove("hide");
-                $appName && $appName.classList.remove("hide");
-            }
             return;
         }
         const matches = search(value);
         let html = "";
         matches.forEach(((post, i) => {
-            html += `\n      <div class="matching-post" aria-label="search result ${i + 1}">\n        <a href="${post.url}">\n          <h2>${post.title}</h2>\n          <p>${post.content}</p>\n        </a>\n      </div>\n    `;
+            html += `\n      <div class="matching-post" aria-label="search result ${i + 1}">\n        <a href="${post.url}">\n          <p class="title clamp-1">${post.title}</p>\n          <p class="content clamp-2">${post.content}</p>\n        </a>\n      </div>\n    `;
         }));
-        $panel.classList.add("show");
-        $clearBtn.classList.add("show");
-        $panel.innerHTML = html || `<p class="empty">${NO_DATA_TEXT}</p>`;
-        $status.textContent = `Found ${matches.length} results`;
-        if (options.hideOtherSidebarContent) {
-            $sidebarNav && $sidebarNav.classList.add("hide");
-            $appName && $appName.classList.add("hide");
-        }
+        $panel.innerHTML = html || "";
+        $status.textContent = matches.length ? `Found ${matches.length} results` : NO_DATA_TEXT;
     }
     function bindEvents() {
-        const $search = Docsify.dom.find("div.search");
+        const $search = Docsify.dom.find(".search");
         const $input = Docsify.dom.find($search, "input");
-        const $inputWrap = Docsify.dom.find($search, ".input-wrap");
+        const $clear = Docsify.dom.find($search, ".clear-button");
         let timeId;
         Docsify.dom.on($search, "click", (e => [ "A", "H2", "P", "EM" ].indexOf(e.target.tagName) === -1 && e.stopPropagation()));
         Docsify.dom.on($input, "input", (e => {
             clearTimeout(timeId);
             timeId = setTimeout((_ => doSearch(e.target.value.trim())), 100);
         }));
-        Docsify.dom.on($inputWrap, "click", (e => {
-            if (e.target.tagName !== "INPUT") {
-                $input.value = "";
-                doSearch();
-            }
+        Docsify.dom.on($clear, "click", (e => {
+            $input.value = "";
+            doSearch();
         }));
     }
     function updatePlaceholder(text, path) {
@@ -350,19 +331,18 @@
             NO_DATA_TEXT = text[match];
         }
     }
-    function updateOptions(opts) {
-        options = opts;
-    }
     function init(opts, vm) {
+        const sidebarElm = Docsify.dom.find(".sidebar");
+        if (!sidebarElm) {
+            return;
+        }
         const keywords = vm.router.parse().query.s;
-        updateOptions(opts);
-        style();
-        tpl(keywords);
+        Docsify.dom.style(cssText);
+        tpl(vm, keywords);
         bindEvents();
         keywords && setTimeout((_ => doSearch(keywords)), 500);
     }
     function update(opts, vm) {
-        updateOptions(opts);
         updatePlaceholder(opts.placeholder, vm.route.path);
         updateNoData(opts.noData, vm.route.path);
     }
@@ -372,10 +352,11 @@
         paths: "auto",
         depth: 2,
         maxAge: 864e5,
-        hideOtherSidebarContent: false,
         namespace: undefined,
         pathNamespaces: undefined,
-        keyBindings: [ "/", "meta+k", "ctrl+k" ]
+        keyBindings: [ "/", "meta+k", "ctrl+k" ],
+        insertAfter: undefined,
+        insertBefore: undefined
     };
     const install = function(hook, vm) {
         const {util: util} = Docsify;
@@ -388,7 +369,6 @@
             CONFIG.placeholder = opts.placeholder || CONFIG.placeholder;
             CONFIG.noData = opts.noData || CONFIG.noData;
             CONFIG.depth = opts.depth || CONFIG.depth;
-            CONFIG.hideOtherSidebarContent = opts.hideOtherSidebarContent || CONFIG.hideOtherSidebarContent;
             CONFIG.namespace = opts.namespace || CONFIG.namespace;
             CONFIG.pathNamespaces = opts.pathNamespaces || CONFIG.pathNamespaces;
             CONFIG.keyBindings = opts.keyBindings || CONFIG.keyBindings;

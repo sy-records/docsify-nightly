@@ -38,8 +38,6 @@
         }
         return false;
     }
-    const inBrowser = true;
-    const isMobile = document.body.clientWidth <= 600;
     const cacheNode = {};
     function getNode(el) {
         let noCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -413,6 +411,11 @@
             }
             return out;
         };
+    }
+    const computedStyle = getComputedStyle(document.documentElement, null);
+    const mobileBreakpoint = computedStyle.getPropertyValue("--_mobile-breakpoint");
+    function isMobile() {
+        return window?.matchMedia?.(`(max-width: ${mobileBreakpoint})`)?.matches;
     }
     function _getDefaults() {
         return {
@@ -2460,14 +2463,12 @@
         return `\n    <a href="${data}" target="${cornerExternalLinkTarget}" class="github-corner" aria-label="View source on Github">\n      <svg viewBox="0 0 250 250" aria-hidden="true">\n        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>\n        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>\n        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>\n      </svg>\n    </a>\n  `;
     }
     function main(config) {
-        const name = config.name ? config.name : "";
-        const aside = `\n    <button class="sidebar-toggle" title="Press \\ to toggle" aria-label="Toggle primary navigation" aria-keyshortcuts="\\" aria-controls="__sidebar">\n      <div class="sidebar-toggle-button" aria-hidden="true">\n        <span></span><span></span><span></span>\n      </div>\n    </button>\n    <aside id="__sidebar" class="sidebar" role="none">\n      ${config.name ? `\n            <h1 class="app-name"><a class="app-name-link" data-nosearch>${config.logo ? `<img alt="${name}" src=${config.logo} />` : name}</a></h1>\n          ` : ""}\n      <div class="sidebar-nav" role="navigation" aria-label="primary">\x3c!--sidebar--\x3e</div>\n    </aside>\n  `;
-        return `\n    <main role="presentation">${aside}\n      <section class="content">\n        <article id="main" class="markdown-section" role="main" tabindex="-1">\x3c!--main--\x3e</article>\n      </section>\n    </main>\n  `;
+        const {hideSidebar: hideSidebar, name: name} = config;
+        const aside = hideSidebar ? "" : `\n    <button class="sidebar-toggle" tabindex="-1" title="Press \\ to toggle">\n      <div class="sidebar-toggle-button" tabindex="0" aria-label="Toggle primary navigation" aria-keyshortcuts="\\" aria-controls="__sidebar">\n        <span></span><span></span><span></span>\n      </div>\n    </button>\n    <aside id="__sidebar" class="sidebar${!isMobile() ? " show" : ""}" tabindex="-1" role="none">\n      ${config.name ? `\n            <h1 class="app-name"><a class="app-name-link" data-nosearch>${config.logo ? `<img alt="${name}" src=${config.logo} />` : name}</a></h1>\n          ` : ""}\n      <div class="sidebar-nav" role="navigation" aria-label="primary">\x3c!--sidebar--\x3e</div>\n    </aside>\n  `;
+        return `\n    <main role="presentation">\n      ${aside}\n      <section class="content">\n        <article id="main" class="markdown-section" role="main" tabindex="-1">\x3c!--main--\x3e</article>\n      </section>\n    </main>\n  `;
     }
     function cover() {
-        const SL = ", 100%, 85%";
-        const bgc = `\n    linear-gradient(\n      to left bottom,\n      hsl(${Math.floor(Math.random() * 255) + SL}) 0%,\n      hsl(${Math.floor(Math.random() * 255) + SL}) 100%\n    )\n  `;
-        return `\n    <section class="cover show" role="complementary" aria-label="cover" style="background: ${bgc}">\n      <div class="mask"></div>\n      <div class="cover-main">\x3c!--cover--\x3e</div>\n    </section>\n  `;
+        return `\n    <section class="cover show" role="complementary" aria-label="cover">\n      <div class="mask"></div>\n      <div class="cover-main">\x3c!--cover--\x3e</div>\n    </section>\n  `;
     }
     function tree(toc) {
         let tpl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '<ul class="app-sub-sidebar">{inner}</ul>';
@@ -4506,7 +4507,7 @@
         let str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
         return str.replace(/(<\/?a.*?>)/gi, "");
     }
-    function getAndRemoveDocisfyIgnoreConfig() {
+    function getAndRemoveDocsifyIgnoreConfig() {
         let content = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
         let ignoreAllSubs, ignoreSubHeading;
         if (/<!-- {docsify-ignore} -->/g.test(content)) {
@@ -5652,17 +5653,17 @@
             let lang = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "markup";
             const langOrMarkup = prism.languages[lang] || prism.languages.markup;
             const text = prism.highlight(code.replace(/@DOCSIFY_QM@/g, "`"), langOrMarkup, lang);
-            return `<pre data-lang="${lang}"><code class="lang-${lang}" tabindex="0">${text}</code></pre>`;
+            return `<pre data-lang="${lang}" class="language-${lang}"><code class="lang-${lang} language-${lang}" tabindex="0">${text}</code></pre>`;
         };
     };
     const paragraphCompiler = _ref => {
         let {renderer: renderer} = _ref;
         return renderer.paragraph = text => {
             let result;
-            if (/^!&gt;/.test(text)) {
-                result = helper("tip", text);
-            } else if (/^\?&gt;/.test(text)) {
-                result = helper("warn", text);
+            if (text.startsWith("!&gt;")) {
+                result = helper("callout important", text);
+            } else if (text.startsWith("?&gt;")) {
+                result = helper("callout tip", text);
             } else {
                 result = `<p>${text}</p>`;
             }
@@ -5868,7 +5869,7 @@
                     level: level,
                     title: str
                 };
-                const {content: content, ignoreAllSubs: ignoreAllSubs, ignoreSubHeading: ignoreSubHeading} = getAndRemoveDocisfyIgnoreConfig(str);
+                const {content: content, ignoreAllSubs: ignoreAllSubs, ignoreSubHeading: ignoreSubHeading} = getAndRemoveDocsifyIgnoreConfig(str);
                 str = content.trim();
                 nextToc.title = removeAtag(str);
                 nextToc.ignoreAllSubs = ignoreAllSubs;
@@ -6568,7 +6569,7 @@
                     if (el) {
                         el.innerHTML = skipLinkText;
                     } else {
-                        const html = `<button id="skip-to-content">${skipLinkText}</button>`;
+                        const html = `<button type="button" id="skip-to-content" class="primary">${skipLinkText}</button>`;
                         body.insertAdjacentHTML("afterbegin", html);
                     }
                 }
@@ -6582,15 +6583,15 @@
             _renderSidebar(text) {
                 const {maxLevel: maxLevel, subMaxLevel: subMaxLevel, loadSidebar: loadSidebar, hideSidebar: hideSidebar} = this.config;
                 const sidebarEl = getNode("aside.sidebar");
+                const sidebarNavEl = getNode(".sidebar-nav");
                 const sidebarToggleEl = getNode("button.sidebar-toggle");
                 if (hideSidebar) {
-                    body.classList.add("hidesidebar");
                     sidebarEl?.remove(sidebarEl);
                     sidebarToggleEl?.remove(sidebarToggleEl);
                     return null;
                 }
                 this._renderTo(".sidebar-nav", this.compiler.sidebar(text, maxLevel));
-                sidebarToggleEl.setAttribute("aria-expanded", !isMobile);
+                sidebarToggleEl.setAttribute("aria-expanded", !isMobile());
                 const activeElmHref = this.router.toURL(this.route.path);
                 const activeEl = find(`.sidebar-nav a[href="${activeElmHref}"]`);
                 this.#addTextAsTitleAttribute(".sidebar-nav a");
@@ -6600,6 +6601,15 @@
                     this.compiler.subSidebar();
                 }
                 this._bindEventOnRendered(activeEl);
+                const pageLinks = findAll(sidebarNavEl, 'a:is(li > a, li > p > a):not(.section-link, [target="_blank"])');
+                const pageLinkGroups = findAll(sidebarEl, "li").filter((elm => elm.querySelector(":scope > ul") && !elm.querySelectorAll(":scope > a, :scope > p > a").length));
+                pageLinks.forEach((elm => {
+                    elm.classList.add("page-link");
+                }));
+                pageLinkGroups.forEach((elm => {
+                    elm.classList.add("group");
+                    elm.querySelector(":scope > p:not(:has(> *))")?.classList.add("group-title");
+                }));
             }
             _bindEventOnRendered(activeEl) {
                 const {autoHeader: autoHeader} = this.config;
@@ -6615,8 +6625,14 @@
                 }
             }
             _renderNav(text) {
-                text && this._renderTo("nav", this.compiler.compile(text));
-                this.#addTextAsTitleAttribute("nav a");
+                if (!text) {
+                    return;
+                }
+                const html = this.compiler.compile(text);
+                [ ".app-nav", ".app-nav-merged" ].forEach((selector => {
+                    this._renderTo(selector, html);
+                    this.#addTextAsTitleAttribute(`${selector} a`);
+                }));
             }
             _renderMain(text) {
                 let opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -6652,6 +6668,8 @@
             }
             _renderCover(text, coverOnly) {
                 const el = getNode(".cover");
+                const rootElm = document.documentElement;
+                const coverBg = getComputedStyle(rootElm).getPropertyValue("--cover-bg");
                 toggleClass(getNode("main"), coverOnly ? "add" : "remove", "hidden");
                 if (!text) {
                     toggleClass(el, "remove", "show");
@@ -6659,23 +6677,45 @@
                 }
                 toggleClass(el, "add", "show");
                 let html = this.coverIsHTML ? text : this.compiler.cover(text);
-                const m = html.trim().match('<p><img.*?data-origin="(.*?)"[^a]+alt="(.*?)">([^<]*?)</p>$');
-                if (m) {
-                    if (m[2] === "color") {
-                        el.style.background = m[1] + (m[3] || "");
-                    } else {
-                        let path = m[1];
-                        toggleClass(el, "add", "has-mask");
-                        if (!isAbsolutePath(m[1])) {
-                            path = getPath(this.router.getBasePath(), m[1]);
+                if (!coverBg) {
+                    const mdBgMatch = html.trim().match('<p><img.*?data-origin="(.*?)".*?alt="(.*?)"[^>]*?>([^<]*?)</p>$');
+                    let mdCoverBg;
+                    if (mdBgMatch) {
+                        const [bgMatch, bgValue, bgType] = mdBgMatch;
+                        if (bgType === "color") {
+                            mdCoverBg = bgValue;
+                        } else {
+                            const path = !isAbsolutePath(bgValue) ? getPath(this.router.getBasePath(), bgValue) : bgValue;
+                            mdCoverBg = `center center / cover url(${path})`;
                         }
-                        el.style.backgroundImage = `url(${path})`;
-                        el.style.backgroundSize = "cover";
-                        el.style.backgroundPosition = "center center";
+                        html = html.replace(bgMatch, "");
+                    } else {
+                        const degrees = Math.round(Math.random() * 120 / 2);
+                        let hue1 = Math.round(Math.random() * 360);
+                        let hue2 = Math.round(Math.random() * 360);
+                        if (Math.abs(hue1 - hue2) < 50) {
+                            const hueShift = Math.round(Math.random() * 25) + 25;
+                            hue1 = Math.max(hue1, hue2) + hueShift;
+                            hue2 = Math.min(hue1, hue2) - hueShift;
+                        }
+                        if (window?.CSS?.supports("color", "oklch(0 0 0 / 1%)")) {
+                            const l = 90;
+                            const c = 20;
+                            mdCoverBg = `linear-gradient(\n              ${degrees}deg,\n              oklch(${l}% ${c}% ${hue1}) 0%,\n              oklch(${l}% ${c}% ${hue2}) 100%\n            )`.replace(/\s+/g, " ");
+                        } else {
+                            const s = 100;
+                            const l = 85;
+                            const o = 100;
+                            mdCoverBg = `linear-gradient(\n              ${degrees}deg,\n              hsl(${hue1} ${s}% ${l}% / ${o}%) 0%,\n              hsl(${hue2} ${s}% ${l}% / ${o}%) 100%\n            )`.replace(/\s+/g, " ");
+                        }
                     }
-                    html = html.replace(m[0], "");
+                    rootElm.style.setProperty("--cover-bg", mdCoverBg);
                 }
                 this._renderTo(".cover-main", html);
+                findAll(".cover-main > p:last-of-type > a:not([class])").forEach((elm => {
+                    const buttonType = elm.matches(":first-child") ? "primary" : "secondary";
+                    elm.classList.add("button", buttonType);
+                }));
             }
             _updateRender() {
                 this.#renderNameLink(this);
@@ -6684,9 +6724,7 @@
             initRender() {
                 const config = this.config;
                 this.compiler = new Compiler(config, this.router);
-                {
-                    window.__current_docsify_compiler__ = this.compiler;
-                }
+                window.__current_docsify_compiler__ = this.compiler;
                 const id = config.el || "#app";
                 const el = find(id);
                 if (el) {
@@ -6712,14 +6750,16 @@
                 }
                 if (config.loadNavbar) {
                     const navEl = find("nav") || create("nav");
-                    const isMergedSidebar = config.mergeNavbar && isMobile;
+                    const isMergedSidebar = config.mergeNavbar;
+                    navEl.classList.add("app-nav");
                     navEl.setAttribute("aria-label", "secondary");
+                    body.prepend(navEl);
                     if (isMergedSidebar) {
-                        find(".sidebar").prepend(navEl);
-                    } else {
-                        body.prepend(navEl);
-                        navEl.classList.add("app-nav");
-                        navEl.classList.toggle("no-badge", !config.repo);
+                        const mergedNavEl = create("div");
+                        const sidebarEl = find(".sidebar");
+                        const sidebarNavEl = find(".sidebar-nav");
+                        mergedNavEl?.classList.add("app-nav-merged");
+                        sidebarEl?.insertBefore(mergedNavEl, sidebarNavEl);
                     }
                 }
                 if (config.themeColor) {
@@ -6901,12 +6941,13 @@
             initEvent() {
                 const {topMargin: topMargin} = this.config;
                 if (topMargin) {
-                    document.documentElement.style.setProperty("scroll-padding-top", `${topMargin}px`);
+                    const value = typeof topMargin === "number" ? `${topMargin}px` : topMargin;
+                    document.documentElement.style.setProperty("--scroll-padding-top", value);
                 }
                 this.#initCover();
-                this.#initSkipToContent("#skip-to-content");
-                this.#initSidebarCollapse(".sidebar");
-                this.#initSidebarToggle("button.sidebar-toggle");
+                this.#initSkipToContent();
+                this.#initSidebar();
+                this.#initSidebarToggle();
                 this.#initKeyBindings();
             }
             #initCover() {
@@ -6997,45 +7038,53 @@
                     }));
                 }
             }
-            #initSidebarCollapse(elm) {
-                elm = typeof elm === "string" ? document.querySelector(elm) : elm;
-                if (!elm) {
+            #initSidebar() {
+                const sidebarElm = document.querySelector(".sidebar");
+                if (!sidebarElm) {
                     return;
                 }
-                on(elm, "click", (_ref3 => {
+                window?.matchMedia?.(`(max-width: ${mobileBreakpoint})`).addEventListener("change", (evt => {
+                    this.#toggleSidebar(!evt.matches);
+                }));
+                on(sidebarElm, "click", (_ref3 => {
                     let {target: target} = _ref3;
-                    if (target.nodeName === "A" && target.nextSibling && target.nextSibling.classList && target.nextSibling.classList.contains("app-sub-sidebar")) {
-                        toggleClass(target.parentNode, "collapse");
+                    const linkElm = target.closest("a");
+                    const linkParent = linkElm?.closest("li");
+                    const subSidebar = linkParent?.querySelector(".app-sub-sidebar");
+                    if (subSidebar) {
+                        toggleClass(linkParent, "collapse");
                     }
                 }));
             }
-            #initSidebarToggle(elm) {
-                elm = typeof elm === "string" ? document.querySelector(elm) : elm;
-                if (!elm) {
+            #initSidebarToggle() {
+                const contentElm = find("main > .content");
+                const toggleElm = find("button.sidebar-toggle");
+                if (!toggleElm) {
                     return;
                 }
-                const toggle = () => {
-                    body.classList.toggle("close");
-                    const isClosed = isMobile ? body.classList.contains("close") : !body.classList.contains("close");
-                    elm.setAttribute("aria-expanded", isClosed);
-                };
-                on(elm, "click", (e => {
-                    e.stopPropagation();
-                    toggle();
+                let lastContentFocusElm;
+                on(contentElm, "focusin", (e => {
+                    const focusAttr = "data-restore-focus";
+                    lastContentFocusElm?.removeAttribute(focusAttr);
+                    lastContentFocusElm = e.target;
+                    lastContentFocusElm.setAttribute(focusAttr, "");
                 }));
-                isMobile && on(body, "click", (() => body.classList.contains("close") && toggle()));
+                on(toggleElm, "click", (e => {
+                    e.stopPropagation();
+                    this.#toggleSidebar();
+                }));
             }
-            #initSkipToContent(elm) {
-                elm = typeof elm === "string" ? document.querySelector(elm) : elm;
-                if (!elm) {
+            #initSkipToContent() {
+                const skipElm = document.querySelector("#skip-to-content");
+                if (!skipElm) {
                     return;
                 }
-                elm.addEventListener("click", (evt => {
+                skipElm.addEventListener("click", (evt => {
+                    const focusElm = this.#focusContent();
                     evt.preventDefault();
-                    find("main")?.scrollIntoView({
+                    focusElm?.scrollIntoView({
                         behavior: "smooth"
                     });
-                    this.#focusContent();
                 }));
             }
             onRender() {
@@ -7048,7 +7097,7 @@
             }
             onNavigate(source) {
                 const {auto2top: auto2top, topMargin: topMargin} = this.config;
-                const {query: query} = this.route;
+                const {path: path, query: query} = this.route;
                 this.#markSidebarActiveElm();
                 if (source !== "history") {
                     if (query.id) {
@@ -7066,6 +7115,9 @@
                         }
                     }
                 }
+                if (path === "/" || query.id && source === "navigate") {
+                    isMobile() && this.#toggleSidebar(false);
+                }
                 if (query.id || source === "navigate") {
                     this.#focusContent();
                 }
@@ -7079,20 +7131,22 @@
                 const {query: query} = this.route;
                 const focusEl = query.id ? find(`#${query.id}`) : find("#main :where(h1, h2, h3, h4, h5, h6)") || find("#main");
                 focusEl?.focus(settings);
+                return focusEl;
             }
             #markAppNavActiveElm() {
                 const href = decodeURIComponent(this.router.toURL(this.route.path));
-                const navElm = find("nav.app-nav");
-                if (!navElm) {
-                    return;
-                }
-                const newActive = findAll(navElm, "a").sort(((a, b) => b.href.length - a.href.length)).find((a => href.includes(a.getAttribute("href")) || href.includes(decodeURI(a.getAttribute("href")))));
-                const oldActive = find(navElm, "li.active");
-                if (newActive && newActive !== oldActive) {
-                    oldActive?.classList.remove("active");
-                    newActive.classList.add("active");
-                }
-                return newActive;
+                [ ".app-nav", ".app-nav-merged" ].forEach((selector => {
+                    const navElm = find(selector);
+                    if (!navElm) {
+                        return;
+                    }
+                    const newActive = findAll(navElm, "a").sort(((a, b) => b.href.length - a.href.length)).find((a => href.includes(a.getAttribute("href")) || href.includes(decodeURI(a.getAttribute("href")))))?.closest("li");
+                    const oldActive = find(navElm, "li.active");
+                    if (newActive && newActive !== oldActive) {
+                        oldActive?.classList.remove("active");
+                        newActive.classList.add("active");
+                    }
+                }));
             }
             #markSidebarActiveElm(href) {
                 href ??= this.router.toURL(this.router.getCurrentPath());
@@ -7122,6 +7176,33 @@
                     newPage.setAttribute("aria-current", "page");
                 }
                 return newPage;
+            }
+            #toggleSidebar(force) {
+                const sidebarElm = find(".sidebar");
+                if (!sidebarElm) {
+                    return;
+                }
+                const ariaElms = findAll('[aria-controls="__sidebar"]');
+                const inertElms = findAll("body > *:not(main, script), main > .content");
+                const isShow = sidebarElm.classList.toggle("show", force);
+                ariaElms.forEach((toggleElm => {
+                    toggleElm.setAttribute("aria-expanded", force ?? sidebarElm.classList.contains("show"));
+                }));
+                if (isShow && isMobile()) {
+                    inertElms.forEach((elm => elm.setAttribute("inert", "")));
+                } else {
+                    inertElms.forEach((elm => elm.removeAttribute("inert")));
+                }
+                if (isShow) {
+                    sidebarElm.focus();
+                } else {
+                    const restoreElm = document.querySelector("main > .content [data-restore-focus]");
+                    if (restoreElm) {
+                        restoreElm.focus({
+                            preventScroll: true
+                        });
+                    }
+                }
             }
             #watchNextScroll() {
                 document.addEventListener("scroll", (() => {
@@ -7257,7 +7338,7 @@
             set themeColor(value) {
                 if (value) {
                     this.__themeColor = value;
-                    console.warn(stripIndent(`\n              $docsify.themeColor is deprecated. Use a --theme-color property in your style sheet. Example:\n              <style>\n                :root {\n                  --theme-color: deeppink;\n                }\n              </style>\n            `).trim());
+                    console.warn(stripIndent(`\n              $docsify.themeColor is deprecated. Use the "--theme-color" theme property to set your theme color.\n              <style>\n                :root {\n                  --theme-color: deeppink;\n                }\n              </style>\n            `).trim());
                 }
             }
         }, typeof window.$docsify === "function" ? window.$docsify(vm) : window.$docsify);
@@ -7266,10 +7347,9 @@
                 toggleSidebar: {
                     bindings: [ "\\" ],
                     callback(e) {
-                        const toggleElm = document.querySelector(".sidebar-toggle");
+                        const toggleElm = document.querySelector(".sidebar-toggle-button");
                         if (toggleElm) {
                             toggleElm.click();
-                            toggleElm.focus();
                         }
                     }
                 }
@@ -7394,12 +7474,12 @@
         getParentPath: getParentPath,
         getPath: getPath,
         hyphenate: hyphenate,
-        inBrowser: inBrowser,
         isAbsolutePath: isAbsolutePath,
         isExternal: isExternal,
         isFn: isFn,
         isMobile: isMobile,
         isPrimitive: isPrimitive,
+        mobileBreakpoint: mobileBreakpoint,
         noop: noop,
         parseQuery: parseQuery,
         removeParams: removeParams,
