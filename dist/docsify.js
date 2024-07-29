@@ -2754,10 +2754,12 @@
         let innerHTML = "";
         toc.forEach((node => {
             const title = node.title.replace(/(<([^>]+)>)/g, "");
-            innerHTML += `<li><a class="section-link" href="${node.slug}" title="${title}">${node.title}</a></li>`;
+            let current = `<li><a class="section-link" href="${node.slug}" title="${title}">${node.title}</a></li>`;
             if (node.children) {
-                innerHTML += tree(node.children, tpl);
+                const children = tree(node.children, "<ul>{inner}</ul>");
+                current = `<li><a class="section-link" href="${node.slug}" title="${title}">${node.title}</a>${children}</li>`;
             }
+            innerHTML += current;
         }));
         return tpl.replace("{inner}", innerHTML);
     }
@@ -2771,7 +2773,7 @@
         const headlines = [];
         const last = {};
         toc.forEach((headline => {
-            const level = headline.level || 1;
+            const level = headline.depth || 1;
             const len = level - 1;
             if (level > maxLevel) {
                 return;
@@ -6087,15 +6089,14 @@
             this.linkTarget = config.externalLinkTarget || "_blank";
             this.linkRel = this.linkTarget === "_blank" ? config.externalLinkRel || "noopener" : "";
             this.contentBase = router.getBasePath();
-            const renderer = this._initRenderer();
-            this.heading = renderer.heading;
+            this.renderer = this._initRenderer();
             let compile;
             const mdConf = config.markdown || {};
             if (isFn(mdConf)) {
-                compile = mdConf(marked, renderer);
+                compile = mdConf(marked, this.renderer);
             } else {
                 marked.setOptions(Object.assign(mdConf, {
-                    renderer: Object.assign(renderer, mdConf.renderer)
+                    renderer: Object.assign(this.renderer, mdConf.renderer)
                 }));
                 compile = marked;
             }
@@ -6225,33 +6226,31 @@
             const currentPath = this.router.getCurrentPath();
             let html = "";
             if (text) {
-                html = this.compile(text);
-            } else {
-                for (let i = 0; i < toc.length; i++) {
-                    if (toc[i].ignoreSubHeading) {
-                        const deletedHeaderLevel = toc[i].level;
-                        toc.splice(i, 1);
-                        for (let j = i; j < toc.length && deletedHeaderLevel < toc[j].level; j++) {
-                            toc.splice(j, 1) && j-- && i++;
-                        }
-                        i--;
-                    }
-                }
-                const tree$1 = this.cacheTree[currentPath] || genTree(toc, level);
-                html = tree(tree$1, "<ul>{inner}</ul>");
-                this.cacheTree[currentPath] = tree$1;
+                return this.compile(text);
             }
+            for (let i = 0; i < toc.length; i++) {
+                if (toc[i].ignoreSubHeading) {
+                    const deletedHeaderLevel = toc[i].depth;
+                    toc.splice(i, 1);
+                    for (let j = i; j < toc.length && deletedHeaderLevel < toc[j].depth; j++) {
+                        toc.splice(j, 1) && j-- && i++;
+                    }
+                    i--;
+                }
+            }
+            const tree$1 = this.cacheTree[currentPath] || genTree(toc, level);
+            html = tree(tree$1);
+            this.cacheTree[currentPath] = tree$1;
             return html;
         }
+        resetToc() {
+            this.toc = [];
+        }
         subSidebar(level) {
-            if (!level) {
-                this.toc = [];
-                return;
-            }
             const currentPath = this.router.getCurrentPath();
             const {cacheTree: cacheTree, toc: toc} = this;
             toc[0] && toc[0].ignoreAllSubs && toc.splice(0);
-            toc[0] && toc[0].level === 1 && toc.shift();
+            toc[0] && toc[0].depth === 1 && toc.shift();
             for (let i = 0; i < toc.length; i++) {
                 toc[i].ignoreSubHeading && toc.splice(i, 1) && i--;
             }
@@ -6261,10 +6260,18 @@
             return tree(tree$1);
         }
         header(text, level) {
-            return this.heading(text, level);
-        }
-        article(text) {
-            return this.compile(text);
+            const tokenHeading = {
+                type: "heading",
+                raw: text,
+                depth: level,
+                text: text,
+                tokens: [ {
+                    type: "text",
+                    raw: text,
+                    text: text
+                } ]
+            };
+            return this.renderer.heading(tokenHeading);
         }
         cover(text) {
             const cacheToc = this.toc.slice();
@@ -6790,7 +6797,6 @@
                     }
                 }
                 this._renderTo(markdownElm, html);
-                !docsifyConfig.loadSidebar && this._renderSidebar();
                 if (docsifyConfig.executeScript || "Vue" in window && docsifyConfig.executeScript !== false) {
                     this.#executeScript();
                 }
@@ -6909,7 +6915,7 @@
                 if (loadSidebar && activeEl) {
                     activeEl.parentNode.innerHTML += this.compiler.subSidebar(subMaxLevel) || "";
                 } else {
-                    this.compiler.subSidebar();
+                    this.compiler.resetToc();
                 }
                 this._bindEventOnRendered(activeEl);
                 const pageLinks = findAll(sidebarNavEl, 'a:is(li > a, li > p > a):not(.section-link, [target="_blank"])');
@@ -7121,14 +7127,15 @@
             };
             _loadSideAndNav(path, qs, loadSidebar, cb) {
                 return () => {
-                    if (!loadSidebar) {
-                        return cb();
-                    }
-                    const fn = result => {
+                    const renderSidebar = result => {
                         this._renderSidebar(result);
                         cb();
                     };
-                    this.#loadNested(path, qs, loadSidebar, fn, this, true);
+                    if (!loadSidebar) {
+                        renderSidebar();
+                        return;
+                    }
+                    this.#loadNested(path, qs, loadSidebar, renderSidebar, this, true);
                 };
             }
             _fetch() {
