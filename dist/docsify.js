@@ -7406,8 +7406,10 @@
                 }));
             }
             onRender() {
+                const {name: name} = this.config;
                 const currentPath = this.router.toURL(this.router.getCurrentPath());
-                const currentTitle = find(`.sidebar a[href='${currentPath}']`)?.innerText;
+                const currentSection = find(`.sidebar a[href='${currentPath}']`)?.getAttribute("title");
+                const currentTitle = name ? currentSection ? `${currentSection} - ${name}` : name : currentSection;
                 $.title = currentTitle || this.#title;
                 this.#markAppNavActiveElm();
                 this.#markSidebarCurrentPage();

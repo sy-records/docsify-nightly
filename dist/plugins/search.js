@@ -6162,7 +6162,8 @@
         const matches = search(value);
         let html = "";
         matches.forEach(((post, i) => {
-            html += `\n      <div class="matching-post" aria-label="search result ${i + 1}">\n        <a href="${post.url}">\n          <p class="title clamp-1">${post.title}</p>\n          <p class="content clamp-2">${post.content}</p>\n        </a>\n      </div>\n    `;
+            const title = (post.title || "").replace(/<[^>]+>/g, "");
+            html += `\n      <div class="matching-post" aria-label="search result ${i + 1}">\n        <a href="${post.url}" title="${title}">\n          <p class="title clamp-1">${post.title}</p>\n          <p class="content clamp-2">${post.content}</p>\n        </a>\n      </div>\n    `;
         }));
         $panel.innerHTML = html || "";
         $status.textContent = matches.length ? `Found ${matches.length} results` : NO_DATA_TEXT;
