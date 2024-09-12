@@ -49,6 +49,12 @@
         }
         return el;
     }
+    function setHTML(el, content, replace) {
+        const node = getNode(el);
+        if (node) {
+            node[replace ? "outerHTML" : "innerHTML"] = content;
+        }
+    }
     const $ = document;
     const body = $.body;
     const head = $.head;
@@ -105,6 +111,7 @@
         head: head,
         off: off,
         on: on,
+        setHTML: setHTML,
         style: style,
         toggleClass: toggleClass
     });
@@ -4643,6 +4650,30 @@
             return `<img src="${url}" data-origin="${href}" alt="${text}" ${attrs.join(" ")} />`;
         };
     };
+    const headingCompiler = _ref => {
+        let {renderer: renderer, router: router, compiler: compiler} = _ref;
+        return renderer.heading = function(_ref2) {
+            let {tokens: tokens, depth: depth} = _ref2;
+            const text = this.parser.parseInline(tokens);
+            let {str: str, config: config} = getAndRemoveConfig(text);
+            const nextToc = {
+                depth: depth,
+                title: str
+            };
+            const {content: content, ignoreAllSubs: ignoreAllSubs, ignoreSubHeading: ignoreSubHeading} = getAndRemoveDocsifyIgnoreConfig(str);
+            str = content.trim();
+            nextToc.title = removeAtag(str);
+            nextToc.ignoreAllSubs = ignoreAllSubs;
+            nextToc.ignoreSubHeading = ignoreSubHeading;
+            const slug = slugify(config.id || str);
+            const url = router.toURL(router.getCurrentPath(), {
+                id: slug
+            });
+            nextToc.slug = url;
+            compiler.toc.push(nextToc);
+            return `<h${depth} id="${slug}" tabindex="-1"><a href="${url}" data-id="${slug}" class="anchor"><span>${str}</span></a></h${depth}>`;
+        };
+    };
     var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
     function getDefaultExportFromCjs(x) {
         return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -5799,17 +5830,17 @@
         };
     };
     const linkCompiler = _ref => {
-        let {renderer: renderer, router: router, linkTarget: linkTarget, linkRel: linkRel, compilerClass: compilerClass} = _ref;
+        let {renderer: renderer, router: router, linkTarget: linkTarget, linkRel: linkRel, compiler: compiler} = _ref;
         return renderer.link = function(_ref2) {
             let {href: href, title: title = "", tokens: tokens} = _ref2;
             const attrs = [];
             const text = this.parser.parseInline(tokens) || "";
             const {str: str, config: config} = getAndRemoveConfig(title);
             linkTarget = config.target || linkTarget;
-            linkRel = linkTarget === "_blank" ? compilerClass.config.externalLinkRel || "noopener" : "";
+            linkRel = linkTarget === "_blank" ? compiler.config.externalLinkRel || "noopener" : "";
             title = str;
-            if (!isAbsolutePath(href) && !compilerClass._matchNotCompileLink(href) && !config.ignore) {
-                if (href === compilerClass.config.homepage) {
+            if (!isAbsolutePath(href) && !compiler._matchNotCompileLink(href) && !config.ignore) {
+                if (href === compiler.config.homepage) {
                     href = "README";
                 }
                 href = router.toURL(href, null, router.getCurrentPath());
@@ -5839,7 +5870,6 @@
             return `<a href="${href}" ${attrs.join(" ")}>${text}</a>`;
         };
     };
-    const cachedLinks = {};
     const compileMedia = {
         markdown(url) {
             return {
@@ -5878,6 +5908,7 @@
             };
         }
     };
+    const cachedLinks = {};
     class Compiler {
         constructor(config, router) {
             this.config = config;
@@ -5951,7 +5982,7 @@
                     } else if (/\.mp3/.test(href)) {
                         type = "audio";
                     }
-                    embed = compileMedia[type].call(this, href, title);
+                    embed = compileMedia[type](href, title);
                     embed.type = type;
                 }
                 embed.fragment = config.fragment;
@@ -5970,29 +6001,12 @@
         _initRenderer() {
             const renderer = new marked.Renderer;
             const {linkTarget: linkTarget, linkRel: linkRel, router: router, contentBase: contentBase} = this;
-            const _self = this;
             const origin = {};
-            origin.heading = renderer.heading = function(_ref) {
-                let {tokens: tokens, depth: depth} = _ref;
-                const text = this.parser.parseInline(tokens);
-                let {str: str, config: config} = getAndRemoveConfig(text);
-                const nextToc = {
-                    depth: depth,
-                    title: str
-                };
-                const {content: content, ignoreAllSubs: ignoreAllSubs, ignoreSubHeading: ignoreSubHeading} = getAndRemoveDocsifyIgnoreConfig(str);
-                str = content.trim();
-                nextToc.title = removeAtag(str);
-                nextToc.ignoreAllSubs = ignoreAllSubs;
-                nextToc.ignoreSubHeading = ignoreSubHeading;
-                const slug = slugify(config.id || str);
-                const url = router.toURL(router.getCurrentPath(), {
-                    id: slug
-                });
-                nextToc.slug = url;
-                _self.toc.push(nextToc);
-                return `<h${depth} id="${slug}" tabindex="-1"><a href="${url}" data-id="${slug}" class="anchor"><span>${str}</span></a></h${depth}>`;
-            };
+            origin.heading = headingCompiler({
+                renderer: renderer,
+                router: router,
+                compiler: this
+            });
             origin.code = highlightCodeCompiler({
                 renderer: renderer
             });
@@ -6001,7 +6015,7 @@
                 router: router,
                 linkTarget: linkTarget,
                 linkRel: linkRel,
-                compilerClass: _self
+                compiler: this
             });
             origin.paragraph = paragraphCompiler({
                 renderer: renderer
@@ -6595,7 +6609,7 @@
                         }
                     }
                 }
-                this._renderTo(markdownElm, html);
+                setHTML(markdownElm, html);
                 if (docsifyConfig.executeScript || "Vue" in window && docsifyConfig.executeScript !== false) {
                     this.#executeScript();
                 }
@@ -6690,12 +6704,6 @@
                     }
                 }
             }
-            _renderTo(el, content, replace) {
-                const node = getNode(el);
-                if (node) {
-                    node[replace ? "outerHTML" : "innerHTML"] = content;
-                }
-            }
             _renderSidebar(text) {
                 const {maxLevel: maxLevel, subMaxLevel: subMaxLevel, loadSidebar: loadSidebar, hideSidebar: hideSidebar} = this.config;
                 const sidebarEl = getNode("aside.sidebar");
@@ -6706,7 +6714,7 @@
                     sidebarToggleEl?.remove(sidebarToggleEl);
                     return null;
                 }
-                this._renderTo(".sidebar-nav", this.compiler.sidebar(text, maxLevel));
+                setHTML(".sidebar-nav", this.compiler.sidebar(text, maxLevel));
                 sidebarToggleEl.setAttribute("aria-expanded", !isMobile());
                 const activeElmHref = this.router.toURL(this.route.path);
                 const activeEl = find(`.sidebar-nav a[href="${activeElmHref}"]`);
@@ -6746,7 +6754,7 @@
                 }
                 const html = this.compiler.compile(text);
                 [ ".app-nav", ".app-nav-merged" ].forEach((selector => {
-                    this._renderTo(selector, html);
+                    setHTML(selector, html);
                     this.#addTextAsTitleAttribute(`${selector} a`);
                 }));
             }
@@ -6827,7 +6835,7 @@
                     }
                     rootElm.style.setProperty("--cover-bg", mdCoverBg);
                 }
-                this._renderTo(".cover-main", html);
+                setHTML(".cover-main", html);
                 findAll(".cover-main > p:last-of-type > a:not([class])").forEach((elm => {
                     const buttonType = elm.matches(":first-child") ? "primary" : "secondary";
                     elm.classList.add("button", buttonType);
@@ -6860,7 +6868,7 @@
                         }
                     }
                     html += main(config);
-                    this._renderTo(el, html, true);
+                    setHTML(el, html, true);
                 } else {
                     this.rendered = true;
                 }
