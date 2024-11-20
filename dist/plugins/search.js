@@ -3022,6 +3022,7 @@
                         }));
                     }));
                 }));
+                if (NativePromise.withResolvers) DexiePromise.withResolvers = NativePromise.withResolvers;
             }
             function executePromiseTask(promise, fn) {
                 try {
@@ -3373,7 +3374,7 @@
                     }));
                 }
             }
-            var DEXIE_VERSION = "4.0.8";
+            var DEXIE_VERSION = "4.0.9";
             var maxString = String.fromCharCode(65535);
             var minKey = -Infinity;
             var INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
@@ -3540,9 +3541,8 @@
                     }
                     if (!compoundIndex && debug) console.warn("The query ".concat(JSON.stringify(indexOrCrit), " on ").concat(this.name, " would benefit from a ") + "compound index [".concat(keyPaths.join("+"), "]"));
                     var idxByName = this.schema.idxByName;
-                    var idb = this.db._deps.indexedDB;
                     function equals(a, b) {
-                        return idb.cmp(a, b) === 0;
+                        return cmp(a, b) === 0;
                     }
                     var _a = keyPaths.reduce((function(_a, keyPath) {
                         var prevIndex = _a[0], prevFilterFn = _a[1];
@@ -4143,7 +4143,7 @@
                     var order = this._ctx.dir === "next" ? 1 : -1;
                     function sorter(a, b) {
                         var aVal = getval(a, lastIndex), bVal = getval(b, lastIndex);
-                        return aVal < bVal ? -order : aVal > bVal ? order : 0;
+                        return cmp(aVal, bVal) * order;
                     }
                     return this.toArray((function(a) {
                         return a.sort(sorter);
@@ -6907,6 +6907,7 @@
                             }));
                             var tableClone = __assign(__assign({}, table), {
                                 mutate: function(req) {
+                                    var _a, _b;
                                     var trans = req.trans;
                                     var mutatedParts = req.mutatedParts || (req.mutatedParts = {});
                                     var getRangeSet = function(indexName) {
@@ -6916,9 +6917,9 @@
                                     var pkRangeSet = getRangeSet("");
                                     var delsRangeSet = getRangeSet(":dels");
                                     var type = req.type;
-                                    var _a = req.type === "deleteRange" ? [ req.range ] : req.type === "delete" ? [ req.keys ] : req.values.length < 50 ? [ getEffectiveKeys(primaryKey, req).filter((function(id) {
+                                    var _c = req.type === "deleteRange" ? [ req.range ] : req.type === "delete" ? [ req.keys ] : req.values.length < 50 ? [ getEffectiveKeys(primaryKey, req).filter((function(id) {
                                         return id;
-                                    })), req.values ] : [], keys = _a[0], newObjs = _a[1];
+                                    })), req.values ] : [], keys = _c[0], newObjs = _c[1];
                                     var oldCache = req.trans["_cache"];
                                     if (isArray(keys)) {
                                         pkRangeSet.addKeys(keys);
@@ -6931,8 +6932,8 @@
                                         }
                                     } else if (keys) {
                                         var range = {
-                                            from: keys.lower,
-                                            to: keys.upper
+                                            from: (_a = keys.lower) !== null && _a !== void 0 ? _a : core.MIN_KEY,
+                                            to: (_b = keys.upper) !== null && _b !== void 0 ? _b : core.MAX_KEY
                                         };
                                         delsRangeSet.add(range);
                                         pkRangeSet.add(range);
@@ -7143,21 +7144,37 @@
                     }
                     switch (op.type) {
                       case "add":
-                        modifedResult = result.concat(req.values ? includedValues : includedValues.map((function(v) {
-                            return extractPrimKey(v);
-                        })));
-                        break;
+                        {
+                            var existingKeys_1 = (new RangeSet).addKeys(req.values ? result.map((function(v) {
+                                return extractPrimKey(v);
+                            })) : result);
+                            modifedResult = result.concat(req.values ? includedValues.filter((function(v) {
+                                var key = extractPrimKey(v);
+                                if (existingKeys_1.hasKey(key)) return false;
+                                existingKeys_1.addKey(key);
+                                return true;
+                            })) : includedValues.map((function(v) {
+                                return extractPrimKey(v);
+                            })).filter((function(k) {
+                                if (existingKeys_1.hasKey(k)) return false;
+                                existingKeys_1.addKey(k);
+                                return true;
+                            })));
+                            break;
+                        }
 
                       case "put":
-                        var keySet_1 = (new RangeSet).addKeys(op.values.map((function(v) {
-                            return extractPrimKey(v);
-                        })));
-                        modifedResult = result.filter((function(item) {
-                            return !keySet_1.hasKey(req.values ? extractPrimKey(item) : item);
-                        })).concat(req.values ? includedValues : includedValues.map((function(v) {
-                            return extractPrimKey(v);
-                        })));
-                        break;
+                        {
+                            var keySet_1 = (new RangeSet).addKeys(op.values.map((function(v) {
+                                return extractPrimKey(v);
+                            })));
+                            modifedResult = result.filter((function(item) {
+                                return !keySet_1.hasKey(req.values ? extractPrimKey(item) : item);
+                            })).concat(req.values ? includedValues : includedValues.map((function(v) {
+                                return extractPrimKey(v);
+                            })));
+                            break;
+                        }
 
                       case "delete":
                         var keysToDelete_1 = (new RangeSet).addKeys(op.keys);
@@ -7358,7 +7375,7 @@
                             var tableMW = __assign(__assign({}, downTable), {
                                 mutate: function(req) {
                                     var trans = PSD.trans;
-                                    if (primKey.outbound || trans.db._options.cache === "disabled" || trans.explicit) {
+                                    if (primKey.outbound || trans.db._options.cache === "disabled" || trans.explicit || trans.idbtrans.mode !== "readwrite") {
                                         return downTable.mutate(req);
                                     }
                                     var tblCache = cache["idb://".concat(dbName, "/").concat(tableName)];
@@ -7371,6 +7388,7 @@
                                             var reqWithResolvedKeys = __assign(__assign({}, req), {
                                                 values: req.values.map((function(value, i) {
                                                     var _a;
+                                                    if (res.failures[i]) return value;
                                                     var valueWithKey = ((_a = primKey.keyPath) === null || _a === void 0 ? void 0 : _a.includes(".")) ? deepClone(value) : __assign({}, value);
                                                     setByKeyPath(valueWithKey, primKey.keyPath, res.results[i]);
                                                     return valueWithKey;
