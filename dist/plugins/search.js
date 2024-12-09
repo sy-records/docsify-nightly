@@ -3431,7 +3431,7 @@
                     }));
                 }
             }
-            var DEXIE_VERSION = "4.0.9";
+            var DEXIE_VERSION = "4.0.10";
             var maxString = String.fromCharCode(65535);
             var minKey = -Infinity;
             var INVALID_KEY_ARGUMENT = "Invalid key provided. Keys must be of type string, number, Date or Array<string | number | Date>.";
@@ -4424,7 +4424,15 @@
                         }
                         var coreTable = ctx.table.core;
                         var _a = coreTable.schema.primaryKey, outbound = _a.outbound, extractKey = _a.extractKey;
-                        var limit = _this.db._options.modifyChunkSize || 200;
+                        var limit = 200;
+                        var modifyChunkSize = _this.db._options.modifyChunkSize;
+                        if (modifyChunkSize) {
+                            if (typeof modifyChunkSize == "object") {
+                                limit = modifyChunkSize[coreTable.name] || modifyChunkSize["*"] || 200;
+                            } else {
+                                limit = modifyChunkSize;
+                            }
+                        }
                         var totalFailures = [];
                         var successCount = 0;
                         var failedKeys = [];
@@ -7012,9 +7020,9 @@
                                                     var pkPos = idx.keyPath.findIndex((function(prop) {
                                                         return prop === primaryKey.keyPath;
                                                     }));
-                                                    res.results.forEach((function(pk) {
-                                                        return idxVals[pkPos] = pk;
-                                                    }));
+                                                    for (var i = 0, len = res.results.length; i < len; ++i) {
+                                                        idxVals[i][pkPos] = res.results[i];
+                                                    }
                                                     getRangeSet(idx.name).addKeys(idxVals);
                                                 }));
                                             }
