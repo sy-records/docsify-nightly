@@ -1,7 +1,7 @@
 /*!
  * Docsify Plugin: search v4.13.0
  * https://docsify.js.org
- * (c) 2017-2024
+ * (c) 2017-2025
  * MIT license
  */
 (function() {
