@@ -7420,8 +7420,13 @@
             #initHeadings() {
                 const headingElms = findAll("#main :where(h1, h2, h3, h4, h5)");
                 const headingsInView = new Set;
+                let isInitialLoad = true;
                 this.#intersectionObserver?.disconnect();
                 this.#intersectionObserver = new IntersectionObserver((entries => {
+                    if (isInitialLoad) {
+                        isInitialLoad = false;
+                        return;
+                    }
                     if (this.#isScrolling) {
                         return;
                     }
@@ -7429,7 +7434,12 @@
                         const op = entry.isIntersecting ? "add" : "delete";
                         headingsInView[op](entry.target);
                     }
-                    const activeHeading = headingsInView.size > 1 ? Array.from(headingsInView).sort(((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))[0] : headingsInView.values().next().value;
+                    let activeHeading;
+                    if (headingsInView.size === 1) {
+                        activeHeading = headingsInView.values().next().value;
+                    } else if (headingsInView.size > 1) {
+                        activeHeading = Array.from(headingsInView).reduce(((closest, current) => !closest || closest.compareDocumentPosition(current) & Node.DOCUMENT_POSITION_FOLLOWING ? current : closest), null);
+                    }
                     if (activeHeading) {
                         const id = activeHeading.getAttribute("id");
                         const href = this.router.toURL(this.router.getCurrentPath(), {
