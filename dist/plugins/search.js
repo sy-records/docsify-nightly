@@ -2259,7 +2259,7 @@
         },
         heading(_ref3) {
             let {tokens: tokens} = _ref3;
-            return this.parser?.parse(tokens) || "";
+            return this.parser?.parseInline(tokens) || "";
         },
         hr() {
             return "";
