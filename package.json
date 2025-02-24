@@ -1,0 +1,23 @@
+{
+  "name": "@sy-records/docsify-nightly",
+  "version": "5.0.0",
+  "description": "Nightly release for docsify.",
+  "main": "dist/docsify.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sy-records/docsify-nightly.git"
+  },
+  "keywords": [
+    "docsify",
+    "nightly"
+  ],
+  "author": "Luffy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sy-records/docsify-nightly/issues"
+  },
+  "homepage": "https://github.com/sy-records/docsify-nightly#readme"
+}
