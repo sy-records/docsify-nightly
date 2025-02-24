@@ -39,7 +39,7 @@ jobs:
           npm publish --tag nightly --dry-run --registry=https://npm.pkg.github.com
 
       - name: Publish to GitHub Packages
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         run: npm publish --tag nightly --registry=https://npm.pkg.github.com
 
       - name: Authenticate with npm
@@ -53,5 +53,5 @@ jobs:
           npm publish --tag nightly --dry-run --registry=https://registry.npmjs.org
 
       - name: Publish to npm registry
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         run: npm publish --tag nightly --access public --registry=https://registry.npmjs.org
