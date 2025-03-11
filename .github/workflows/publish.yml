@@ -1,11 +1,6 @@
 name: Publish NPM Package to GitHub Packages and npm
 
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - 'dist/**'
   workflow_dispatch:
   repository_dispatch:
     types: [trigger-publish]
@@ -41,7 +36,7 @@ jobs:
           npm publish --tag nightly --dry-run --registry=https://npm.pkg.github.com
 
       - name: Publish to GitHub Packages
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+        if: github.event_name == 'repository_dispatch'
         run: npm publish --tag nightly --registry=https://npm.pkg.github.com
 
       - name: Authenticate with npm
@@ -55,5 +50,5 @@ jobs:
           npm publish --tag nightly --dry-run --registry=https://registry.npmjs.org
 
       - name: Publish to npm registry
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+        if: github.event_name == 'repository_dispatch'
         run: npm publish --tag nightly --access public --registry=https://registry.npmjs.org
