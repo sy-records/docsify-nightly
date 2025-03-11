@@ -10,6 +10,9 @@ jobs:
   build:
     runs-on: "ubuntu-latest"
 
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,8 +37,17 @@ jobs:
           git status
 
       - name: Commit
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
+        id: auto-commit-action
         with:
           commit_user_name: sy-records
           commit_user_email: 52o@qq52o.cn
           commit_message: Nightly release for docsify
+
+      - name: Trigger publish workflow
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        run: |
+          curl -X POST -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/dispatches \
+          -d '{"event_type":"trigger-publish"}'
