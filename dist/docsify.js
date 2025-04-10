@@ -185,7 +185,10 @@
             return match ? this.#getAlias(path.replace(this.#cached[match], alias[match]), alias, path) : path;
         }
         #getFileName(path, ext) {
-            return new RegExp(`\\.(${ext.replace(/^\./, "")}|html)$`, "g").test(path) ? path : /\/$/g.test(path) ? `${path}README${ext}` : `${path}${ext}`;
+            const [basePath, query] = path.split("?");
+            const hasValidExt = new RegExp(`\\.(${ext.replace(/^\./, "")}|html)$`).test(basePath);
+            const updatedPath = hasValidExt ? basePath : /\/$/g.test(basePath) ? `${basePath}README${ext}` : `${basePath}${ext}`;
+            return query ? `${updatedPath}?${query}` : updatedPath;
         }
         getBasePath() {
             return this.config.basePath;
