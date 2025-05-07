@@ -1,5 +1,5 @@
 /*!
- * Docsify Plugin: search v4.13.0
+ * Docsify Plugin: search v4.13.1
  * https://docsify.js.org
  * (c) 2017-2025
  * MIT license
