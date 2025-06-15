@@ -7568,7 +7568,7 @@
             onNavigate(source) {
                 const {auto2top: auto2top, topMargin: topMargin} = this.config;
                 const {path: path, query: query} = this.route;
-                this.#markSidebarActiveElm();
+                const activeSidebarElm = this.#markSidebarActiveElm();
                 if (source !== "history") {
                     if (query.id) {
                         const headingElm = find(`.markdown-section :where(h1, h2, h3, h4, h5)[id="${query.id}"]`);
@@ -7585,10 +7585,14 @@
                         }
                     }
                 }
-                if (path === "/" || query.id && source === "navigate") {
-                    isMobile() && this.#toggleSidebar(false);
+                const isNavigate = source === "navigate";
+                const hasId = "id" in query;
+                const noSubSidebar = !activeSidebarElm?.querySelector(".app-sub-sidebar");
+                const shouldCloseSidebar = path === "/" || isNavigate && (hasId || noSubSidebar);
+                if (shouldCloseSidebar && isMobile()) {
+                    this.#toggleSidebar(false);
                 }
-                if (query.id || source === "navigate") {
+                if (hasId || isNavigate) {
                     this.#focusContent();
                 }
             }
