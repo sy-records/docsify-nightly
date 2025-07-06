@@ -10,11 +10,14 @@ Runs at `03:37` UTC every day
 
 [![docsify-nightly](https://github.com/sy-records/docsify-nightly/actions/workflows/build.yml/badge.svg?event=schedule)](https://github.com/sy-records/docsify-nightly/actions?query=event%3Aschedule)
 
-## Use
+## Usage
 
 see https://cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/
 
 ```html
+<!-- Core Theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/themes/core.min.css">
+<!-- Vue Theme (add-on) -->
 <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/themes/vue.css"/>
 
 <script src="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/docsify.min.js"></script>
