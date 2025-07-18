@@ -6927,7 +6927,13 @@
                 };
                 const {query: query} = this.route;
                 const focusEl = query.id ? find(`#${query.id}`) : find("#main :where(h1, h2, h3, h4, h5, h6)") || find("#main");
-                focusEl?.focus(settings);
+                if (focusEl) {
+                    focusEl.focus(settings);
+                    focusEl.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }
                 return focusEl;
             }
             #markAppNavActiveElm() {
