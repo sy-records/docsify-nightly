@@ -3959,11 +3959,19 @@
         const config = {};
         if (str) {
             str = str.replace(/^('|")/, "").replace(/('|")$/, "").replace(/(?:^|\s):([\w-]+:?)=?([\w-%]+)?/g, ((m, key, value) => {
-                if (key.indexOf(":") === -1) {
-                    config[key] = value && value.replace(/&quot;/g, "") || true;
-                    return "";
+                if (key.indexOf(":") !== -1) {
+                    return m;
                 }
-                return m;
+                value = value && value.replace(/&quot;/g, "") || true;
+                if (value !== true && config[key] !== undefined) {
+                    if (!Array.isArray(config[key]) && value !== config[key]) {
+                        config[key] = [ config[key] ];
+                    }
+                    config[key].includes(value) || config[key].push(value);
+                } else {
+                    config[key] = value;
+                }
+                return "";
             })).trim();
         }
         return {
@@ -4023,7 +4031,11 @@
                 }
             }
             if (config.class) {
-                attrs.push(`class="${config.class}"`);
+                let classes = config.class;
+                if (Array.isArray(config.class)) {
+                    classes = config.class.join(" ");
+                }
+                attrs.push(`class="${classes}"`);
             }
             if (config.id) {
                 attrs.push(`id="${config.id}"`);
@@ -5515,7 +5527,11 @@
                 href = "javascript:void(0)";
             }
             if (config.class) {
-                attrs.push(`class="${config.class}"`);
+                let classes = config.class;
+                if (Array.isArray(config.class)) {
+                    classes = config.class.join(" ");
+                }
+                attrs.push(`class="${classes}"`);
             }
             if (config.id) {
                 attrs.push(`id="${config.id}"`);
