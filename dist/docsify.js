@@ -259,6 +259,15 @@
                 const el = e.target.tagName === "A" ? e.target : e.target.parentNode;
                 if (el && el.tagName === "A" && !isExternal(el.href)) {
                     navigating = true;
+                    if ([ "app-name-link", "page-link" ].includes(el.className)) {
+                        return;
+                    }
+                    if (el.hash === location.hash) {
+                        cb({
+                            event: e,
+                            source: "navigate"
+                        });
+                    }
                 }
             }));
             on("hashchange", (e => {

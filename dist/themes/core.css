@@ -1257,7 +1257,6 @@ body:has(.app-nav) .markdown-section {
     /* Prevent long titles from causing horizontal scrolling */
   }
 [id]:is(.markdown-section :where(h1,h2,h3,h4,h5,h6)) a {
-      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
     }
