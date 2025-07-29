@@ -39,8 +39,7 @@
         return false;
     }
     const cacheNode = {};
-    function getNode(el) {
-        let noCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    function getNode(el, noCache = false) {
         if (typeof el === "string") {
             if (typeof window.Vue !== "undefined") {
                 return find(el);
@@ -89,8 +88,7 @@
     function style(content) {
         appendTo(head, create("style", content));
     }
-    function documentReady(callback) {
-        let doc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
+    function documentReady(callback, doc = document) {
         const state = doc.readyState;
         if (state === "complete" || state === "interactive") {
             return setTimeout(callback, 0);
@@ -129,8 +127,7 @@
         }));
         return res;
     }
-    function stringifyQuery(obj) {
-        let ignores = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    function stringifyQuery(obj, ignores = []) {
         const qs = [];
         for (const key in obj) {
             if (ignores.indexOf(key) > -1) {
@@ -165,10 +162,7 @@
     function normaliseFragment(path) {
         return path.split("/").filter((p => p.indexOf("#") === -1)).join("/");
     }
-    function getPath() {
-        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
+    function getPath(...args) {
         return cleanPath(args.map(normaliseFragment).join("/"));
     }
     const replaceSlug = cached$1((path => path.replace("#", "?id=")));
@@ -193,9 +187,7 @@
         getBasePath() {
             return this.config.basePath;
         }
-        getFile() {
-            let path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getCurrentPath();
-            let isRelative = arguments.length > 1 ? arguments[1] : undefined;
+        getFile(path = this.getCurrentPath(), isRelative) {
             const {config: config} = this;
             const base = this.getBasePath();
             const ext = typeof config.ext === "string" ? config.ext : ".md";
@@ -208,8 +200,7 @@
             }
             return path;
         }
-        onchange() {
-            let cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+        onchange(cb = noop) {
             cb();
         }
         getCurrentPath() {}
@@ -252,8 +243,7 @@
             const index = href.indexOf("#");
             return index === -1 ? "" : href.slice(index + 1);
         }
-        onchange() {
-            let cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+        onchange(cb = noop) {
             let navigating = false;
             on("click", (e => {
                 const el = e.target.tagName === "A" ? e.target : e.target.parentNode;
@@ -287,8 +277,7 @@
             }
             replaceHash("/" + path);
         }
-        parse() {
-            let path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : location.href;
+        parse(path = location.href) {
             let query = "";
             const hashIndex = path.indexOf("#");
             if (hashIndex >= 0) {
@@ -320,8 +309,7 @@
             }
             return (path || "/") + window.location.search + window.location.hash;
         }
-        onchange() {
-            let cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+        onchange(cb = noop) {
             on("click", (e => {
                 const el = e.target.tagName === "A" ? e.target : e.target.parentNode;
                 if (el && el.tagName === "A" && !isExternal(el.href)) {
@@ -343,8 +331,7 @@
                 });
             }));
         }
-        parse() {
-            let path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : location.href;
+        parse(path = location.href) {
             let query = "";
             const queryIndex = path.indexOf("?");
             if (queryIndex >= 0) {
@@ -457,8 +444,7 @@
     var C = {
         exec: () => null
     };
-    function h(a) {
-        let e = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+    function h(a, e = "") {
         let t = typeof a == "string" ? a : a.source, n = {
             replace: (s, i) => {
                 let r = typeof i == "string" ? i : i.source;
@@ -970,8 +956,7 @@
                 return de(n, i, n[0], this.lexer, this.rules);
             }
         }
-        emStrong(e, t) {
-            let n = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+        emStrong(e, t, n = "") {
             let s = this.rules.inline.emStrongLDelim.exec(e);
             if (!s || s[3] && n.match(this.rules.other.unicodeAlphaNumeric)) return;
             if (!(s[1] || s[2] || "") || !n || this.rules.inline.punctuation.exec(n)) {
@@ -1131,9 +1116,7 @@
             }
             return this.inlineQueue = [], this.tokens;
         }
-        blockTokens(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-            let n = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : !1;
+        blockTokens(e, t = [], n = !1) {
             for (this.options.pedantic && (e = e.replace(m.tabCharGlobal, "    ").replace(m.spaceLine, "")); e; ) {
                 let s;
                 if (this.options.extensions?.block?.some((r => (s = r.call({
@@ -1227,15 +1210,13 @@
             }
             return this.state.top = !0, t;
         }
-        inline(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        inline(e, t = []) {
             return this.inlineQueue.push({
                 src: e,
                 tokens: t
             }), t;
         }
-        inlineTokens(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        inlineTokens(e, t = []) {
             let n = e, s = null;
             if (this.tokens.links) {
                 let o = Object.keys(this.tokens.links);
@@ -1328,21 +1309,17 @@
         space(e) {
             return "";
         }
-        code(_ref) {
-            let {text: e, lang: t, escaped: n} = _ref;
+        code({text: e, lang: t, escaped: n}) {
             let s = (t || "").match(m.notSpaceStart)?.[0], i = e.replace(m.endingNewline, "") + `\n`;
             return s ? '<pre><code class="language-' + R(s) + '">' + (n ? i : R(i, !0)) + `</code></pre>\n` : "<pre><code>" + (n ? i : R(i, !0)) + `</code></pre>\n`;
         }
-        blockquote(_ref2) {
-            let {tokens: e} = _ref2;
+        blockquote({tokens: e}) {
             return `<blockquote>\n${this.parser.parse(e)}</blockquote>\n`;
         }
-        html(_ref3) {
-            let {text: e} = _ref3;
+        html({text: e}) {
             return e;
         }
-        heading(_ref4) {
-            let {tokens: e, depth: t} = _ref4;
+        heading({tokens: e, depth: t}) {
             return `<h${t}>${this.parser.parseInline(e)}</h${t}>\n`;
         }
         hr(e) {
@@ -1374,12 +1351,10 @@
             }
             return t += this.parser.parse(e.tokens, !!e.loose), `<li>${t}</li>\n`;
         }
-        checkbox(_ref5) {
-            let {checked: e} = _ref5;
+        checkbox({checked: e}) {
             return "<input " + (e ? 'checked="" ' : "") + 'disabled="" type="checkbox">';
         }
-        paragraph(_ref6) {
-            let {tokens: e} = _ref6;
+        paragraph({tokens: e}) {
             return `<p>${this.parser.parseInline(e)}</p>\n`;
         }
         table(e) {
@@ -1399,43 +1374,36 @@
             }
             return s && (s = `<tbody>${s}</tbody>`), `<table>\n<thead>\n` + t + `</thead>\n` + s + `</table>\n`;
         }
-        tablerow(_ref7) {
-            let {text: e} = _ref7;
+        tablerow({text: e}) {
             return `<tr>\n${e}</tr>\n`;
         }
         tablecell(e) {
             let t = this.parser.parseInline(e.tokens), n = e.header ? "th" : "td";
             return (e.align ? `<${n} align="${e.align}">` : `<${n}>`) + t + `</${n}>\n`;
         }
-        strong(_ref8) {
-            let {tokens: e} = _ref8;
+        strong({tokens: e}) {
             return `<strong>${this.parser.parseInline(e)}</strong>`;
         }
-        em(_ref9) {
-            let {tokens: e} = _ref9;
+        em({tokens: e}) {
             return `<em>${this.parser.parseInline(e)}</em>`;
         }
-        codespan(_ref10) {
-            let {text: e} = _ref10;
+        codespan({text: e}) {
             return `<code>${R(e, !0)}</code>`;
         }
         br(e) {
             return "<br>";
         }
-        del(_ref11) {
-            let {tokens: e} = _ref11;
+        del({tokens: e}) {
             return `<del>${this.parser.parseInline(e)}</del>`;
         }
-        link(_ref12) {
-            let {href: e, title: t, tokens: n} = _ref12;
+        link({href: e, title: t, tokens: n}) {
             let s = this.parser.parseInline(n), i = J(e);
             if (i === null) return s;
             e = i;
             let r = '<a href="' + e + '"';
             return t && (r += ' title="' + R(t) + '"'), r += ">" + s + "</a>", r;
         }
-        image(_ref13) {
-            let {href: e, title: t, text: n, tokens: s} = _ref13;
+        image({href: e, title: t, text: n, tokens: s}) {
             s && (n = this.parser.parseInline(s, this.parser.textRenderer));
             let i = J(e);
             if (i === null) return R(n);
@@ -1448,36 +1416,28 @@
         }
     };
     var _ = class {
-        strong(_ref14) {
-            let {text: e} = _ref14;
+        strong({text: e}) {
             return e;
         }
-        em(_ref15) {
-            let {text: e} = _ref15;
+        em({text: e}) {
             return e;
         }
-        codespan(_ref16) {
-            let {text: e} = _ref16;
+        codespan({text: e}) {
             return e;
         }
-        del(_ref17) {
-            let {text: e} = _ref17;
+        del({text: e}) {
             return e;
         }
-        html(_ref18) {
-            let {text: e} = _ref18;
+        html({text: e}) {
             return e;
         }
-        text(_ref19) {
-            let {text: e} = _ref19;
+        text({text: e}) {
             return e;
         }
-        link(_ref20) {
-            let {text: e} = _ref20;
+        link({text: e}) {
             return "" + e;
         }
-        image(_ref21) {
-            let {text: e} = _ref21;
+        image({text: e}) {
             return "" + e;
         }
         br() {
@@ -1498,8 +1458,7 @@
         static parseInline(e, t) {
             return new a(t).parseInline(e);
         }
-        parse(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : !0;
+        parse(e, t = !0) {
             let n = "";
             for (let s = 0; s < e.length; s++) {
                 let i = e[s];
@@ -1596,8 +1555,7 @@
             }
             return n;
         }
-        parseInline(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.renderer;
+        parseInline(e, t = this.renderer) {
             let n = "";
             for (let s = 0; s < e.length; s++) {
                 let i = e[s];
@@ -1717,8 +1675,8 @@
         Lexer=b;
         Tokenizer=S;
         Hooks=L;
-        constructor() {
-            this.use(...arguments);
+        constructor(...e) {
+            this.use(...e);
         }
         walkTokens(e, t) {
             let n = [];
@@ -1749,14 +1707,11 @@
             }
             return n;
         }
-        use() {
+        use(...e) {
             let t = this.defaults.extensions || {
                 renderers: {},
                 childTokens: {}
             };
-            for (var _len = arguments.length, e = new Array(_len), _key = 0; _key < _len; _key++) {
-                e[_key] = arguments[_key];
-            }
             return e.forEach((n => {
                 let s = {
                     ...n
@@ -1765,10 +1720,7 @@
                     if (!i.name) throw new Error("extension name required");
                     if ("renderer" in i) {
                         let r = t.renderers[i.name];
-                        r ? t.renderers[i.name] = function() {
-                            for (var _len2 = arguments.length, o = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                                o[_key2] = arguments[_key2];
-                            }
+                        r ? t.renderers[i.name] = function(...o) {
                             let l = i.renderer.apply(this, o);
                             return l === !1 && (l = r.apply(this, o)), l;
                         } : t.renderers[i.name] = i.renderer;
@@ -1785,10 +1737,7 @@
                         if (!(r in i)) throw new Error(`renderer '${r}' does not exist`);
                         if ([ "options", "parser" ].includes(r)) continue;
                         let o = r, l = n.renderer[o], c = i[o];
-                        i[o] = function() {
-                            for (var _len3 = arguments.length, p = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-                                p[_key3] = arguments[_key3];
-                            }
+                        i[o] = (...p) => {
                             let u = l.apply(i, p);
                             return u === !1 && (u = c.apply(i, p)), u || "";
                         };
@@ -1801,10 +1750,7 @@
                         if (!(r in i)) throw new Error(`tokenizer '${r}' does not exist`);
                         if ([ "options", "rules", "lexer" ].includes(r)) continue;
                         let o = r, l = n.tokenizer[o], c = i[o];
-                        i[o] = function() {
-                            for (var _len4 = arguments.length, p = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-                                p[_key4] = arguments[_key4];
-                            }
+                        i[o] = (...p) => {
                             let u = l.apply(i, p);
                             return u === !1 && (u = c.apply(i, p)), u;
                         };
@@ -1821,10 +1767,7 @@
                             if (this.defaults.async) return Promise.resolve(l.call(i, p)).then((d => c.call(i, d)));
                             let u = l.call(i, p);
                             return c.call(i, u);
-                        } : i[o] = function() {
-                            for (var _len5 = arguments.length, p = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-                                p[_key5] = arguments[_key5];
-                            }
+                        } : i[o] = (...p) => {
                             let u = l.apply(i, p);
                             return u === !1 && (u = c.apply(i, p)), u;
                         };
@@ -1902,8 +1845,8 @@
     };
     k.getDefaults = M;
     k.defaults = w;
-    k.use = function() {
-        return z.use(...arguments), k.defaults = z.defaults, H(k.defaults), k;
+    k.use = function(...a) {
+        return z.use(...a), k.defaults = z.defaults, H(k.defaults), k;
     };
     k.walkTokens = function(a, e) {
         return z.walkTokens(a, e);
@@ -1944,8 +1887,7 @@
     function cover() {
         return `\n    <section class="cover show" role="complementary" aria-label="cover">\n      <div class="mask"></div>\n      <div class="cover-main">\x3c!--cover--\x3e</div>\n    </section>\n  `;
     }
-    function tree(toc) {
-        let tpl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '<ul class="app-sub-sidebar">{inner}</ul>';
+    function tree(toc, tpl = '<ul class="app-sub-sidebar">{inner}</ul>') {
         if (!toc || !toc.length) {
             return "";
         }
@@ -3963,8 +3905,7 @@
     function emojify(text, useNativeEmoji) {
         return text.replace(/<(code|pre|script|template)[^>]*?>[\s\S]+?<\/(code|pre|script|template)>/g, (m => m.replace(/:/g, "__colon__"))).replace(/<!--[\s\S]+?-->/g, (m => m.replace(/:/g, "__colon__"))).replace(/([a-z]{2,}:)?\/\/[^\s'">)]+/gi, (m => m.replace(/:/g, "__colon__"))).replace(/:([a-z0-9_\-+]+?):/g, ((m, $1) => replaceEmojiShorthand(m, $1, useNativeEmoji))).replace(/__colon__/g, ":");
     }
-    function getAndRemoveConfig() {
-        let str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    function getAndRemoveConfig(str = "") {
         const config = {};
         if (str) {
             str = str.replace(/^('|")/, "").replace(/('|")$/, "").replace(/(?:^|\s):([\w-]+:?)=?([\w-%]+)?/g, ((m, key, value) => {
@@ -3988,12 +3929,10 @@
             config: config
         };
     }
-    function removeAtag() {
-        let str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    function removeAtag(str = "") {
         return str.replace(/(<\/?a.*?>)/gi, "");
     }
-    function getAndRemoveDocsifyIgnoreConfig() {
-        let content = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    function getAndRemoveDocsifyIgnoreConfig(content = "") {
         let ignoreAllSubs, ignoreSubHeading;
         if (/<!-- {docsify-ignore} -->/g.test(content)) {
             content = content.replace("\x3c!-- {docsify-ignore} --\x3e", "");
@@ -4017,67 +3956,59 @@
             ignoreSubHeading: ignoreSubHeading
         };
     }
-    const imageCompiler = _ref => {
-        let {renderer: renderer, contentBase: contentBase, router: router} = _ref;
-        return renderer.image = _ref2 => {
-            let {href: href, title: title, text: text} = _ref2;
-            let url = href;
-            const attrs = [];
-            const {str: str, config: config} = getAndRemoveConfig(title);
-            title = str;
-            if (config["no-zoom"]) {
-                attrs.push("data-no-zoom");
+    const imageCompiler = ({renderer: renderer, contentBase: contentBase, router: router}) => renderer.image = ({href: href, title: title, text: text}) => {
+        let url = href;
+        const attrs = [];
+        const {str: str, config: config} = getAndRemoveConfig(title);
+        title = str;
+        if (config["no-zoom"]) {
+            attrs.push("data-no-zoom");
+        }
+        if (title) {
+            attrs.push(`title="${title}"`);
+        }
+        if (config.size) {
+            const [width, height] = config.size.split("x");
+            if (height) {
+                attrs.push(`width="${width}" height="${height}"`);
+            } else {
+                attrs.push(`width="${width}"`);
             }
-            if (title) {
-                attrs.push(`title="${title}"`);
+        }
+        if (config.class) {
+            let classes = config.class;
+            if (Array.isArray(config.class)) {
+                classes = config.class.join(" ");
             }
-            if (config.size) {
-                const [width, height] = config.size.split("x");
-                if (height) {
-                    attrs.push(`width="${width}" height="${height}"`);
-                } else {
-                    attrs.push(`width="${width}"`);
-                }
-            }
-            if (config.class) {
-                let classes = config.class;
-                if (Array.isArray(config.class)) {
-                    classes = config.class.join(" ");
-                }
-                attrs.push(`class="${classes}"`);
-            }
-            if (config.id) {
-                attrs.push(`id="${config.id}"`);
-            }
-            if (!isAbsolutePath(href)) {
-                url = getPath(contentBase, getParentPath(router.getCurrentPath()), href);
-            }
-            return `<img src="${url}" data-origin="${href}" alt="${text}" ${attrs.join(" ")} />`;
-        };
+            attrs.push(`class="${classes}"`);
+        }
+        if (config.id) {
+            attrs.push(`id="${config.id}"`);
+        }
+        if (!isAbsolutePath(href)) {
+            url = getPath(contentBase, getParentPath(router.getCurrentPath()), href);
+        }
+        return `<img src="${url}" data-origin="${href}" alt="${text}" ${attrs.join(" ")} />`;
     };
-    const headingCompiler = _ref => {
-        let {renderer: renderer, router: router, compiler: compiler} = _ref;
-        return renderer.heading = function(_ref2) {
-            let {tokens: tokens, depth: depth} = _ref2;
-            const text = this.parser.parseInline(tokens);
-            let {str: str, config: config} = getAndRemoveConfig(text);
-            const nextToc = {
-                depth: depth,
-                title: str
-            };
-            const {content: content, ignoreAllSubs: ignoreAllSubs, ignoreSubHeading: ignoreSubHeading} = getAndRemoveDocsifyIgnoreConfig(str);
-            str = content.trim();
-            nextToc.title = removeAtag(str);
-            nextToc.ignoreAllSubs = ignoreAllSubs;
-            nextToc.ignoreSubHeading = ignoreSubHeading;
-            const slug = slugify(config.id || str);
-            const url = router.toURL(router.getCurrentPath(), {
-                id: slug
-            });
-            nextToc.slug = url;
-            compiler.toc.push(nextToc);
-            return `<h${depth} id="${slug}" tabindex="-1"><a href="${url}" data-id="${slug}" class="anchor"><span>${str}</span></a></h${depth}>`;
+    const headingCompiler = ({renderer: renderer, router: router, compiler: compiler}) => renderer.heading = function({tokens: tokens, depth: depth}) {
+        const text = this.parser.parseInline(tokens);
+        let {str: str, config: config} = getAndRemoveConfig(text);
+        const nextToc = {
+            depth: depth,
+            title: str
         };
+        const {content: content, ignoreAllSubs: ignoreAllSubs, ignoreSubHeading: ignoreSubHeading} = getAndRemoveDocsifyIgnoreConfig(str);
+        str = content.trim();
+        nextToc.title = removeAtag(str);
+        nextToc.ignoreAllSubs = ignoreAllSubs;
+        nextToc.ignoreSubHeading = ignoreSubHeading;
+        const slug = slugify(config.id || str);
+        const url = router.toURL(router.getCurrentPath(), {
+            id: slug
+        });
+        nextToc.slug = url;
+        compiler.toc.push(nextToc);
+        return `<h${depth} id="${slug}" tabindex="-1"><a href="${url}" data-id="${slug}" class="anchor"><span>${str}</span></a></h${depth}>`;
     };
     var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
     function getDefaultExportFromCjs(x) {
@@ -5432,124 +5363,106 @@
         }
         return "\n" + cur;
     };
-    const highlightCodeCompiler = _ref => {
-        let {renderer: renderer} = _ref;
-        return renderer.code = function(_ref2) {
-            let {text: text, lang: lang = "markup"} = _ref2;
-            checkLangDependenciesAllLoaded(lang);
-            const langOrMarkup = prism.languages[lang] || prism.languages.markup;
-            const code = prism.highlight(text.replace(/@DOCSIFY_QM@/g, "`"), langOrMarkup, lang);
-            return `<pre data-lang="${lang}" class="language-${lang}"><code class="lang-${lang} language-${lang}" tabindex="0">${code}</code></pre>`;
-        };
+    const highlightCodeCompiler = ({renderer: renderer}) => renderer.code = function({text: text, lang: lang = "markup"}) {
+        checkLangDependenciesAllLoaded(lang);
+        const langOrMarkup = prism.languages[lang] || prism.languages.markup;
+        const code = prism.highlight(text.replace(/@DOCSIFY_QM@/g, "`"), langOrMarkup, lang);
+        return `<pre data-lang="${lang}" class="language-${lang}"><code class="lang-${lang} language-${lang}" tabindex="0">${code}</code></pre>`;
     };
-    const paragraphCompiler = _ref => {
-        let {renderer: renderer} = _ref;
-        return renderer.paragraph = function(_ref2) {
-            let {tokens: tokens} = _ref2;
-            const text = this.parser.parseInline(tokens);
-            let result;
-            if (text.startsWith("!&gt;")) {
-                result = helper("callout important", text);
-            } else if (text.startsWith("?&gt;")) {
-                result = helper("callout tip", text);
-            } else {
-                result = `<p>${text}</p>`;
-            }
-            return result;
-        };
+    const paragraphCompiler = ({renderer: renderer}) => renderer.paragraph = function({tokens: tokens}) {
+        const text = this.parser.parseInline(tokens);
+        let result;
+        if (text.startsWith("!&gt;")) {
+            result = helper("callout important", text);
+        } else if (text.startsWith("?&gt;")) {
+            result = helper("callout tip", text);
+        } else {
+            result = `<p>${text}</p>`;
+        }
+        return result;
     };
-    const taskListCompiler = _ref => {
-        let {renderer: renderer} = _ref;
-        return renderer.list = function(token) {
-            const ordered = token.ordered;
-            const start = token.start;
-            let body = "";
-            for (let j = 0; j < token.items.length; j++) {
-                const item = token.items[j];
-                body += this.listitem?.(item);
-            }
-            const isTaskList = /<li class="task-list-item">/.test(body.split('class="task-list"')[0]);
-            const isStartReq = start && start > 1;
-            const tag = ordered ? "ol" : "ul";
-            const tagAttrs = [ isTaskList ? 'class="task-list"' : "", isStartReq ? `start="${start}"` : "" ].join(" ").trim();
-            return `<${tag} ${tagAttrs}>${body}</${tag}>`;
-        };
+    const taskListCompiler = ({renderer: renderer}) => renderer.list = function(token) {
+        const ordered = token.ordered;
+        const start = token.start;
+        let body = "";
+        for (let j = 0; j < token.items.length; j++) {
+            const item = token.items[j];
+            body += this.listitem?.(item);
+        }
+        const isTaskList = /<li class="task-list-item">/.test(body.split('class="task-list"')[0]);
+        const isStartReq = start && start > 1;
+        const tag = ordered ? "ol" : "ul";
+        const tagAttrs = [ isTaskList ? 'class="task-list"' : "", isStartReq ? `start="${start}"` : "" ].join(" ").trim();
+        return `<${tag} ${tagAttrs}>${body}</${tag}>`;
     };
-    const taskListItemCompiler = _ref => {
-        let {renderer: renderer} = _ref;
-        return renderer.listitem = function(item) {
-            let text = "";
-            if (item.task) {
-                const checkbox = this.checkbox?.({
-                    checked: !!item.checked
-                });
-                if (item.loose) {
-                    if (item.tokens.length > 0 && item.tokens[0].type === "paragraph") {
-                        item.tokens[0].text = checkbox + " " + item.tokens[0].text;
-                        if (item.tokens[0].tokens && item.tokens[0].tokens.length > 0 && item.tokens[0].tokens[0].type === "text") {
-                            item.tokens[0].tokens[0].text = checkbox + " " + item.tokens[0].tokens[0].text;
-                        }
-                    } else {
-                        item.tokens.unshift({
-                            type: "text",
-                            raw: checkbox + " ",
-                            text: checkbox + " "
-                        });
+    const taskListItemCompiler = ({renderer: renderer}) => renderer.listitem = function(item) {
+        let text = "";
+        if (item.task) {
+            const checkbox = this.checkbox?.({
+                checked: !!item.checked
+            });
+            if (item.loose) {
+                if (item.tokens.length > 0 && item.tokens[0].type === "paragraph") {
+                    item.tokens[0].text = checkbox + " " + item.tokens[0].text;
+                    if (item.tokens[0].tokens && item.tokens[0].tokens.length > 0 && item.tokens[0].tokens[0].type === "text") {
+                        item.tokens[0].tokens[0].text = checkbox + " " + item.tokens[0].tokens[0].text;
                     }
                 } else {
-                    text += checkbox + " ";
-                }
-            }
-            text += this.parser?.parse(item.tokens, !!item.loose);
-            const isTaskItem = /^(<input.*type="checkbox"[^>]*>)/.test(text);
-            const html = isTaskItem ? `<li class="task-list-item"><label>${text}</label></li>` : `<li>${text}</li>`;
-            return html;
-        };
-    };
-    const linkCompiler = _ref => {
-        let {renderer: renderer, router: router, linkTarget: linkTarget, linkRel: linkRel, compiler: compiler} = _ref;
-        return renderer.link = function(_ref2) {
-            let {href: href, title: title = "", tokens: tokens} = _ref2;
-            const attrs = [];
-            const text = this.parser.parseInline(tokens) || "";
-            const {str: str, config: config} = getAndRemoveConfig(title);
-            linkTarget = config.target || linkTarget;
-            linkRel = linkTarget === "_blank" ? compiler.config.externalLinkRel || "noopener" : "";
-            title = str;
-            if (!isAbsolutePath(href) && !compiler._matchNotCompileLink(href) && !config.ignore) {
-                if (href === compiler.config.homepage) {
-                    href = "README";
-                }
-                href = router.toURL(href, null, router.getCurrentPath());
-                if (config.target) {
-                    href.indexOf("mailto:") !== 0 && attrs.push(`target="${linkTarget}"`);
+                    item.tokens.unshift({
+                        type: "text",
+                        raw: checkbox + " ",
+                        text: checkbox + " "
+                    });
                 }
             } else {
-                if (!isAbsolutePath(href) && href.slice(0, 2) === "./") {
-                    href = document.URL.replace(/\/(?!.*\/).*/, "/").replace("#/./", "") + href;
-                }
-                attrs.push(href.indexOf("mailto:") === 0 ? "" : `target="${linkTarget}"`);
-                attrs.push(href.indexOf("mailto:") === 0 ? "" : linkRel !== "" ? ` rel="${linkRel}"` : "");
+                text += checkbox + " ";
             }
-            if (config.disabled) {
-                attrs.push("disabled");
-                href = "javascript:void(0)";
+        }
+        text += this.parser?.parse(item.tokens, !!item.loose);
+        const isTaskItem = /^(<input.*type="checkbox"[^>]*>)/.test(text);
+        const html = isTaskItem ? `<li class="task-list-item"><label>${text}</label></li>` : `<li>${text}</li>`;
+        return html;
+    };
+    const linkCompiler = ({renderer: renderer, router: router, linkTarget: linkTarget, linkRel: linkRel, compiler: compiler}) => renderer.link = function({href: href, title: title = "", tokens: tokens}) {
+        const attrs = [];
+        const text = this.parser.parseInline(tokens) || "";
+        const {str: str, config: config} = getAndRemoveConfig(title);
+        linkTarget = config.target || linkTarget;
+        linkRel = linkTarget === "_blank" ? compiler.config.externalLinkRel || "noopener" : "";
+        title = str;
+        if (!isAbsolutePath(href) && !compiler._matchNotCompileLink(href) && !config.ignore) {
+            if (href === compiler.config.homepage) {
+                href = "README";
             }
-            if (config.class) {
-                let classes = config.class;
-                if (Array.isArray(config.class)) {
-                    classes = config.class.join(" ");
-                }
-                attrs.push(`class="${classes}"`);
+            href = router.toURL(href, null, router.getCurrentPath());
+            if (config.target) {
+                href.indexOf("mailto:") !== 0 && attrs.push(`target="${linkTarget}"`);
             }
-            if (config.id) {
-                attrs.push(`id="${config.id}"`);
+        } else {
+            if (!isAbsolutePath(href) && href.slice(0, 2) === "./") {
+                href = document.URL.replace(/\/(?!.*\/).*/, "/").replace("#/./", "") + href;
             }
-            if (title) {
-                attrs.push(`title="${title}"`);
+            attrs.push(href.indexOf("mailto:") === 0 ? "" : `target="${linkTarget}"`);
+            attrs.push(href.indexOf("mailto:") === 0 ? "" : linkRel !== "" ? ` rel="${linkRel}"` : "");
+        }
+        if (config.disabled) {
+            attrs.push("disabled");
+            href = "javascript:void(0)";
+        }
+        if (config.class) {
+            let classes = config.class;
+            if (Array.isArray(config.class)) {
+                classes = config.class.join(" ");
             }
-            return `<a href="${href}" ${attrs.join(" ")}>${text}</a>`;
-        };
+            attrs.push(`class="${classes}"`);
+        }
+        if (config.id) {
+            attrs.push(`id="${config.id}"`);
+        }
+        if (title) {
+            attrs.push(`title="${title}"`);
+        }
+        return `<a href="${href}" ${attrs.join(" ")}>${text}</a>`;
     };
     const compileMedia = {
         markdown(url) {
@@ -6068,9 +5981,7 @@
         }
     }
     const cache = {};
-    function get(url) {
-        let hasBar = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        let headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    function get(url, hasBar = false, headers = {}) {
         const xhr = new XMLHttpRequest;
         const cached = cache[url];
         if (cached) {
@@ -6085,8 +5996,7 @@
         }
         xhr.send();
         return {
-            then(success) {
-                let error = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
+            then(success, error = noop) {
                 const getResponseStatus = event => ({
                     ok: event.target.status >= 200 && event.target.status < 300,
                     status: event.target.status,
@@ -6127,8 +6037,7 @@
         };
     }
     const cached = {};
-    function walkFetchEmbed(_ref, cb) {
-        let {embedTokens: embedTokens, compile: compile, fetch: fetch} = _ref;
+    function walkFetchEmbed({embedTokens: embedTokens, compile: compile, fetch: fetch}, cb) {
         let token;
         let step = 0;
         let count = 0;
@@ -6192,8 +6101,7 @@
             }
         }
     }
-    function prerenderEmbed(_ref2, done) {
-        let {compiler: compiler, raw: raw = "", fetch: fetch} = _ref2;
+    function prerenderEmbed({compiler: compiler, raw: raw = "", fetch: fetch}, done) {
         const hit = cached[raw];
         if (hit) {
             const copy = hit.slice();
@@ -6224,8 +6132,7 @@
             compile: compile,
             embedTokens: embedTokens,
             fetch: fetch
-        }, (_ref3 => {
-            let {embedToken: embedToken, token: token} = _ref3;
+        }, (({embedToken: embedToken, token: token}) => {
             if (token) {
                 let index = token.index;
                 moves.forEach((pos => {
@@ -6309,16 +6216,10 @@
                     if (!this.#vueGlobalData && vueGlobalOptions.data && typeof vueGlobalOptions.data === "function") {
                         this.#vueGlobalData = vueGlobalOptions.data();
                     }
-                    vueMountData.push(...Object.keys(docsifyConfig.vueMounts || {}).map((cssSelector => [ find(markdownElm, cssSelector), docsifyConfig.vueMounts[cssSelector] ])).filter((_ref => {
-                        let [elm, vueConfig] = _ref;
-                        return elm;
-                    })));
+                    vueMountData.push(...Object.keys(docsifyConfig.vueMounts || {}).map((cssSelector => [ find(markdownElm, cssSelector), docsifyConfig.vueMounts[cssSelector] ])).filter((([elm, vueConfig]) => elm)));
                     const reHasBraces = /{{2}[^{}]*}{2}/;
                     const reHasDirective = /<[^>/]+\s([@:]|v-)[\w-:.[\]]+[=>\s]/;
-                    vueMountData.push(...findAll(".markdown-section > *").filter((elm => !vueMountData.some((_ref2 => {
-                        let [e, c] = _ref2;
-                        return e === elm;
-                    })))).filter((elm => {
+                    vueMountData.push(...findAll(".markdown-section > *").filter((elm => !vueMountData.some((([e, c]) => e === elm)))).filter((elm => {
                         const isVueMount = elm.tagName.toLowerCase() in (docsifyConfig.vueComponents || {}) || elm.querySelector(vueComponentNames.join(",") || null) || reHasBraces.test(elm.outerHTML) || reHasDirective.test(elm.outerHTML);
                         return isVueMount;
                     })).map((elm => {
@@ -6439,9 +6340,7 @@
                     this.#addTextAsTitleAttribute(`${selector} a`);
                 }));
             }
-            _renderMain(text) {
-                let opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-                let next = arguments.length > 2 ? arguments[2] : undefined;
+            _renderMain(text, opt = {}, next) {
                 const {response: response} = this.route;
                 if (response && !response.ok && (!text || response.status !== 404)) {
                     text = `# ${response.status} - ${response.statusText}`;
@@ -6626,8 +6525,7 @@
                     this.#loadNested(path, qs, loadSidebar, renderSidebar, this, true);
                 };
             }
-            _fetch() {
-                let cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+            _fetch(cb = noop) {
                 const {query: query} = this.route;
                 const {path: path} = this.route;
                 if (isExternal(path)) {
@@ -6689,9 +6587,7 @@
                     return coverOnly;
                 }
             }
-            $fetch() {
-                let cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
-                let onNavigate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.onNavigate.bind(this);
+            $fetch(cb = noop, onNavigate = this.onNavigate.bind(this)) {
                 const done = () => {
                     this.callHook("doneEach");
                     cb();
@@ -6706,8 +6602,7 @@
                     }));
                 }
             }
-            _fetchFallbackPage(path, qs) {
-                let cb = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : noop;
+            _fetchFallbackPage(path, qs, cb = noop) {
                 const {requestHeaders: requestHeaders, fallbackLanguages: fallbackLanguages, loadSidebar: loadSidebar} = this.config;
                 if (!fallbackLanguages) {
                     return false;
@@ -6721,8 +6616,7 @@
                 req.then(((text, opt) => this._renderMain(text, opt, this._loadSideAndNav(path, qs, loadSidebar, cb))), (_error => this._fetch404(path, qs, cb)));
                 return true;
             }
-            _fetch404(path, qs) {
-                let cb = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : noop;
+            _fetch404(path, qs, cb = noop) {
                 const {loadSidebar: loadSidebar, requestHeaders: requestHeaders, notFoundPage: notFoundPage} = this.config;
                 const fnLoadSideAndNav = this._loadSideAndNav(path, qs, loadSidebar, cb);
                 if (notFoundPage) {
@@ -6734,7 +6628,6 @@
                 return false;
             }
             initFetch() {
-                this.config;
                 this.$fetch((_ => this.callHook("ready")));
             }
         };
@@ -6842,12 +6735,8 @@
                             return;
                         }
                         const bindingConfigs = Object.values(keyBindings || []);
-                        const matchingConfigs = bindingConfigs.filter((_ref => {
-                            let {bindings: bindings} = _ref;
-                            return bindings && bindings.some((keys => keys.every((k => modifierKeys.includes(k) && e[k + "Key"] || e.key === k || e.code.toLowerCase() === k || e.code.toLowerCase() === `key${k}`))));
-                        }));
-                        matchingConfigs.forEach((_ref2 => {
-                            let {callback: callback} = _ref2;
+                        const matchingConfigs = bindingConfigs.filter((({bindings: bindings}) => bindings && bindings.some((keys => keys.every((k => modifierKeys.includes(k) && e[k + "Key"] || e.key === k || e.code.toLowerCase() === k || e.code.toLowerCase() === `key${k}`))))));
+                        matchingConfigs.forEach((({callback: callback}) => {
                             e.preventDefault();
                             callback(e);
                         }));
@@ -6862,12 +6751,11 @@
                 window?.matchMedia?.(`(max-width: ${mobileBreakpoint})`).addEventListener("change", (evt => {
                     this.#toggleSidebar(!evt.matches);
                 }));
-                on(sidebarElm, "click", (_ref3 => {
-                    let {target: target} = _ref3;
+                on(sidebarElm, "click", (({target: target}) => {
                     const linkElm = target.closest("a");
                     const linkParent = linkElm?.closest("li");
-                    const subSidebar = linkParent?.querySelector(".app-sub-sidebar");
-                    if (subSidebar) {
+                    const hasSubSidebar = linkParent?.querySelector(".app-sub-sidebar");
+                    if (hasSubSidebar) {
                         toggleClass(linkParent, "collapse");
                     }
                 }));
@@ -6944,8 +6832,7 @@
                     this.#focusContent();
                 }
             }
-            #focusContent() {
-                let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+            #focusContent(options = {}) {
                 const settings = {
                     preventScroll: true,
                     ...options
@@ -7221,8 +7108,7 @@
                     this._lifecycle[hook] = fn => arr.push(fn);
                 }));
             }
-            callHook(hookName, data) {
-                let next = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : noop;
+            callHook(hookName, data, next = noop) {
                 const queue = this._hooks[hookName];
                 const catchPluginErrors = this.config.catchPluginErrors;
                 const step = function(index) {

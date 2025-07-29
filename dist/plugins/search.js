@@ -6,8 +6,7 @@
  */
 (function() {
     "use strict";
-    function getAndRemoveConfig() {
-        let str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    function getAndRemoveConfig(str = "") {
         const config = {};
         if (str) {
             str = str.replace(/^('|")/, "").replace(/('|")$/, "").replace(/(?:^|\s):([\w-]+:?)=?([\w-%]+)?/g, ((m, key, value) => {
@@ -31,8 +30,7 @@
             config: config
         };
     }
-    function getAndRemoveDocsifyIgnoreConfig() {
-        let content = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+    function getAndRemoveDocsifyIgnoreConfig(content = "") {
         let ignoreAllSubs, ignoreSubHeading;
         if (/<!-- {docsify-ignore} -->/g.test(content)) {
             content = content.replace("\x3c!-- {docsify-ignore} --\x3e", "");
@@ -77,8 +75,7 @@
     var C = {
         exec: () => null
     };
-    function h(a) {
-        let e = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+    function h(a, e = "") {
         let t = typeof a == "string" ? a : a.source, n = {
             replace: (s, i) => {
                 let r = typeof i == "string" ? i : i.source;
@@ -590,8 +587,7 @@
                 return de(n, i, n[0], this.lexer, this.rules);
             }
         }
-        emStrong(e, t) {
-            let n = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+        emStrong(e, t, n = "") {
             let s = this.rules.inline.emStrongLDelim.exec(e);
             if (!s || s[3] && n.match(this.rules.other.unicodeAlphaNumeric)) return;
             if (!(s[1] || s[2] || "") || !n || this.rules.inline.punctuation.exec(n)) {
@@ -751,9 +747,7 @@
             }
             return this.inlineQueue = [], this.tokens;
         }
-        blockTokens(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-            let n = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : !1;
+        blockTokens(e, t = [], n = !1) {
             for (this.options.pedantic && (e = e.replace(m.tabCharGlobal, "    ").replace(m.spaceLine, "")); e; ) {
                 let s;
                 if (this.options.extensions?.block?.some((r => (s = r.call({
@@ -847,15 +841,13 @@
             }
             return this.state.top = !0, t;
         }
-        inline(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        inline(e, t = []) {
             return this.inlineQueue.push({
                 src: e,
                 tokens: t
             }), t;
         }
-        inlineTokens(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        inlineTokens(e, t = []) {
             let n = e, s = null;
             if (this.tokens.links) {
                 let o = Object.keys(this.tokens.links);
@@ -948,21 +940,17 @@
         space(e) {
             return "";
         }
-        code(_ref) {
-            let {text: e, lang: t, escaped: n} = _ref;
+        code({text: e, lang: t, escaped: n}) {
             let s = (t || "").match(m.notSpaceStart)?.[0], i = e.replace(m.endingNewline, "") + `\n`;
             return s ? '<pre><code class="language-' + R(s) + '">' + (n ? i : R(i, !0)) + `</code></pre>\n` : "<pre><code>" + (n ? i : R(i, !0)) + `</code></pre>\n`;
         }
-        blockquote(_ref2) {
-            let {tokens: e} = _ref2;
+        blockquote({tokens: e}) {
             return `<blockquote>\n${this.parser.parse(e)}</blockquote>\n`;
         }
-        html(_ref3) {
-            let {text: e} = _ref3;
+        html({text: e}) {
             return e;
         }
-        heading(_ref4) {
-            let {tokens: e, depth: t} = _ref4;
+        heading({tokens: e, depth: t}) {
             return `<h${t}>${this.parser.parseInline(e)}</h${t}>\n`;
         }
         hr(e) {
@@ -994,12 +982,10 @@
             }
             return t += this.parser.parse(e.tokens, !!e.loose), `<li>${t}</li>\n`;
         }
-        checkbox(_ref5) {
-            let {checked: e} = _ref5;
+        checkbox({checked: e}) {
             return "<input " + (e ? 'checked="" ' : "") + 'disabled="" type="checkbox">';
         }
-        paragraph(_ref6) {
-            let {tokens: e} = _ref6;
+        paragraph({tokens: e}) {
             return `<p>${this.parser.parseInline(e)}</p>\n`;
         }
         table(e) {
@@ -1019,43 +1005,36 @@
             }
             return s && (s = `<tbody>${s}</tbody>`), `<table>\n<thead>\n` + t + `</thead>\n` + s + `</table>\n`;
         }
-        tablerow(_ref7) {
-            let {text: e} = _ref7;
+        tablerow({text: e}) {
             return `<tr>\n${e}</tr>\n`;
         }
         tablecell(e) {
             let t = this.parser.parseInline(e.tokens), n = e.header ? "th" : "td";
             return (e.align ? `<${n} align="${e.align}">` : `<${n}>`) + t + `</${n}>\n`;
         }
-        strong(_ref8) {
-            let {tokens: e} = _ref8;
+        strong({tokens: e}) {
             return `<strong>${this.parser.parseInline(e)}</strong>`;
         }
-        em(_ref9) {
-            let {tokens: e} = _ref9;
+        em({tokens: e}) {
             return `<em>${this.parser.parseInline(e)}</em>`;
         }
-        codespan(_ref10) {
-            let {text: e} = _ref10;
+        codespan({text: e}) {
             return `<code>${R(e, !0)}</code>`;
         }
         br(e) {
             return "<br>";
         }
-        del(_ref11) {
-            let {tokens: e} = _ref11;
+        del({tokens: e}) {
             return `<del>${this.parser.parseInline(e)}</del>`;
         }
-        link(_ref12) {
-            let {href: e, title: t, tokens: n} = _ref12;
+        link({href: e, title: t, tokens: n}) {
             let s = this.parser.parseInline(n), i = J(e);
             if (i === null) return s;
             e = i;
             let r = '<a href="' + e + '"';
             return t && (r += ' title="' + R(t) + '"'), r += ">" + s + "</a>", r;
         }
-        image(_ref13) {
-            let {href: e, title: t, text: n, tokens: s} = _ref13;
+        image({href: e, title: t, text: n, tokens: s}) {
             s && (n = this.parser.parseInline(s, this.parser.textRenderer));
             let i = J(e);
             if (i === null) return R(n);
@@ -1068,36 +1047,28 @@
         }
     };
     var _ = class {
-        strong(_ref14) {
-            let {text: e} = _ref14;
+        strong({text: e}) {
             return e;
         }
-        em(_ref15) {
-            let {text: e} = _ref15;
+        em({text: e}) {
             return e;
         }
-        codespan(_ref16) {
-            let {text: e} = _ref16;
+        codespan({text: e}) {
             return e;
         }
-        del(_ref17) {
-            let {text: e} = _ref17;
+        del({text: e}) {
             return e;
         }
-        html(_ref18) {
-            let {text: e} = _ref18;
+        html({text: e}) {
             return e;
         }
-        text(_ref19) {
-            let {text: e} = _ref19;
+        text({text: e}) {
             return e;
         }
-        link(_ref20) {
-            let {text: e} = _ref20;
+        link({text: e}) {
             return "" + e;
         }
-        image(_ref21) {
-            let {text: e} = _ref21;
+        image({text: e}) {
             return "" + e;
         }
         br() {
@@ -1118,8 +1089,7 @@
         static parseInline(e, t) {
             return new a(t).parseInline(e);
         }
-        parse(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : !0;
+        parse(e, t = !0) {
             let n = "";
             for (let s = 0; s < e.length; s++) {
                 let i = e[s];
@@ -1216,8 +1186,7 @@
             }
             return n;
         }
-        parseInline(e) {
-            let t = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.renderer;
+        parseInline(e, t = this.renderer) {
             let n = "";
             for (let s = 0; s < e.length; s++) {
                 let i = e[s];
@@ -1337,8 +1306,8 @@
         Lexer=b;
         Tokenizer=S;
         Hooks=L;
-        constructor() {
-            this.use(...arguments);
+        constructor(...e) {
+            this.use(...e);
         }
         walkTokens(e, t) {
             let n = [];
@@ -1369,14 +1338,11 @@
             }
             return n;
         }
-        use() {
+        use(...e) {
             let t = this.defaults.extensions || {
                 renderers: {},
                 childTokens: {}
             };
-            for (var _len = arguments.length, e = new Array(_len), _key = 0; _key < _len; _key++) {
-                e[_key] = arguments[_key];
-            }
             return e.forEach((n => {
                 let s = {
                     ...n
@@ -1385,10 +1351,7 @@
                     if (!i.name) throw new Error("extension name required");
                     if ("renderer" in i) {
                         let r = t.renderers[i.name];
-                        r ? t.renderers[i.name] = function() {
-                            for (var _len2 = arguments.length, o = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                                o[_key2] = arguments[_key2];
-                            }
+                        r ? t.renderers[i.name] = function(...o) {
                             let l = i.renderer.apply(this, o);
                             return l === !1 && (l = r.apply(this, o)), l;
                         } : t.renderers[i.name] = i.renderer;
@@ -1405,10 +1368,7 @@
                         if (!(r in i)) throw new Error(`renderer '${r}' does not exist`);
                         if ([ "options", "parser" ].includes(r)) continue;
                         let o = r, l = n.renderer[o], c = i[o];
-                        i[o] = function() {
-                            for (var _len3 = arguments.length, p = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-                                p[_key3] = arguments[_key3];
-                            }
+                        i[o] = (...p) => {
                             let u = l.apply(i, p);
                             return u === !1 && (u = c.apply(i, p)), u || "";
                         };
@@ -1421,10 +1381,7 @@
                         if (!(r in i)) throw new Error(`tokenizer '${r}' does not exist`);
                         if ([ "options", "rules", "lexer" ].includes(r)) continue;
                         let o = r, l = n.tokenizer[o], c = i[o];
-                        i[o] = function() {
-                            for (var _len4 = arguments.length, p = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-                                p[_key4] = arguments[_key4];
-                            }
+                        i[o] = (...p) => {
                             let u = l.apply(i, p);
                             return u === !1 && (u = c.apply(i, p)), u;
                         };
@@ -1441,10 +1398,7 @@
                             if (this.defaults.async) return Promise.resolve(l.call(i, p)).then((d => c.call(i, d)));
                             let u = l.call(i, p);
                             return c.call(i, u);
-                        } : i[o] = function() {
-                            for (var _len5 = arguments.length, p = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-                                p[_key5] = arguments[_key5];
-                            }
+                        } : i[o] = (...p) => {
                             let u = l.apply(i, p);
                             return u === !1 && (u = c.apply(i, p)), u;
                         };
@@ -1522,8 +1476,8 @@
     };
     k.getDefaults = M;
     k.defaults = w;
-    k.use = function() {
-        return z.use(...arguments), k.defaults = z.defaults, H(k.defaults), k;
+    k.use = function(...a) {
+        return z.use(...a), k.defaults = z.defaults, H(k.defaults), k;
     };
     k.walkTokens = function(a, e) {
         return z.walkTokens(a, e);
@@ -1576,20 +1530,17 @@
         space() {
             return "";
         },
-        code(_ref) {
-            let {text: text} = _ref;
+        code({text: text}) {
             const code = text.replace(/\n$/, "");
             return escape(code);
         },
-        blockquote(_ref2) {
-            let {tokens: tokens} = _ref2;
+        blockquote({tokens: tokens}) {
             return this.parser?.parse(tokens) || "";
         },
         html() {
             return "";
         },
-        heading(_ref3) {
-            let {tokens: tokens} = _ref3;
+        heading({tokens: tokens}) {
             return this.parser?.parseInline(tokens) || "";
         },
         hr() {
@@ -1632,8 +1583,7 @@
         checkbox() {
             return "";
         },
-        paragraph(_ref4) {
-            let {tokens: tokens} = _ref4;
+        paragraph({tokens: tokens}) {
             return this.parser?.parseInline(tokens) || "";
         },
         table(token) {
@@ -1658,38 +1608,31 @@
             }
             return header + " " + body;
         },
-        tablerow(_ref5) {
-            let {text: text} = _ref5;
+        tablerow({text: text}) {
             return text;
         },
         tablecell(token) {
             return this.parser?.parseInline(token.tokens) || "";
         },
-        strong(_ref6) {
-            let {text: text} = _ref6;
+        strong({text: text}) {
             return text;
         },
-        em(_ref7) {
-            let {tokens: tokens} = _ref7;
+        em({tokens: tokens}) {
             return this.parser?.parseInline(tokens) || "";
         },
-        codespan(_ref8) {
-            let {text: text} = _ref8;
+        codespan({text: text}) {
             return text;
         },
         br() {
             return " ";
         },
-        del(_ref9) {
-            let {tokens: tokens} = _ref9;
+        del({tokens: tokens}) {
             return this.parser?.parseInline(tokens);
         },
-        link(_ref10) {
-            let {tokens: tokens, href: href, title: title} = _ref10;
+        link({tokens: tokens, href: href, title: title}) {
             return `${this.parser?.parseInline(tokens) || ""} ${href || ""} ${title || ""}`;
         },
-        image(_ref11) {
-            let {title: title, text: text, href: href} = _ref11;
+        image({title: title, text: text, href: href}) {
             return `${text || ""} ${href || ""} ${title || ""}`;
         },
         text(token) {
@@ -5654,8 +5597,7 @@
             value: Date.now() + maxAge
         });
     }
-    async function getData(key) {
-        let isExpireKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    async function getData(key, isExpireKey = false) {
         if (isExpireKey) {
             const item = await db.expires.get(key);
             return item ? item.value : 0;
@@ -5710,11 +5652,7 @@
         }
         return token.text;
     }
-    function genIndex(path) {
-        let content = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-        let router = arguments.length > 2 ? arguments[2] : undefined;
-        let depth = arguments.length > 3 ? arguments[3] : undefined;
-        let indexKey = arguments.length > 4 ? arguments[4] : undefined;
+    function genIndex(path, content = "", router, depth, indexKey) {
         const tokens = window.marked.lexer(content);
         const slugify = window.Docsify.slugify;
         const index = {};
@@ -5886,8 +5824,7 @@
     }
     var cssText = "/* prettier-ignore */\n:root {\n  --plugin-search-input-bg           : var(--form-element-bg);\n  --plugin-search-input-border-color : var(--sidebar-border-color);\n  --plugin-search-input-border-radius: var(--form-element-border-radius);\n  --plugin-search-input-color        : var(--form-element-color);\n  --plugin-search-kbd-bg             : var(--color-bg);\n  --plugin-search-kbd-border         : 1px solid var(--color-mono-3);\n  --plugin-search-kbd-border-radius  : 4px;\n  --plugin-search-kbd-color          : var(--color-mono-5);\n  --plugin-search-margin             : 10px;\n  --plugin-search-reset-bg           : var(--theme-color);\n  --plugin-search-reset-border       : transparent;\n  --plugin-search-reset-border-radius: var(--border-radius);\n  --plugin-search-reset-color        : #fff;\n}\n\n.search {\n  margin: var(--plugin-search-margin);\n}\n\n/* Input */\n/* ================================== */\n.search .input-wrap {\n  position: relative;\n}\n\n.search input {\n  width: 100%;\n  padding-inline-end: 36px;\n  border: 1px solid var(--plugin-search-input-border-color);\n  border-radius: var(--plugin-search-input-border-radius);\n  background: var(--plugin-search-input-bg);\n  color: var(--plugin-search-input-color);\n}\n\n.search input::-webkit-search-decoration,\n.search input::-webkit-search-cancel-button {\n  appearance: none;\n}\n\n.search .clear-button,\n.search .kbd-group {\n  visibility: hidden;\n  display: flex;\n  gap: 0.15em;\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  opacity: 0;\n  translate: 0 -50%;\n  transition-property: opacity, visibility;\n  transition-duration: var(--duration-medium);\n}\n\n/* Note: invalid = empty, valid = not empty */\n.search input:valid ~ .clear-button,\n.search input:invalid:where(:focus, :hover) ~ .kbd-group,\n.search .kbd-group:hover {\n  visibility: visible;\n  opacity: 1;\n}\n\n.search .clear-button {\n  --_button-size: 20px;\n  --_content-size: 12px;\n\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: var(--_button-size);\n  width: var(--_button-size);\n  border: var(--plugin-search-reset-border);\n  border-radius: var(--plugin-search-reset-border-radius);\n  background: var(--plugin-search-reset-bg);\n  cursor: pointer;\n}\n\n.search .clear-button::before,\n.search .clear-button::after {\n  content: '';\n  position: absolute;\n  height: 2px;\n  width: var(--_content-size);\n  color: var(--plugin-search-reset-color);\n  background: var(--plugin-search-reset-color);\n}\n\n.search .clear-button::before {\n  rotate: 45deg;\n}\n\n.search .clear-button::after {\n  rotate: -45deg;\n}\n\n.search kbd {\n  border: var(--plugin-search-kbd-border);\n  border-radius: var(--plugin-search-kbd-border-radius);\n  background: var(--plugin-search-kbd-bg);\n  color: var(--plugin-search-kbd-color);\n  font-size: var(--font-size-s);\n}\n\n/* Results */\n/* ================================== */\n.search a:hover {\n  color: var(--theme-color);\n}\n\n.search .results-panel:empty {\n  display: none;\n}\n\n/* Hide other sidebar items when results are shown */\n.search:has(.results-panel:not(:empty)) ~ * {\n  display: none;\n}\n\n/* Dim other sidebar items when no results are found */\n.search:where(:has(input:valid:focus), :has(.results-panel::empty)) ~ * {\n  opacity: 0.2;\n}\n\n.search .matching-post {\n  overflow: hidden;\n  padding: 1em 0 1.2em 0;\n  border-bottom: 1px solid var(--color-mono-2);\n}\n\n.search .matching-post:hover a {\n  text-decoration-color: transparent;\n}\n\n.search .matching-post:hover .title {\n  text-decoration: inherit;\n  text-decoration-color: var(--link-underline-color-hover);\n}\n\n.search .matching-post .title {\n  margin: 0 0 0.5em 0;\n  line-height: 1.4;\n}\n\n.search .matching-post .content {\n  margin: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status {\n  margin-bottom: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status:empty {\n  display: none;\n}\n";
     let NO_DATA_TEXT = "";
-    function tpl(vm) {
-        let defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+    function tpl(vm, defaultValue = "") {
         const {insertAfter: insertAfter, insertBefore: insertBefore} = vm.config?.search || {};
         const html = `\n    <div class="input-wrap">\n      <input type="search" value="${defaultValue}" required aria-keyshortcuts="/ control+k meta+k" />\n      <button class="clear-button" title="Clear search">\n        <span class="visually-hidden">Clear search</span>\n      </button>\n      <div class="kbd-group">\n        <kbd title="Press / to search">/</kbd>\n        <kbd title="Press Control+K to search">⌃K</kbd>\n      </div>\n    </div>\n    <p class="results-status" aria-live="polite"></p>\n    <div class="results-panel"></div>\n  `;
         const sidebarElm = Docsify.dom.find(".sidebar");
