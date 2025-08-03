@@ -6322,11 +6322,13 @@
                 this.onRender();
                 if (autoHeader && activeEl) {
                     const main = getNode("#main");
-                    const firstNode = main.children[0];
-                    if (firstNode && firstNode.tagName !== "H1") {
-                        const h1 = this.compiler.header(activeEl.innerText, 1);
-                        const wrapper = create("div", h1);
-                        before(main, wrapper.children[0]);
+                    const hasH1 = main.querySelector("h1");
+                    if (!hasH1) {
+                        const h1HTML = this.compiler.header(activeEl.innerText, 1);
+                        const h1Node = create("div", h1HTML).firstElementChild;
+                        if (h1Node) {
+                            before(main, h1Node);
+                        }
                     }
                 }
             }
