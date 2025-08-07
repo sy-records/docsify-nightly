@@ -19,20 +19,17 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Install dependencies
+      - name: Clone & Build Docsify
         run: |
+          set -e
           git clone https://github.com/docsifyjs/docsify.git
           cd docsify
           npm ci --ignore-scripts
-
-      - name: Build docsify
-        run: |
-          cd docsify
           npm run build
 
-      - name: Move files
+      - name: Sync files
         run: |
-          cp -Rf docsify/dist ./
+          rsync -av --delete docsify/dist/ ./dist/
           rm -rf docsify
           git status
 
@@ -41,7 +38,7 @@ jobs:
         id: auto-commit-action
         with:
           commit_user_name: sy-records
-          commit_user_email: 52o@qq52o.cn
+          commit_user_email: lufei@docsifyjs.org
           commit_message: Nightly release for docsify
 
       - name: Trigger publish workflow
