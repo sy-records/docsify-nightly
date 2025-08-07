@@ -137,6 +137,18 @@
         }
         return qs.length ? `?${qs.join("&")}` : "";
     }
+    function stripUrlExceptId(str) {
+        const [path, queryString] = str.split("?");
+        if (!queryString) {
+            return str;
+        }
+        const params = new URLSearchParams(queryString);
+        const id = params.get("id");
+        if (id !== null) {
+            return `${path}?id=${id}`;
+        }
+        return path;
+    }
     const isAbsolutePath = cached$1((path => /(:|(\/{2}))/g.test(path)));
     const removeParams = cached$1((path => path.split(/[?#]/)[0]));
     const getParentPath = cached$1((path => {
@@ -4006,7 +4018,7 @@
         const url = router.toURL(router.getCurrentPath(), {
             id: slug
         });
-        nextToc.slug = url;
+        nextToc.slug = stripUrlExceptId(url);
         compiler.toc.push(nextToc);
         return `<h${depth} id="${slug}" tabindex="-1"><a href="${url}" data-id="${slug}" class="anchor"><span>${str}</span></a></h${depth}>`;
     };
@@ -6871,6 +6883,7 @@
                 if (!sidebar) {
                     return;
                 }
+                href = stripUrlExceptId(href);
                 const oldActive = find(sidebar, "li.active");
                 const newActive = find(sidebar, `a[href="${href}"], a[href="${decodeURIComponent(href)}"]`)?.closest("li");
                 if (newActive && newActive !== oldActive) {
@@ -7201,7 +7214,8 @@
         removeParams: removeParams,
         replaceSlug: replaceSlug,
         resolvePath: resolvePath,
-        stringifyQuery: stringifyQuery
+        stringifyQuery: stringifyQuery,
+        stripUrlExceptId: stripUrlExceptId
     });
     function initGlobalAPI() {
         window.Docsify = {

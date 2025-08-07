@@ -5583,7 +5583,7 @@
     if (_Dexie.semVer !== Dexie.semVer) {
         throw new Error(`Two different versions of Dexie loaded in the same app: ${_Dexie.semVer} and ${Dexie.semVer}`);
     }
-    let INDEXES = {};
+    let INDEXES = [];
     const db = new Dexie("docsify");
     db.version(1).stores({
         search: "slug, title, body, path, indexKey",
@@ -5655,7 +5655,7 @@
     function genIndex(path, content = "", router, depth, indexKey) {
         const tokens = window.marked.lexer(content);
         const slugify = window.Docsify.slugify;
-        const index = {};
+        const index = [];
         let slug;
         let title = "";
         tokens.forEach(((token, tokenIndex) => {
@@ -5803,7 +5803,7 @@
         const isExpired = await getData(expireKey, true) < Date.now();
         INDEXES = await getData(indexKey);
         if (isExpired) {
-            INDEXES = {};
+            INDEXES = [];
         } else if (!isAuto) {
             return;
         }
@@ -5893,9 +5893,9 @@
         if (!sidebarElm) {
             return;
         }
-        const keywords = vm.router.parse().query.s;
+        const keywords = vm.router.parse().query.s || "";
         Docsify.dom.style(cssText);
-        tpl(vm, keywords);
+        tpl(vm, escapeHtml(keywords));
         bindEvents();
         keywords && setTimeout((_ => doSearch(keywords)), 500);
     }

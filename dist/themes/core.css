@@ -95,7 +95,7 @@
   --callout-charm-translate       : -50% -50%;
   --callout-color                 : ;
   --callout-padding               : 1em 1em 1em var(--callout-charm-size);
-  --code-bg                       : var(--color-mono-1);
+  --code-bg                       : var(--color-mono-2);
   --code-color                    : ;
   --codeblock-bg                  : var(--code-bg);
   --codeblock-color               : var(--code-color);
@@ -708,6 +708,9 @@ body:not:has(.sidebar) :is(main > .content) {
 :is(:is(.cover h1) a),:is(:is(.cover h1) a):hover {
         text-decoration-color: transparent;
       }
+:is(.cover h1) a {
+      color: var(--cover-title-color);
+    }
 :is(.cover h1) small {
       font-weight: var(--font-weight);
       position: absolute;
