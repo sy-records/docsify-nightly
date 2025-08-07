@@ -18,7 +18,7 @@ see https://cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/
 <!-- Core Theme -->
 <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/themes/core.min.css">
 <!-- Vue Theme (add-on) -->
-<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/themes/vue.css"/>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/themes/addons/vue.min.css"/>
 
 <script src="//cdn.jsdelivr.net/gh/sy-records/docsify-nightly@develop/dist/docsify.min.js"></script>
 ```
