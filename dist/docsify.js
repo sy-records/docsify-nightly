@@ -6049,6 +6049,14 @@
         };
     }
     const cached = {};
+    function extractFragmentContent(text, fragment) {
+        if (!fragment) {
+            return text;
+        }
+        const pattern = new RegExp(`(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]([\\s\\S]*?)(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`);
+        const match = text.match(pattern);
+        return stripIndent((match || [])[1] || "").trim();
+    }
     function walkFetchEmbed({embedTokens: embedTokens, compile: compile, fetch: fetch}, cb) {
         let token;
         let step = 0;
@@ -6076,12 +6084,13 @@
                         if (frontMatterInstalled === true) {
                             text = $docsify.frontMatter.parseMarkdown(text);
                         }
+                        if (currentToken.embed.fragment) {
+                            text = extractFragmentContent(text, currentToken.embed.fragment);
+                        }
                         embedToken = compile.lexer(text);
                     } else if (currentToken.embed.type === "code") {
                         if (currentToken.embed.fragment) {
-                            const fragment = currentToken.embed.fragment;
-                            const pattern = new RegExp(`(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]([\\s\\S]*)(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`);
-                            text = stripIndent((text.match(pattern) || [])[1] || "").trim();
+                            text = extractFragmentContent(text, currentToken.embed.fragment);
                         }
                         embedToken = compile.lexer("```" + currentToken.embed.lang + "\n" + text.replace(/`/g, "@DOCSIFY_QM@") + "\n```\n");
                     } else if (currentToken.embed.type === "mermaid") {
