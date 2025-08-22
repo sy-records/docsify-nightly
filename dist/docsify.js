@@ -6863,11 +6863,16 @@
                 const {query: query} = this.route;
                 const focusEl = query.id ? find(`#${query.id}`) : find("#main :where(h1, h2, h3, h4, h5, h6)") || find("#main");
                 if (focusEl) {
+                    if (!focusEl.hasAttribute("tabindex")) {
+                        focusEl.setAttribute("tabindex", "-1");
+                        focusEl.setAttribute("data-added-tabindex", "true");
+                    }
+                    if (focusEl.hasAttribute("data-added-tabindex")) {
+                        focusEl.scrollIntoView({
+                            behavior: "smooth"
+                        });
+                    }
                     focusEl.focus(settings);
-                    focusEl.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
                 }
                 return focusEl;
             }
