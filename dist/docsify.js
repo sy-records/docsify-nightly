@@ -5651,8 +5651,8 @@
                 if (toc[i].ignoreSubHeading) {
                     const deletedHeaderLevel = toc[i].depth;
                     toc.splice(i, 1);
-                    for (let j = i; j < toc.length && deletedHeaderLevel < toc[j].depth; j++) {
-                        toc.splice(j, 1) && j-- && i++;
+                    while (i < toc.length && toc[i].depth > deletedHeaderLevel) {
+                        toc.splice(i, 1);
                     }
                     i--;
                 }
