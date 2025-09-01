@@ -30,6 +30,9 @@
             config: config
         };
     }
+    function removeAtag(str = "") {
+        return str.replace(/(<\/?a.*?>)/gi, "");
+    }
     function getAndRemoveDocsifyIgnoreConfig(content = "") {
         let ignoreAllSubs, ignoreSubHeading;
         if (/<!-- {docsify-ignore} -->/g.test(content)) {
@@ -5661,18 +5664,12 @@
         tokens.forEach(((token, tokenIndex) => {
             if (token.type === "heading" && token.depth <= depth) {
                 const {str: str, config: config} = getAndRemoveConfig(token.text);
-                const text = getAndRemoveDocsifyIgnoreConfig(token.text).content;
-                if (config.id) {
-                    slug = router.toURL(path, {
-                        id: slugify(config.id)
-                    });
-                } else {
-                    slug = router.toURL(path, {
-                        id: slugify(escapeHtml(text))
-                    });
-                }
+                slug = router.toURL(path, {
+                    id: slugify(config.id || token.text)
+                });
                 if (str) {
                     title = getAndRemoveDocsifyIgnoreConfig(str).content;
+                    title = removeAtag(title.trim());
                 }
                 index[slug] = {
                     slug: slug,

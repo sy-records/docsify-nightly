@@ -1948,7 +1948,7 @@
         if (typeof str !== "string") {
             return "";
         }
-        let slug = str.trim().replace(/[A-Z]+/g, lower).replace(/<[^>]+>/g, "").replace(re, "").replace(/\s/g, "-").replace(/-+/g, "-").replace(/^(\d)/, "_$1");
+        let slug = str.trim().normalize("NFKD").replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/[A-Z]+/g, lower).replace(/<[^>]+>/g, "").replace(re, "").replace(/\s/g, "-").replace(/^(\d)/, "_$1");
         let count = cache$1[slug];
         count = Object.keys(cache$1).includes(slug) ? count + 1 : 0;
         cache$1[slug] = count;
@@ -4002,9 +4002,9 @@
         }
         return `<img src="${url}" data-origin="${href}" alt="${text}" ${attrs.join(" ")} />`;
     };
-    const headingCompiler = ({renderer: renderer, router: router, compiler: compiler}) => renderer.heading = function({tokens: tokens, depth: depth}) {
-        const text = this.parser.parseInline(tokens);
-        let {str: str, config: config} = getAndRemoveConfig(text);
+    const headingCompiler = ({renderer: renderer, router: router, compiler: compiler}) => renderer.heading = function({tokens: tokens, depth: depth, text: text}) {
+        const parsedText = this.parser.parseInline(tokens);
+        let {str: str, config: config} = getAndRemoveConfig(parsedText);
         const nextToc = {
             depth: depth,
             title: str
@@ -4014,7 +4014,7 @@
         nextToc.title = removeAtag(str);
         nextToc.ignoreAllSubs = ignoreAllSubs;
         nextToc.ignoreSubHeading = ignoreSubHeading;
-        const slug = slugify(config.id || str);
+        const slug = slugify(config.id || text);
         const url = router.toURL(router.getCurrentPath(), {
             id: slug
         });
