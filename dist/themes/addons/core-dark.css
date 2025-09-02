@@ -27,10 +27,35 @@
 
   color-scheme: dark;
 }
+/* Cover */
+/* ========================================================================== */
 .cover-main a.button.secondary {
     color: var(--color-text);
     border-color: rgba(255, 255, 255, 0.5);
   }
+/* Markdown */
+/* ========================================================================== */
+[class]:is(.markdown-section .callout) {
+      --callout-bg: unset;
+    }
+.caution:is(.markdown-section .callout) {
+      --callout-border-color: #991b1b; /* Tailwind: red 800 */
+    }
+.important:is(.markdown-section .callout) {
+      --callout-border-color: #5b21b6; /* Tailwind: violet 800 */
+    }
+.note:is(.markdown-section .callout) {
+      --callout-border-color: var(--theme-color-4);
+    }
+.tip:is(.markdown-section .callout) {
+      --callout-border-color: #115e59; /* Tailwind: teal 800 */
+    }
+.warning:is(.markdown-section .callout) {
+      --callout-border-color: #a16207; /* Tailwind: yellow 700 */
+    }
+:is(.markdown-section .callout) code,:is(.markdown-section .callout) pre:where([data-lang]) {
+      background: var(--color-mono-min);
+    }
 /* Force light mode for iframes in dark theme */
 iframe,
 iframe *,

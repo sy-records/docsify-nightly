@@ -1948,7 +1948,7 @@
         if (typeof str !== "string") {
             return "";
         }
-        let slug = str.trim().normalize("NFKD").replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/[A-Z]+/g, lower).replace(/<[^>]+>/g, "").replace(re, "").replace(/\s/g, "-").replace(/^(\d)/, "_$1");
+        let slug = str.trim().normalize("NFC").replace(/\uFE0F/g, "").replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/[A-Z]+/g, lower).replace(/<[^>]+>/g, "").replace(re, "").replace(/\s/g, "-").replace(/^(\d)/, "_$1");
         let count = cache$1[slug];
         count = Object.keys(cache$1).includes(slug) ? count + 1 : 0;
         cache$1[slug] = count;
@@ -5393,6 +5393,27 @@
         }
         return result;
     };
+    const blockquoteCompiler = ({renderer: renderer}) => renderer.blockquote = function({tokens: tokens}) {
+        const calloutData = tokens[0].type === "paragraph" && tokens[0].raw.match(/^(\[!(\w+)\])/);
+        let openTag = "<blockquote>";
+        let closeTag = "</blockquote>";
+        if (calloutData) {
+            const calloutMark = calloutData[1];
+            const calloutType = calloutData[2].toLowerCase();
+            const token = tokens[0].tokens[0];
+            [ "raw", "text" ].forEach((key => {
+                token[key] = token[key].replace(calloutMark, "").trimStart();
+            }));
+            if (tokens.length > 1 && !token.raw.trim()) {
+                tokens = tokens.slice(1);
+            }
+            openTag = `<div class="callout ${calloutType}">`;
+            closeTag = `</div>`;
+        }
+        const body = this.parser.parse(tokens);
+        const html = `${openTag}${body}${closeTag}`;
+        return html;
+    };
     const taskListCompiler = ({renderer: renderer}) => renderer.list = function(token) {
         const ordered = token.ordered;
         const start = token.start;
@@ -5619,6 +5640,9 @@
                 renderer: renderer,
                 router: router,
                 compiler: this
+            });
+            origin.blockquoteCompiler = blockquoteCompiler({
+                renderer: renderer
             });
             origin.code = highlightCodeCompiler({
                 renderer: renderer
