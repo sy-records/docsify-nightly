@@ -1,5 +1,5 @@
 /*!
- * Docsify Plugin: disqus v5.0.0-rc.1
+ * Docsify Plugin: disqus v5.0.0-rc.3
  * https://docsify.js.org
  * (c) 2017-2025
  * MIT license
