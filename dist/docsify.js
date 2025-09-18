@@ -1893,7 +1893,7 @@
     }
     function main(config) {
         const {hideSidebar: hideSidebar, name: name} = config;
-        const aside = hideSidebar ? "" : `\n    <button class="sidebar-toggle" tabindex="-1" title="Press \\ to toggle">\n      <div class="sidebar-toggle-button" tabindex="0" aria-label="Toggle primary navigation" aria-keyshortcuts="\\" aria-controls="__sidebar">\n        <span></span><span></span><span></span>\n      </div>\n    </button>\n    <aside id="__sidebar" class="sidebar${!isMobile() ? " show" : ""}" tabindex="-1" role="none">\n      ${config.name ? `\n            <h1 class="app-name"><a class="app-name-link" data-nosearch>${config.logo ? `<img alt="${name}" src=${config.logo} />` : name}</a></h1>\n          ` : ""}\n      <div class="sidebar-nav" role="navigation" aria-label="primary">\x3c!--sidebar--\x3e</div>\n    </aside>\n  `;
+        const aside = hideSidebar ? "" : `\n    <button class="sidebar-toggle" tabindex="-1" title="Press \\ to toggle">\n      <div class="sidebar-toggle-button" tabindex="0" aria-label="Hide primary navigation" aria-keyshortcuts="Use shortcut key \\" aria-controls="__sidebar" role="button">\n        <span></span><span></span><span></span>\n      </div>\n    </button>\n    <aside id="__sidebar" class="sidebar${!isMobile() ? " show" : ""}" tabindex="-1" role="none">\n      ${config.name ? `\n            <h1 class="app-name"><a class="app-name-link" data-nosearch>${config.logo ? `<img alt="${name}" src=${config.logo} />` : name}</a></h1>\n          ` : ""}\n      <div class="sidebar-nav" role="navigation" aria-label="primary">\x3c!--sidebar--\x3e</div>\n    </aside>\n  `;
         return `\n    <main role="presentation">\n      ${aside}\n      <section class="content">\n        <article id="main" class="markdown-section" role="main" tabindex="-1">\x3c!--main--\x3e</article>\n      </section>\n    </main>\n  `;
     }
     function cover() {
@@ -6961,7 +6961,9 @@
                 const inertElms = findAll("body > *:not(main, script), main > .content");
                 const isShow = sidebarElm.classList.toggle("show", force);
                 ariaElms.forEach((toggleElm => {
-                    toggleElm.setAttribute("aria-expanded", force ?? sidebarElm.classList.contains("show"));
+                    const expanded = force ?? sidebarElm.classList.contains("show");
+                    toggleElm.setAttribute("aria-expanded", expanded);
+                    toggleElm.setAttribute("aria-label", expanded ? "Hide primary navigation" : "Show primary navigation");
                 }));
                 if (isShow && isMobile()) {
                     inertElms.forEach((elm => elm.setAttribute("inert", "")));
