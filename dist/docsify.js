@@ -5542,6 +5542,17 @@
             };
         }
     };
+    const tableCellCompiler = ({renderer: renderer}) => renderer.tablecell = function(token) {
+        let content;
+        if (token.embedTokens && token.embedTokens.length > 0) {
+            content = this.parser.parse(token.embedTokens);
+        } else {
+            content = this.parser.parseInline(token.tokens);
+        }
+        const type = token.header ? "th" : "td";
+        const tag = token.align ? `<${type} align="${token.align}">` : `<${type}>`;
+        return tag + content + `</${type}>\n`;
+    };
     const cachedLinks = {};
     class Compiler {
         constructor(config, router) {
@@ -5667,6 +5678,10 @@
             });
             origin.listitem = taskListItemCompiler({
                 renderer: renderer
+            });
+            origin.tablecell = tableCellCompiler({
+                renderer: renderer,
+                compiler: this
             });
             renderer.origin = origin;
             return renderer;
@@ -6140,7 +6155,10 @@
                 }
                 cb({
                     token: currentToken,
-                    embedToken: embedToken
+                    embedToken: embedToken,
+                    rowIndex: currentToken.rowIndex,
+                    cellIndex: currentToken.cellIndex,
+                    tokenRef: currentToken.tokenRef
                 });
                 if (++count >= embedTokens.length) {
                     cb({});
@@ -6165,17 +6183,37 @@
         const embedTokens = [];
         const linkRE = compile.Lexer.rules.inline.normal.link;
         const links = tokens.links;
+        const linkMatcher = new RegExp(linkRE.source, "g");
         tokens.forEach(((token, index) => {
             if (token.type === "paragraph") {
-                token.text = token.text.replace(new RegExp(linkRE.source, "g"), ((src, filename, href, title) => {
+                token.text = token.text.replace(linkMatcher, ((src, filename, href, title) => {
                     const embed = compiler.compileEmbed(href, title);
                     if (embed) {
                         embedTokens.push({
                             index: index,
+                            tokenRef: token,
                             embed: embed
                         });
                     }
                     return src;
+                }));
+            } else if (token.type === "table") {
+                token.rows.forEach(((row, rowIndex) => {
+                    row.forEach(((cell, cellIndex) => {
+                        cell.text = cell.text.replace(linkMatcher, ((src, filename, href, title) => {
+                            const embed = compiler.compileEmbed(href, title);
+                            if (embed) {
+                                embedTokens.push({
+                                    index: index,
+                                    tokenRef: token,
+                                    rowIndex: rowIndex,
+                                    cellIndex: cellIndex,
+                                    embed: embed
+                                });
+                            }
+                            return src;
+                        }));
+                    }));
                 }));
             }
         }));
@@ -6184,20 +6222,25 @@
             compile: compile,
             embedTokens: embedTokens,
             fetch: fetch
-        }, (({embedToken: embedToken, token: token}) => {
+        }, (({embedToken: embedToken, token: token, rowIndex: rowIndex, cellIndex: cellIndex, tokenRef: tokenRef}) => {
             if (token) {
-                let index = token.index;
-                moves.forEach((pos => {
-                    if (index > pos.start) {
-                        index += pos.length;
-                    }
-                }));
-                Object.assign(links, embedToken.links);
-                tokens = tokens.slice(0, index).concat(embedToken, tokens.slice(index + 1));
-                moves.push({
-                    start: index,
-                    length: embedToken.length - 1
-                });
+                if (typeof rowIndex === "number" && typeof cellIndex === "number") {
+                    const cell = tokenRef.rows[rowIndex][cellIndex];
+                    cell.embedTokens = embedToken;
+                } else {
+                    let index = token.index;
+                    moves.forEach((pos => {
+                        if (index > pos.start) {
+                            index += pos.length;
+                        }
+                    }));
+                    Object.assign(links, embedToken.links);
+                    tokens = tokens.slice(0, index).concat(embedToken, tokens.slice(index + 1));
+                    moves.push({
+                        start: index,
+                        length: embedToken.length - 1
+                    });
+                }
             } else {
                 cached[raw] = tokens.concat();
                 tokens.links = cached[raw].links = links;
