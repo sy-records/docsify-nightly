@@ -6700,7 +6700,7 @@
                 }
             }
             _fetchFallbackPage(path, qs, cb = noop) {
-                const {requestHeaders: requestHeaders, fallbackLanguages: fallbackLanguages, loadSidebar: loadSidebar} = this.config;
+                const {requestHeaders: requestHeaders, fallbackLanguages: fallbackLanguages, fallbackDefaultLanguage: fallbackDefaultLanguage, loadSidebar: loadSidebar} = this.config;
                 if (!fallbackLanguages) {
                     return false;
                 }
@@ -6708,7 +6708,7 @@
                 if (fallbackLanguages.indexOf(local) === -1) {
                     return false;
                 }
-                const newPath = this.router.getFile(path.replace(new RegExp(`^/${local}`), ""));
+                const newPath = this.router.getFile(path.replace(new RegExp(`^/${local}`), fallbackDefaultLanguage));
                 const req = this.#request(newPath + qs, requestHeaders);
                 req.then(((text, opt) => this._renderMain(text, opt, this._loadSideAndNav(path, qs, loadSidebar, cb))), (_error => this._fetch404(path, qs, cb)));
                 return true;
@@ -7120,6 +7120,7 @@
     const currentScript = document.currentScript;
     function config(vm) {
         const config = Object.assign({
+            alias: {},
             auto2top: false,
             autoHeader: false,
             basePath: "",
@@ -7131,11 +7132,16 @@
             ext: ".md",
             externalLinkRel: "noopener",
             externalLinkTarget: "_blank",
+            fallbackLanguages: null,
+            fallbackDefaultLanguage: "",
             formatUpdated: "",
-            ga: "",
+            hideSidebar: false,
             homepage: "README.md",
+            keyBindings: {},
             loadNavbar: null,
             loadSidebar: null,
+            logo: false,
+            markdown: null,
             maxLevel: 6,
             mergeNavbar: false,
             name: "",
@@ -7144,11 +7150,14 @@
             noCompileLinks: [],
             noEmoji: false,
             notFoundPage: false,
+            onlyCover: false,
             plugins: [],
             relativePath: false,
             repo: "",
-            routes: {},
+            requestHeaders: {},
             routerMode: "hash",
+            routes: {},
+            skipLink: "Skip to main content",
             subMaxLevel: 0,
             topMargin: 0,
             __themeColor: "",
