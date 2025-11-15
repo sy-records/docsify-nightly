@@ -5394,25 +5394,35 @@
         return result;
     };
     const blockquoteCompiler = ({renderer: renderer}) => renderer.blockquote = function({tokens: tokens}) {
-        const calloutData = tokens[0].type === "paragraph" && tokens[0].raw.match(/^(\[!(\w+)\])/);
         let openTag = "<blockquote>";
         let closeTag = "</blockquote>";
-        if (calloutData) {
-            const calloutMark = calloutData[1];
-            const calloutType = calloutData[2].toLowerCase();
-            const token = tokens[0].tokens[0];
-            [ "raw", "text" ].forEach((key => {
-                token[key] = token[key].replace(calloutMark, "").trimStart();
-            }));
-            if (tokens.length > 1 && !token.raw.trim()) {
-                tokens = tokens.slice(1);
+        const firstParagraphIndex = tokens.findIndex((t => t.type === "paragraph"));
+        const firstParagraph = tokens[firstParagraphIndex];
+        if (firstParagraph) {
+            const calloutData = firstParagraph.raw.match(/^(\[!(\w+)\])/);
+            if (calloutData) {
+                const calloutMark = calloutData[1];
+                const calloutType = calloutData[2].toLowerCase();
+                firstParagraph.raw = firstParagraph.raw.replace(calloutMark, "").trimStart();
+                if (firstParagraph.tokens && firstParagraph.tokens.length > 0) {
+                    firstParagraph.tokens.forEach((t => {
+                        if (t.raw) {
+                            t.raw = t.raw.replace(calloutMark, "");
+                        }
+                        if (t.text) {
+                            t.text = t.text.replace(calloutMark, "");
+                        }
+                    }));
+                }
+                if (!firstParagraph.raw.trim()) {
+                    tokens.splice(firstParagraphIndex, 1);
+                }
+                openTag = `<div class="callout ${calloutType}">`;
+                closeTag = `</div>`;
             }
-            openTag = `<div class="callout ${calloutType}">`;
-            closeTag = `</div>`;
         }
         const body = this.parser.parse(tokens);
-        const html = `${openTag}${body}${closeTag}`;
-        return html;
+        return `${openTag}${body}${closeTag}`;
     };
     const taskListCompiler = ({renderer: renderer}) => renderer.list = function(token) {
         const ordered = token.ordered;
