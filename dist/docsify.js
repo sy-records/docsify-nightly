@@ -5690,8 +5690,7 @@
                 renderer: renderer
             });
             origin.tablecell = tableCellCompiler({
-                renderer: renderer,
-                compiler: this
+                renderer: renderer
             });
             renderer.origin = origin;
             return renderer;
