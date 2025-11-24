@@ -5532,12 +5532,12 @@
         },
         video(url, title) {
             return {
-                html: `<video src="${url}" ${title || "controls"}>Not Support</video>`
+                html: `<video src="${url}" ${title || "controls"}>Not Supported</video>`
             };
         },
         audio(url, title) {
             return {
-                html: `<audio src="${url}" ${title || "controls"}>Not Support</audio>`
+                html: `<audio src="${url}" ${title || "controls"}>Not Supported</audio>`
             };
         },
         code(url, title) {
@@ -5641,6 +5641,7 @@
                     embed.type = type;
                 }
                 embed.fragment = config.fragment;
+                embed.omitFragmentLine = config.omitFragmentLine;
                 return embed;
             }
         }
@@ -6104,11 +6105,16 @@
         };
     }
     const cached = {};
-    function extractFragmentContent(text, fragment) {
+    function extractFragmentContent(text, fragment, fullLine) {
         if (!fragment) {
             return text;
         }
-        const pattern = new RegExp(`(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]([\\s\\S]*?)(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`);
+        let fragmentRegex = `(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`;
+        const contentRegex = `[\\s\\S]*?`;
+        if (fullLine) {
+            fragmentRegex = `.*${fragmentRegex}.*\n`;
+        }
+        const pattern = new RegExp(`(?:${fragmentRegex})(${contentRegex})(?:${fragmentRegex})`);
         const match = text.match(pattern);
         return stripIndent((match || [])[1] || "").trim();
     }
@@ -6140,12 +6146,12 @@
                             text = $docsify.frontMatter.parseMarkdown(text);
                         }
                         if (currentToken.embed.fragment) {
-                            text = extractFragmentContent(text, currentToken.embed.fragment);
+                            text = extractFragmentContent(text, currentToken.embed.fragment, currentToken.embed.omitFragmentLine);
                         }
                         embedToken = compile.lexer(text);
                     } else if (currentToken.embed.type === "code") {
                         if (currentToken.embed.fragment) {
-                            text = extractFragmentContent(text, currentToken.embed.fragment);
+                            text = extractFragmentContent(text, currentToken.embed.fragment, currentToken.embed.omitFragmentLine);
                         }
                         embedToken = compile.lexer("```" + currentToken.embed.lang + "\n" + text.replace(/`/g, "@DOCSIFY_QM@") + "\n```\n");
                     } else if (currentToken.embed.type === "mermaid") {
