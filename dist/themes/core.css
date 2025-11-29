@@ -1212,8 +1212,9 @@ body:has(.app-nav) .markdown-section {
       line-height: 1;
       opacity: 0.5;
     }
-.markdown-section code,.markdown-section samp {
+.markdown-section :not(pre) > code,.markdown-section samp {
     white-space: pre-wrap;
+    overflow-wrap: break-word;
   }
 .markdown-section code {
     margin: 0 0.1em;
