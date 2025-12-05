@@ -12,6 +12,7 @@
         script.src = options.host + "/matomo.js";
         document.body.appendChild(script);
     }
+    const window = globalThis;
     function init(options) {
         window._paq = window._paq || [];
         window._paq.push([ "trackPageView" ]);
@@ -24,19 +25,19 @@
     }
     function collect() {
         if (!window._paq) {
-            init($docsify.matomo);
+            init(window.$docsify.matomo);
         }
         window._paq.push([ "setCustomUrl", window.location.hash.substr(1) ]);
         window._paq.push([ "setDocumentTitle", document.title ]);
         window._paq.push([ "trackPageView" ]);
     }
     const install = function(hook) {
-        if (!$docsify.matomo) {
+        if (!window.$docsify.matomo) {
             console.error("[Docsify] matomo is required.");
             return;
         }
         hook.beforeEach(collect);
     };
     window.$docsify = window.$docsify || {};
-    $docsify.plugins = [ install, ...$docsify.plugins || [] ];
+    window.$docsify.plugins = [ install, ...window.$docsify.plugins || [] ];
 })();

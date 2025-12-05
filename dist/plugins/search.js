@@ -1583,7 +1583,7 @@
             itemBody += this.parser?.parse(item.tokens, !!item.loose);
             return `${itemBody || ""}`;
         },
-        checkbox() {
+        checkbox(options) {
             return "";
         },
         paragraph({tokens: tokens}) {
@@ -5658,7 +5658,7 @@
     function genIndex(path, content = "", router, depth, indexKey) {
         const tokens = window.marked.lexer(content);
         const slugify = window.Docsify.slugify;
-        const index = [];
+        const index = {};
         let slug;
         let title = "";
         tokens.forEach(((token, tokenIndex) => {
@@ -5937,7 +5937,7 @@
                         const sidebarElm = document.querySelector(".sidebar");
                         const sidebarToggleElm = document.querySelector(".sidebar-toggle");
                         const searchElm = sidebarElm?.querySelector('input[type="search"]');
-                        const isSidebarHidden = sidebarElm?.getBoundingClientRect().x < 0;
+                        const isSidebarHidden = (sidebarElm?.getBoundingClientRect().x ?? 0) < 0;
                         isSidebarHidden && sidebarToggleElm?.click();
                         setTimeout((() => searchElm?.focus()), isSidebarHidden ? 250 : 0);
                     }
@@ -5954,5 +5954,5 @@
         }));
     };
     window.$docsify = window.$docsify || {};
-    $docsify.plugins = [ install, ...$docsify.plugins || [] ];
+    window.$docsify.plugins = [ install, ...window.$docsify.plugins || [] ];
 })();

@@ -12,6 +12,7 @@
         script.src = "https://www.google-analytics.com/analytics.js";
         document.body.appendChild(script);
     }
+    const window = globalThis;
     function init(id) {
         appendScript();
         window.ga = window.ga || function() {
@@ -22,18 +23,18 @@
     }
     function collect() {
         if (!window.ga) {
-            init($docsify.ga);
+            init(window.$docsify.ga);
         }
         window.ga("set", "page", location.hash);
         window.ga("send", "pageview");
     }
     const install = function(hook) {
-        if (!$docsify.ga) {
+        if (!window.$docsify.ga) {
             console.error("[Docsify] ga is required.");
             return;
         }
         hook.beforeEach(collect);
     };
     window.$docsify = window.$docsify || {};
-    $docsify.plugins = [ install, ...$docsify.plugins || [] ];
+    window.$docsify.plugins = [ install, ...window.$docsify?.plugins || [] ];
 })();

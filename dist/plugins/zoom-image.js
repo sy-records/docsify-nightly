@@ -497,5 +497,5 @@
         }));
     }
     window.$docsify = window.$docsify || {};
-    $docsify.plugins = [ install, ...$docsify.plugins || [] ];
+    window.$docsify.plugins = [ install, ...window.$docsify.plugins || [] ];
 })();
