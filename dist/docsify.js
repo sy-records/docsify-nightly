@@ -7235,9 +7235,6 @@
         __topMargin: 0
     });
     function config(vm, config = {}) {
-        if (window.$docsify) {
-            console.warn("DEPRECATION: The global $docsify config variable is deprecated. See the latest getting started docs. https://docsify.js.org/#/quickstart");
-        }
         config = Object.assign(defaultDocsifyConfig(), window.$docsify, typeof window.$docsify === "function" ? window.$docsify(vm) : undefined, config);
         if (config.keyBindings !== false) {
             config.keyBindings = Object.assign({
