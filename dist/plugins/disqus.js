@@ -1,7 +1,7 @@
 /*!
  * Docsify Plugin: disqus v5.0.0-rc.3
  * https://docsify.js.org
- * (c) 2017-2025
+ * (c) 2017-2026
  * MIT license
  */
 (function() {
