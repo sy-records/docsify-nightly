@@ -6991,7 +6991,8 @@
                 const {name: name} = this.config;
                 const currentPath = this.router.toURL(this.router.getCurrentPath());
                 const currentSection = find(`.sidebar a[href='${currentPath}']`)?.getAttribute("title");
-                const currentTitle = name ? currentSection ? `${currentSection} - ${name}` : name : currentSection;
+                const plainName = name ? name.replace(/<[^>]+>/g, "").trim() : name;
+                const currentTitle = plainName ? currentSection ? `${currentSection} - ${plainName}` : plainName : currentSection;
                 $$1.title = currentTitle || this.#title;
                 this.#markAppNavActiveElm();
                 this.#markSidebarCurrentPage();
