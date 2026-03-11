@@ -1,5 +1,5 @@
 /*!
- * Docsify Plugin: emoji v5.0.0-rc.3
+ * Docsify Plugin: emoji v5.0.0-rc.4
  * https://docsify.js.org
  * (c) 2017-2026
  * MIT license
