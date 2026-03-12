@@ -14,8 +14,8 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
 
@@ -30,6 +30,7 @@ jobs:
       - name: Sync files
         run: |
           rsync -av --delete docsify/dist/ ./dist/
+          rsync -av --delete docsify/src/ ./src/
           rm -rf docsify
           git status
 
