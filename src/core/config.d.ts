@@ -33,6 +33,7 @@ declare function defaultDocsifyConfig(): {
     fallbackLanguages: null | string[];
     fallbackDefaultLanguage: string;
     formatUpdated: string | ((updatedAt: string) => string);
+    pageTitleFormatter: null | ((name: string) => string);
     /** For the frontmatter plugin. */
     frontMatter: Record<string, TODO> | null;
     hideSidebar: boolean;

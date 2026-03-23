@@ -6988,10 +6988,10 @@
                 }));
             }
             onRender() {
-                const {name: name} = this.config;
+                const {name: name, pageTitleFormatter: pageTitleFormatter} = this.config;
                 const currentPath = this.router.toURL(this.router.getCurrentPath());
                 const currentSection = find(`.sidebar a[href='${currentPath}']`)?.getAttribute("title");
-                const plainName = name ? name.replace(/<[^>]+>/g, "").trim() : name;
+                const plainName = typeof pageTitleFormatter === "function" && typeof name === "string" ? pageTitleFormatter(name) : name ? name.replace(/<[^>]+>/g, "").trim() : name;
                 const currentTitle = plainName ? currentSection ? `${currentSection} - ${plainName}` : plainName : currentSection;
                 $$1.title = currentTitle || this.#title;
                 this.#markAppNavActiveElm();
@@ -7234,6 +7234,7 @@
         fallbackLanguages: null,
         fallbackDefaultLanguage: "",
         formatUpdated: "",
+        pageTitleFormatter: null,
         frontMatter: null,
         hideSidebar: false,
         homepage: "README.md",
