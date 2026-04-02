@@ -6485,7 +6485,7 @@
                 }
                 setHTML(".sidebar-nav", this.compiler.sidebar(text, maxLevel));
                 sidebarToggleEl.setAttribute("aria-expanded", String(!isMobile()));
-                const activeElmHref = this.router.toURL(this.route.path);
+                const activeElmHref = decodeURIComponent(this.router.toURL(this.route.path));
                 const activeEl = find(`.sidebar-nav a[href="${activeElmHref}"]`);
                 this.#addTextAsTitleAttribute(".sidebar-nav a");
                 if (loadSidebar && activeEl) {
