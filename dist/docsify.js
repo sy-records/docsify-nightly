@@ -1396,6 +1396,7 @@
                 response: {}
             };
         }
+        normalize() {}
     }
     let lastRoute = {};
     function Router(Base) {
