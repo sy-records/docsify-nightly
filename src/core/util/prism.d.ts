@@ -4,4 +4,9 @@
  * @param {*} lang current lang to check dependencies
  */
 export default function checkLangDependenciesAllLoaded(lang: any): void;
+export function sanitizeCodeLang(lang: any): {
+    codeLang: string;
+    prismLang: any | string;
+    escapedLang: string;
+};
 //# sourceMappingURL=prism.d.ts.map

@@ -57,6 +57,16 @@
             ignoreSubHeading: ignoreSubHeading
         };
     }
+    function escapeHtml(string) {
+        const entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+        return String(string).replace(/[&<>"']/g, (s => entityMap[s]));
+    }
     function L() {
         return {
             async: false,
@@ -5671,16 +5681,6 @@
     }
     function resolveIndexKey(namespace) {
         return namespace ? `${LOCAL_STORAGE.INDEX_KEY}/${namespace}` : LOCAL_STORAGE.INDEX_KEY;
-    }
-    function escapeHtml(string) {
-        const entityMap = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        };
-        return String(string).replace(/[&<>"']/g, (s => entityMap[s]));
     }
     function getAllPaths(router) {
         const paths = [];

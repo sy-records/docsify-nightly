@@ -40,4 +40,11 @@ export function getAndRemoveDocsifyIgnoreConfig(content?: string): {
     ignoreAllSubs: boolean;
     ignoreSubHeading: boolean;
 };
+/**
+ * Escape HTML special characters in a string to prevent XSS attacks.
+ *
+ * @param string
+ * @returns {string}
+ */
+export function escapeHtml(string: any): string;
 //# sourceMappingURL=utils.d.ts.map

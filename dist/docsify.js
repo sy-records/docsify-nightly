@@ -5054,6 +5054,16 @@
             ignoreSubHeading: ignoreSubHeading
         };
     }
+    function escapeHtml(string) {
+        const entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+        return String(string).replace(/[&<>"']/g, (s => entityMap[s]));
+    }
     const imageCompiler = ({renderer: renderer, contentBase: contentBase, router: router}) => renderer.image = ({href: href, title: title, text: text}) => {
         let url = href;
         const attrs = [];
@@ -5394,6 +5404,15 @@
         yml: "yaml"
     };
     const depTreeCache = {};
+    const sanitizeCodeLang = lang => {
+        const codeLang = typeof lang === "string" && lang.trim().length ? lang.trim() : "markup";
+        const prismLang = lang_aliases[codeLang] || codeLang;
+        return {
+            codeLang: codeLang,
+            prismLang: prismLang,
+            escapedLang: escapeHtml(codeLang)
+        };
+    };
     function checkLangDependenciesAllLoaded(lang) {
         if (!lang) {
             return;
@@ -5412,8 +5431,8 @@
             const depTree = dummy.dependencies[0];
             depTreeCache[lang] = depTree;
             if (!dummy.loaded) {
-                const prettyOutput = prettryPrint(depTree, 1);
-                console.warn(`The language '${lang}' required dependencies for code block highlighting are not satisfied.`, `Priority dependencies from low to high, consider to place all the necessary dependencie by priority (higher first): \n`, prettyOutput);
+                const prettyOutput = prettyPrint(depTree, 1);
+                console.warn(`The language '${lang}' required dependencies for code block highlighting are not satisfied.`, `Priority dependencies from low to high, consider to place all the necessary dependencies by priority (higher first): \n`, prettyOutput);
             }
         }
     }
@@ -5439,20 +5458,21 @@
         }));
         parent.dependencies.push(cur);
     };
-    const prettryPrint = (depTree, level) => {
+    const prettyPrint = (depTree, level) => {
         let cur = `${"  ".repeat(level * 3)} ${depTree.cur} ${depTree.loaded ? "(+)" : "(-)"}`;
         if (depTree.dependencies.length) {
             depTree.dependencies.forEach((dep => {
-                cur += prettryPrint(dep, level + 1);
+                cur += prettyPrint(dep, level + 1);
             }));
         }
         return "\n" + cur;
     };
     const highlightCodeCompiler = ({renderer: renderer}) => renderer.code = function({text: text, lang: lang = "markup"}) {
-        checkLangDependenciesAllLoaded(lang);
-        const langOrMarkup = prismExports.languages[lang] || prismExports.languages.markup;
-        const code = prismExports.highlight(text.replace(/@DOCSIFY_QM@/g, "`"), langOrMarkup, lang);
-        return `<pre data-lang="${lang}" class="language-${lang}"><code class="lang-${lang} language-${lang}" tabindex="0">${code}</code></pre>`;
+        const {escapedLang: escapedLang, prismLang: prismLang} = sanitizeCodeLang(lang);
+        checkLangDependenciesAllLoaded(prismLang);
+        const langOrMarkup = prismExports.languages[prismLang] || prismExports.languages.markup;
+        const code = prismExports.highlight(text.replace(/@DOCSIFY_QM@/g, "`"), langOrMarkup, prismLang);
+        return `<pre data-lang="${escapedLang}" class="language-${escapedLang}"><code class="lang-${escapedLang} language-${escapedLang}" tabindex="0">${code}</code></pre>`;
     };
     const paragraphCompiler = ({renderer: renderer}) => renderer.paragraph = function({tokens: tokens}) {
         const text = this.parser.parseInline(tokens);

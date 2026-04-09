@@ -1,4 +1,3 @@
-export function escapeHtml(string: any): string;
 export function genIndex(path: any, content: string | undefined, router: any, depth: any, indexKey: any): Record<string, any>;
 export function ignoreDiacriticalMarks(keyword: any): any;
 /**
