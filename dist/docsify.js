@@ -5073,7 +5073,7 @@
             attrs.push("data-no-zoom");
         }
         if (title) {
-            attrs.push(`title="${title}"`);
+            attrs.push(`title="${escapeHtml(title)}"`);
         }
         if (config.size) {
             const [width, height] = config.size.split("x");
@@ -5096,7 +5096,7 @@
         if (!isAbsolutePath(href)) {
             url = getPath(contentBase, getParentPath(router.getCurrentPath()), href);
         }
-        return `<img src="${url}" data-origin="${href}" alt="${text}" ${attrs.join(" ")} />`;
+        return `<img src="${escapeHtml(url)}" data-origin="${escapeHtml(href)}" alt="${escapeHtml(text)}" ${attrs.join(" ")} />`;
     };
     const headingCompiler = ({renderer: renderer, router: router, compiler: compiler}) => renderer.heading = function({tokens: tokens, depth: depth, text: text}) {
         const parsedText = this.parser.parseInline(tokens);
@@ -5601,9 +5601,9 @@
             attrs.push(`id="${config.id}"`);
         }
         if (title) {
-            attrs.push(`title="${title}"`);
+            attrs.push(`title="${escapeHtml(title)}"`);
         }
-        return `<a href="${href}" ${attrs.join(" ")}>${text}</a>`;
+        return `<a href="${escapeHtml(href)}" ${attrs.join(" ")}>${text}</a>`;
     };
     const compileMedia = {
         markdown(url) {
@@ -5618,17 +5618,17 @@
         },
         iframe(url, title) {
             return {
-                html: `<iframe src="${url}" ${title || "width=100% height=400"}></iframe>`
+                html: `<iframe src="${escapeHtml(url)}" ${title || "width=100% height=400"}></iframe>`
             };
         },
         video(url, title) {
             return {
-                html: `<video src="${url}" ${title || "controls"}>Not Supported</video>`
+                html: `<video src="${escapeHtml(url)}" ${title || "controls"}>Not Supported</video>`
             };
         },
         audio(url, title) {
             return {
-                html: `<audio src="${url}" ${title || "controls"}>Not Supported</audio>`
+                html: `<audio src="${escapeHtml(url)}" ${title || "controls"}>Not Supported</audio>`
             };
         },
         code(url, title) {
