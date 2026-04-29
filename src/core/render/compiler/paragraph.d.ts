@@ -1,6 +1,7 @@
 export function paragraphCompiler({ renderer }: {
     renderer: any;
-}): ({ tokens }: {
+}): ({ tokens, embedTokenMap }: {
     tokens: any;
+    embedTokenMap: any;
 }) => string;
 //# sourceMappingURL=paragraph.d.ts.map

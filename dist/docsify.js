@@ -5474,15 +5474,42 @@
         const code = prismExports.highlight(text.replace(/@DOCSIFY_QM@/g, "`"), langOrMarkup, prismLang);
         return `<pre data-lang="${escapedLang}" class="language-${escapedLang}"><code class="lang-${escapedLang} language-${escapedLang}" tabindex="0">${code}</code></pre>`;
     };
-    const paragraphCompiler = ({renderer: renderer}) => renderer.paragraph = function({tokens: tokens}) {
-        const text = this.parser.parseInline(tokens);
-        let result;
+    function renderParagraphText(text) {
         if (text.startsWith("!&gt;")) {
-            result = helper("callout important", text);
-        } else if (text.startsWith("?&gt;")) {
-            result = helper("callout tip", text);
+            return helper("callout important", text);
+        }
+        if (text.startsWith("?&gt;")) {
+            return helper("callout tip", text);
+        }
+        return `<p>${text}</p>`;
+    }
+    const paragraphCompiler = ({renderer: renderer}) => renderer.paragraph = function({tokens: tokens, embedTokenMap: embedTokenMap}) {
+        let result;
+        if (embedTokenMap && tokens?.length) {
+            const parts = [];
+            let inlineBuffer = [];
+            const flushInlineBuffer = () => {
+                if (!inlineBuffer.length) {
+                    return;
+                }
+                const text = this.parser.parseInline(inlineBuffer);
+                parts.push(renderParagraphText(text));
+                inlineBuffer = [];
+            };
+            tokens.forEach(((inlineToken, inlineIndex) => {
+                const embedToken = embedTokenMap[inlineIndex];
+                if (embedToken?.length) {
+                    flushInlineBuffer();
+                    parts.push(this.parser.parse(embedToken));
+                } else {
+                    inlineBuffer.push(inlineToken);
+                }
+            }));
+            flushInlineBuffer();
+            result = parts.join("");
         } else {
-            result = `<p>${text}</p>`;
+            const text = this.parser.parseInline(tokens);
+            result = renderParagraphText(text);
         }
         return result;
     };
@@ -5645,7 +5672,17 @@
     };
     const tableCellCompiler = ({renderer: renderer}) => renderer.tablecell = function(token) {
         let content;
-        if (token.embedTokens && token.embedTokens.length > 0) {
+        if (token.embedTokenMap && token.tokens?.length) {
+            content = "";
+            token.tokens.forEach(((inlineToken, inlineIndex) => {
+                const embedToken = token.embedTokenMap[inlineIndex];
+                if (embedToken?.length) {
+                    content += this.parser.parse(embedToken);
+                } else {
+                    content += this.parser.parseInline([ inlineToken ]);
+                }
+            }));
+        } else if (token.embedTokens && token.embedTokens.length > 0) {
             content = this.parser.parse(token.embedTokens);
         } else {
             content = this.parser.parseInline(token.tokens);
@@ -6210,14 +6247,11 @@
         return stripIndent((match || [])[1] || "").trim();
     }
     function walkFetchEmbed({embedTokens: embedTokens, compile: compile, fetch: fetch}, cb) {
-        let token;
-        let step = 0;
-        let count = 0;
         if (!embedTokens.length) {
             return cb({});
         }
-        while (token = embedTokens[step++]) {
-            const currentToken = token;
+        const processStep = step => {
+            const currentToken = embedTokens[step];
             const next = text => {
                 let embedToken;
                 if (text) {
@@ -6266,16 +6300,19 @@
                     cellIndex: currentToken.cellIndex,
                     tokenRef: currentToken.tokenRef
                 });
-                if (++count >= embedTokens.length) {
+                if (step + 1 >= embedTokens.length) {
                     cb({});
+                } else {
+                    processStep(step + 1);
                 }
             };
-            if (token.embed.url) {
-                get(token.embed.url).then(next);
+            if (currentToken.embed.url) {
+                get(currentToken.embed.url).then(next);
             } else {
-                next(token.embed.html);
+                next(currentToken.embed.html);
             }
-        }
+        };
+        processStep(0);
     }
     function prerenderEmbed({compiler: compiler, raw: raw = "", fetch: fetch}, done) {
         const hit = cached[raw];
@@ -6287,65 +6324,104 @@
         const compile = compiler._marked;
         let tokens = compile.lexer(raw);
         const embedTokens = [];
-        const linkRE = compile.Lexer.rules.inline.normal.link;
         const links = tokens.links;
-        const linkMatcher = new RegExp(linkRE.source, "g");
         tokens.forEach(((token, index) => {
             if (token.type === "paragraph") {
-                token.text = token.text.replace(linkMatcher, ((src, filename, href, title) => {
-                    const embed = compiler.compileEmbed(href, title);
+                (token.tokens || []).forEach(((inlineToken, inlineIndex) => {
+                    if (inlineToken.type !== "link") {
+                        return;
+                    }
+                    const embed = compiler.compileEmbed(inlineToken.href, inlineToken.title);
                     if (embed) {
                         embedTokens.push({
                             index: index,
                             tokenRef: token,
+                            inlineIndex: inlineIndex,
                             embed: embed
                         });
                     }
-                    return src;
                 }));
             } else if (token.type === "table") {
                 token.rows.forEach(((row, rowIndex) => {
                     row.forEach(((cell, cellIndex) => {
-                        cell.text = cell.text.replace(linkMatcher, ((src, filename, href, title) => {
-                            const embed = compiler.compileEmbed(href, title);
+                        (cell.tokens || []).forEach(((inlineToken, inlineIndex) => {
+                            if (inlineToken.type !== "link") {
+                                return;
+                            }
+                            const embed = compiler.compileEmbed(inlineToken.href, inlineToken.title);
                             if (embed) {
                                 embedTokens.push({
                                     index: index,
                                     tokenRef: token,
                                     rowIndex: rowIndex,
                                     cellIndex: cellIndex,
+                                    inlineIndex: inlineIndex,
                                     embed: embed
                                 });
                             }
-                            return src;
                         }));
                     }));
                 }));
             }
         }));
         const moves = [];
+        const tokenInsertState = new WeakMap;
         walkFetchEmbed({
             compile: compile,
             embedTokens: embedTokens,
             fetch: fetch
         }, (({embedToken: embedToken, token: token, rowIndex: rowIndex, cellIndex: cellIndex, tokenRef: tokenRef}) => {
             if (token) {
+                Object.assign(links, embedToken.links);
                 if (typeof rowIndex === "number" && typeof cellIndex === "number") {
                     const cell = tokenRef.rows[rowIndex][cellIndex];
-                    cell.embedTokens = embedToken;
+                    if (typeof token.inlineIndex === "number") {
+                        cell.embedTokenMap ||= {};
+                        const existing = cell.embedTokenMap[token.inlineIndex];
+                        cell.embedTokenMap[token.inlineIndex] = existing ? existing.concat(embedToken) : embedToken;
+                    }
+                    if (cell.embedTokens && cell.embedTokens.length) {
+                        cell.embedTokens = cell.embedTokens.concat(embedToken);
+                    } else {
+                        cell.embedTokens = embedToken;
+                    }
+                } else if (tokenRef.type === "paragraph") {
+                    if (typeof token.inlineIndex === "number") {
+                        tokenRef.embedTokenMap ||= {};
+                        const existing = tokenRef.embedTokenMap[token.inlineIndex];
+                        tokenRef.embedTokenMap[token.inlineIndex] = existing ? existing.concat(embedToken) : embedToken;
+                    }
+                    if (tokenRef.embedTokens && tokenRef.embedTokens.length) {
+                        tokenRef.embedTokens = tokenRef.embedTokens.concat(embedToken);
+                    } else {
+                        tokenRef.embedTokens = embedToken;
+                    }
                 } else {
-                    let index = token.index;
-                    moves.forEach((pos => {
-                        if (index > pos.start) {
-                            index += pos.length;
-                        }
-                    }));
-                    Object.assign(links, embedToken.links);
-                    tokens = tokens.slice(0, index).concat(embedToken, tokens.slice(index + 1));
-                    moves.push({
-                        start: index,
-                        length: embedToken.length - 1
-                    });
+                    const state = tokenInsertState.get(tokenRef);
+                    if (state) {
+                        const insertAt = state.nextIndex;
+                        tokens = tokens.slice(0, insertAt).concat(embedToken, tokens.slice(insertAt));
+                        moves.push({
+                            start: insertAt,
+                            delta: embedToken.length
+                        });
+                        state.nextIndex = insertAt + embedToken.length;
+                    } else {
+                        let index = token.index;
+                        moves.forEach((pos => {
+                            if (index > pos.start) {
+                                index += pos.delta;
+                            }
+                        }));
+                        tokens = tokens.slice(0, index).concat(embedToken, tokens.slice(index + 1));
+                        moves.push({
+                            start: index,
+                            delta: embedToken.length - 1
+                        });
+                        tokenInsertState.set(tokenRef, {
+                            nextIndex: index + embedToken.length
+                        });
+                    }
                 }
             } else {
                 cached[raw] = tokens.concat();
