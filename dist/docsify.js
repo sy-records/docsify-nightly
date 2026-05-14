@@ -1470,7 +1470,7 @@
     function isMobile() {
         return window?.matchMedia?.(`(max-width: ${mobileBreakpoint})`)?.matches;
     }
-    function L() {
+    function z() {
         return {
             async: false,
             breaks: false,
@@ -1484,26 +1484,26 @@
             walkTokens: null
         };
     }
-    var T = L();
-    function Z(u) {
-        T = u;
+    var T = z();
+    function G(l) {
+        T = l;
     }
-    var C = {
+    var _ = {
         exec: () => null
     };
-    function k(u, e = "") {
-        let t = typeof u == "string" ? u : u.source, n = {
-            replace: (r, i) => {
-                let s = typeof i == "string" ? i : i.source;
-                return s = s.replace(m.caret, "$1"), t = t.replace(r, s), n;
+    function d(l, e = "") {
+        let t = typeof l == "string" ? l : l.source, n = {
+            replace: (s, r) => {
+                let i = typeof r == "string" ? r : r.source;
+                return i = i.replace(m.caret, "$1"), t = t.replace(s, i), n;
             },
             getRegex: () => new RegExp(t, e)
         };
         return n;
     }
-    var me = (() => {
+    var Re = ((l = "") => {
         try {
-            return !!new RegExp("(?<=1)(?<!1)");
+            return !!new RegExp("(?<=1)(?<!1)" + l);
         } catch {
             return false;
         }
@@ -1524,7 +1524,6 @@
         blockquoteStart: /^ {0,3}>/,
         blockquoteSetextReplace: /\n {0,3}((?:=+|-+) *)(?=\n|$)/g,
         blockquoteSetextReplace2: /^ {0,3}>[ \t]?/gm,
-        listReplaceTabs: /^\t+/,
         listReplaceNesting: /^ {1,4}(?=( {4})*[^ ])/g,
         listIsTask: /^\[[ xX]\] +\S/,
         listReplaceTask: /^\[[ xX]\] +/,
@@ -1549,7 +1548,6 @@
         escapeReplace: /[&<>"']/g,
         escapeTestNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/,
         escapeReplaceNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g,
-        unescapeTest: /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/gi,
         caret: /(^|[^\[])\^/g,
         percentDecode: /%25/g,
         findPipe: /\|/g,
@@ -1559,158 +1557,176 @@
         spaceLine: /^ +$/gm,
         notSpaceStart: /^\S*/,
         endingNewline: /\n$/,
-        listItemRegex: u => new RegExp(`^( {0,3}${u})((?:[\t ][^\\n]*)?(?:\\n|$))`),
-        nextBulletRegex: u => new RegExp(`^ {0,${Math.min(3, u - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ \t][^\\n]*)?(?:\\n|$))`),
-        hrRegex: u => new RegExp(`^ {0,${Math.min(3, u - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`),
-        fencesBeginRegex: u => new RegExp(`^ {0,${Math.min(3, u - 1)}}(?:\`\`\`|~~~)`),
-        headingBeginRegex: u => new RegExp(`^ {0,${Math.min(3, u - 1)}}#`),
-        htmlBeginRegex: u => new RegExp(`^ {0,${Math.min(3, u - 1)}}<(?:[a-z].*>|!--)`, "i")
-    }, xe = /^(?:[ \t]*(?:\n|$))+/, be = /^((?: {4}| {0,3}\t)[^\n]+(?:\n(?:[ \t]*(?:\n|$))*)?)+/, Re = /^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/, I = /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/, Te = /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/, N = /(?:[*+-]|\d{1,9}[.)])/, re$1 = /^(?!bull |blockCode|fences|blockquote|heading|html|table)((?:.|\n(?!\s*?\n|bull |blockCode|fences|blockquote|heading|html|table))+?)\n {0,3}(=+|-+) *(?:\n+|$)/, se = k(re$1).replace(/bull/g, N).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/\|table/g, "").getRegex(), Oe = k(re$1).replace(/bull/g, N).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/table/g, / {0,3}\|?(?:[:\- ]*\|)+[\:\- ]*\n/).getRegex(), Q = /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/, we = /^[^\n]+/, F = /(?!\s*\])(?:\\[\s\S]|[^\[\]\\])+/, ye = k(/^ {0,3}\[(label)\]: *(?:\n[ \t]*)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n[ \t]*)?| *\n[ \t]*)(title))? *(?:\n+|$)/).replace("label", F).replace("title", /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/).getRegex(), Pe = k(/^( {0,3}bull)([ \t][^\n]+?)?(?:\n|$)/).replace(/bull/g, N).getRegex(), v = "address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul", j = /<!--(?:-?>|[\s\S]*?(?:-->|$))/, Se = k("^ {0,3}(?:<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)|comment[^\\n]*(\\n+|$)|<\\?[\\s\\S]*?(?:\\?>\\n*|$)|<![A-Z][\\s\\S]*?(?:>\\n*|$)|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$))", "i").replace("comment", j).replace("tag", v).replace("attribute", / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/).getRegex(), ie = k(Q).replace("hr", I).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("|table", "").replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex(), $e = k(/^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/).replace("paragraph", ie).getRegex(), U = {
-        blockquote: $e,
-        code: be,
-        def: ye,
-        fences: Re,
-        heading: Te,
+        listItemRegex: l => new RegExp(`^( {0,3}${l})((?:[\t ][^\\n]*)?(?:\\n|$))`),
+        nextBulletRegex: l => new RegExp(`^ {0,${Math.min(3, l - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ \t][^\\n]*)?(?:\\n|$))`),
+        hrRegex: l => new RegExp(`^ {0,${Math.min(3, l - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`),
+        fencesBeginRegex: l => new RegExp(`^ {0,${Math.min(3, l - 1)}}(?:\`\`\`|~~~)`),
+        headingBeginRegex: l => new RegExp(`^ {0,${Math.min(3, l - 1)}}#`),
+        htmlBeginRegex: l => new RegExp(`^ {0,${Math.min(3, l - 1)}}<(?:[a-z].*>|!--)`, "i"),
+        blockquoteBeginRegex: l => new RegExp(`^ {0,${Math.min(3, l - 1)}}>`)
+    }, Te = /^(?:[ \t]*(?:\n|$))+/, Oe = /^((?: {4}| {0,3}\t)[^\n]+(?:\n(?:[ \t]*(?:\n|$))*)?)+/, we = /^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/, I = /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/, ye = /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/, Q = / {0,3}(?:[*+-]|\d{1,9}[.)])/, ie = /^(?!bull |blockCode|fences|blockquote|heading|html|table)((?:.|\n(?!\s*?\n|bull |blockCode|fences|blockquote|heading|html|table))+?)\n {0,3}(=+|-+) *(?:\n+|$)/, oe = d(ie).replace(/bull/g, Q).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/\|table/g, "").getRegex(), Pe = d(ie).replace(/bull/g, Q).replace(/blockCode/g, /(?: {4}| {0,3}\t)/).replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g, / {0,3}>/).replace(/heading/g, / {0,3}#{1,6}/).replace(/html/g, / {0,3}<[^\n>]+>\n/).replace(/table/g, / {0,3}\|?(?:[:\- ]*\|)+[\:\- ]*\n/).getRegex(), j = /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/, Se = /^[^\n]+/, F = /(?!\s*\])(?:\\[\s\S]|[^\[\]\\])+/, $e = d(/^ {0,3}\[(label)\]: *(?:\n[ \t]*)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n[ \t]*)?| *\n[ \t]*)(title))? *(?:\n+|$)/).replace("label", F).replace("title", /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/).getRegex(), Le = d(/^(bull)([ \t][^\n]+?)?(?:\n|$)/).replace(/bull/g, Q).getRegex(), v = "address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul", U = /<!--(?:-?>|[\s\S]*?(?:-->|$))/, _e = d("^ {0,3}(?:<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)|comment[^\\n]*(\\n+|$)|<\\?[\\s\\S]*?(?:\\?>\\n*|$)|<![A-Z][\\s\\S]*?(?:>\\n*|$)|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$))", "i").replace("comment", U).replace("tag", v).replace("attribute", / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/).getRegex(), ae = d(j).replace("hr", I).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("|table", "").replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)])[ \\t]").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex(), Me = d(/^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/).replace("paragraph", ae).getRegex(), K = {
+        blockquote: Me,
+        code: Oe,
+        def: $e,
+        fences: we,
+        heading: ye,
         hr: I,
-        html: Se,
-        lheading: se,
-        list: Pe,
-        newline: xe,
-        paragraph: ie,
-        table: C,
-        text: we
-    }, te = k("^ *([^\\n ].*)\\n {0,3}((?:\\| *)?:?-+:? *(?:\\| *:?-+:? *)*(?:\\| *)?)(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)").replace("hr", I).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("blockquote", " {0,3}>").replace("code", "(?: {4}| {0,3}\t)[^\\n]").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex(), _e = {
-        ...U,
-        lheading: Oe,
-        table: te,
-        paragraph: k(Q).replace("hr", I).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("table", te).replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)]) ").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex()
-    }, Le = {
-        ...U,
-        html: k(`^ *(?:comment *(?:\\n|\\s*$)|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)|<tag(?:"[^"]*"|'[^']*'|\\s[^'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))`).replace("comment", j).replace(/tag/g, "(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b").getRegex(),
+        html: _e,
+        lheading: oe,
+        list: Le,
+        newline: Te,
+        paragraph: ae,
+        table: _,
+        text: Se
+    }, re$1 = d("^ *([^\\n ].*)\\n {0,3}((?:\\| *)?:?-+:? *(?:\\| *:?-+:? *)*(?:\\| *)?)(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)").replace("hr", I).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("blockquote", " {0,3}>").replace("code", "(?: {4}| {0,3}\t)[^\\n]").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)])[ \\t]").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex(), ze = {
+        ...K,
+        lheading: Pe,
+        table: re$1,
+        paragraph: d(j).replace("hr", I).replace("heading", " {0,3}#{1,6}(?:\\s|$)").replace("|lheading", "").replace("table", re$1).replace("blockquote", " {0,3}>").replace("fences", " {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list", " {0,3}(?:[*+-]|1[.)])[ \\t]").replace("html", "</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag", v).getRegex()
+    }, Ee = {
+        ...K,
+        html: d(`^ *(?:comment *(?:\\n|\\s*$)|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)|<tag(?:"[^"]*"|'[^']*'|\\s[^'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))`).replace("comment", U).replace(/tag/g, "(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b").getRegex(),
         def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/,
         heading: /^(#{1,6})(.*)(?:\n+|$)/,
-        fences: C,
+        fences: _,
         lheading: /^(.+?)\n {0,3}(=+|-+) *(?:\n+|$)/,
-        paragraph: k(Q).replace("hr", I).replace("heading", ` *#{1,6} *[^\n]`).replace("lheading", se).replace("|table", "").replace("blockquote", " {0,3}>").replace("|fences", "").replace("|list", "").replace("|html", "").replace("|tag", "").getRegex()
-    }, Me = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/, ze = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/, oe = /^( {2,}|\\)\n(?!\s*$)/, Ae = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/, D = /[\p{P}\p{S}]/u, K = /[\s\p{P}\p{S}]/u, ae = /[^\s\p{P}\p{S}]/u, Ce = k(/^((?![*_])punctSpace)/, "u").replace(/punctSpace/g, K).getRegex(), le = /(?!~)[\p{P}\p{S}]/u, Ie = /(?!~)[\s\p{P}\p{S}]/u, Ee = /(?:[^\s\p{P}\p{S}]|~)/u, Be = k(/link|precode-code|html/, "g").replace("link", /\[(?:[^\[\]`]|(?<a>`+)[^`]+\k<a>(?!`))*?\]\((?:\\[\s\S]|[^\\\(\)]|\((?:\\[\s\S]|[^\\\(\)])*\))*\)/).replace("precode-", me ? "(?<!`)()" : "(^^|[^`])").replace("code", /(?<b>`+)[^`]+\k<b>(?!`)/).replace("html", /<(?! )[^<>]*?>/).getRegex(), ue = /^(?:\*+(?:((?!\*)punct)|[^\s*]))|^_+(?:((?!_)punct)|([^\s_]))/, qe = k(ue, "u").replace(/punct/g, D).getRegex(), ve = k(ue, "u").replace(/punct/g, le).getRegex(), pe = "^[^_*]*?__[^_*]*?\\*[^_*]*?(?=__)|[^*]+(?=[^*])|(?!\\*)punct(\\*+)(?=[\\s]|$)|notPunctSpace(\\*+)(?!\\*)(?=punctSpace|$)|(?!\\*)punctSpace(\\*+)(?=notPunctSpace)|[\\s](\\*+)(?!\\*)(?=punct)|(?!\\*)punct(\\*+)(?!\\*)(?=punct)|notPunctSpace(\\*+)(?=notPunctSpace)", De = k(pe, "gu").replace(/notPunctSpace/g, ae).replace(/punctSpace/g, K).replace(/punct/g, D).getRegex(), He = k(pe, "gu").replace(/notPunctSpace/g, Ee).replace(/punctSpace/g, Ie).replace(/punct/g, le).getRegex(), Ze = k("^[^_*]*?\\*\\*[^_*]*?_[^_*]*?(?=\\*\\*)|[^_]+(?=[^_])|(?!_)punct(_+)(?=[\\s]|$)|notPunctSpace(_+)(?!_)(?=punctSpace|$)|(?!_)punctSpace(_+)(?=notPunctSpace)|[\\s](_+)(?!_)(?=punct)|(?!_)punct(_+)(?!_)(?=punct)", "gu").replace(/notPunctSpace/g, ae).replace(/punctSpace/g, K).replace(/punct/g, D).getRegex(), Ge = k(/\\(punct)/, "gu").replace(/punct/g, D).getRegex(), Ne = k(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/).replace("scheme", /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/).replace("email", /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/).getRegex(), Qe = k(j).replace("(?:--\x3e|$)", "--\x3e").getRegex(), Fe = k("^comment|^</[a-zA-Z][\\w:-]*\\s*>|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>|^<\\?[\\s\\S]*?\\?>|^<![a-zA-Z]+\\s[\\s\\S]*?>|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>").replace("comment", Qe).replace("attribute", /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/).getRegex(), q = /(?:\[(?:\\[\s\S]|[^\[\]\\])*\]|\\[\s\S]|`+[^`]*?`+(?!`)|[^\[\]\\`])*?/, je = k(/^!?\[(label)\]\(\s*(href)(?:(?:[ \t]*(?:\n[ \t]*)?)(title))?\s*\)/).replace("label", q).replace("href", /<(?:\\.|[^\n<>\\])+>|[^ \t\n\x00-\x1f]*/).replace("title", /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/).getRegex(), ce = k(/^!?\[(label)\]\[(ref)\]/).replace("label", q).replace("ref", F).getRegex(), he = k(/^!?\[(ref)\](?:\[\])?/).replace("ref", F).getRegex(), Ue = k("reflink|nolink(?!\\()", "g").replace("reflink", ce).replace("nolink", he).getRegex(), ne = /[hH][tT][tT][pP][sS]?|[fF][tT][pP]/, W = {
-        _backpedal: C,
-        anyPunctuation: Ge,
-        autolink: Ne,
-        blockSkip: Be,
-        br: oe,
-        code: ze,
-        del: C,
-        emStrongLDelim: qe,
-        emStrongRDelimAst: De,
-        emStrongRDelimUnd: Ze,
-        escape: Me,
-        link: je,
-        nolink: he,
-        punctuation: Ce,
-        reflink: ce,
-        reflinkSearch: Ue,
-        tag: Fe,
-        text: Ae,
-        url: C
-    }, Ke = {
-        ...W,
-        link: k(/^!?\[(label)\]\((.*?)\)/).replace("label", q).getRegex(),
-        reflink: k(/^!?\[(label)\]\s*\[([^\]]*)\]/).replace("label", q).getRegex()
-    }, G = {
-        ...W,
-        emStrongRDelimAst: He,
-        emStrongLDelim: ve,
-        url: k(/^((?:protocol):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/).replace("protocol", ne).replace("email", /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/).getRegex(),
+        paragraph: d(j).replace("hr", I).replace("heading", ` *#{1,6} *[^\n]`).replace("lheading", oe).replace("|table", "").replace("blockquote", " {0,3}>").replace("|fences", "").replace("|list", "").replace("|html", "").replace("|tag", "").getRegex()
+    }, Ae = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/, Ce = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/, le = /^( {2,}|\\)\n(?!\s*$)/, Ie = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/, E = /[\p{P}\p{S}]/u, H = /[\s\p{P}\p{S}]/u, W = /[^\s\p{P}\p{S}]/u, Be = d(/^((?![*_])punctSpace)/, "u").replace(/punctSpace/g, H).getRegex(), ue = /(?!~)[\p{P}\p{S}]/u, De = /(?!~)[\s\p{P}\p{S}]/u, qe = /(?:[^\s\p{P}\p{S}]|~)/u, ve = d(/link|precode-code|html/, "g").replace("link", /\[(?:[^\[\]`]|(?<a>`+)[^`]+\k<a>(?!`))*?\]\((?:\\[\s\S]|[^\\\(\)]|\((?:\\[\s\S]|[^\\\(\)])*\))*\)/).replace("precode-", Re ? "(?<!`)()" : "(^^|[^`])").replace("code", /(?<b>`+)[^`]+\k<b>(?!`)/).replace("html", /<(?! )[^<>]*?>/).getRegex(), pe = /^(?:\*+(?:((?!\*)punct)|([^\s*]))?)|^_+(?:((?!_)punct)|([^\s_]))?/, He = d(pe, "u").replace(/punct/g, E).getRegex(), Ze = d(pe, "u").replace(/punct/g, ue).getRegex(), ce = "^[^_*]*?__[^_*]*?\\*[^_*]*?(?=__)|[^*]+(?=[^*])|(?!\\*)punct(\\*+)(?=[\\s]|$)|notPunctSpace(\\*+)(?!\\*)(?=punctSpace|$)|(?!\\*)punctSpace(\\*+)(?=notPunctSpace)|[\\s](\\*+)(?!\\*)(?=punct)|(?!\\*)punct(\\*+)(?!\\*)(?=punct)|notPunctSpace(\\*+)(?=notPunctSpace)", Ge = d(ce, "gu").replace(/notPunctSpace/g, W).replace(/punctSpace/g, H).replace(/punct/g, E).getRegex(), Ne = d(ce, "gu").replace(/notPunctSpace/g, qe).replace(/punctSpace/g, De).replace(/punct/g, ue).getRegex(), Qe = d("^[^_*]*?\\*\\*[^_*]*?_[^_*]*?(?=\\*\\*)|[^_]+(?=[^_])|(?!_)punct(_+)(?=[\\s]|$)|notPunctSpace(_+)(?!_)(?=punctSpace|$)|(?!_)punctSpace(_+)(?=notPunctSpace)|[\\s](_+)(?!_)(?=punct)|(?!_)punct(_+)(?!_)(?=punct)", "gu").replace(/notPunctSpace/g, W).replace(/punctSpace/g, H).replace(/punct/g, E).getRegex(), je = d(/^~~?(?:((?!~)punct)|[^\s~])/, "u").replace(/punct/g, E).getRegex(), Fe = "^[^~]+(?=[^~])|(?!~)punct(~~?)(?=[\\s]|$)|notPunctSpace(~~?)(?!~)(?=punctSpace|$)|(?!~)punctSpace(~~?)(?=notPunctSpace)|[\\s](~~?)(?!~)(?=punct)|(?!~)punct(~~?)(?!~)(?=punct)|notPunctSpace(~~?)(?=notPunctSpace)", Ue = d(Fe, "gu").replace(/notPunctSpace/g, W).replace(/punctSpace/g, H).replace(/punct/g, E).getRegex(), Ke = d(/\\(punct)/, "gu").replace(/punct/g, E).getRegex(), We = d(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/).replace("scheme", /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/).replace("email", /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/).getRegex(), Xe = d(U).replace("(?:--\x3e|$)", "--\x3e").getRegex(), Je = d("^comment|^</[a-zA-Z][\\w:-]*\\s*>|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>|^<\\?[\\s\\S]*?\\?>|^<![a-zA-Z]+\\s[\\s\\S]*?>|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>").replace("comment", Xe).replace("attribute", /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/).getRegex(), q = /(?:\[(?:\\[\s\S]|[^\[\]\\])*\]|\\[\s\S]|`+(?!`)[^`]*?`+(?!`)|``+(?=\])|[^\[\]\\`])*?/, Ve = d(/^!?\[(label)\]\(\s*(href)(?:(?:[ \t]+(?:\n[ \t]*)?|\n[ \t]*)(title))?\s*\)/).replace("label", q).replace("href", /<(?:\\.|[^\n<>\\])+>|[^ \t\n\x00-\x1f]*/).replace("title", /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/).getRegex(), he = d(/^!?\[(label)\]\[(ref)\]/).replace("label", q).replace("ref", F).getRegex(), ke = d(/^!?\[(ref)\](?:\[\])?/).replace("ref", F).getRegex(), Ye = d("reflink|nolink(?!\\()", "g").replace("reflink", he).replace("nolink", ke).getRegex(), se = /[hH][tT][tT][pP][sS]?|[fF][tT][pP]/, X = {
+        _backpedal: _,
+        anyPunctuation: Ke,
+        autolink: We,
+        blockSkip: ve,
+        br: le,
+        code: Ce,
+        del: _,
+        delLDelim: _,
+        delRDelim: _,
+        emStrongLDelim: He,
+        emStrongRDelimAst: Ge,
+        emStrongRDelimUnd: Qe,
+        escape: Ae,
+        link: Ve,
+        nolink: ke,
+        punctuation: Be,
+        reflink: he,
+        reflinkSearch: Ye,
+        tag: Je,
+        text: Ie,
+        url: _
+    }, et = {
+        ...X,
+        link: d(/^!?\[(label)\]\((.*?)\)/).replace("label", q).getRegex(),
+        reflink: d(/^!?\[(label)\]\s*\[([^\]]*)\]/).replace("label", q).getRegex()
+    }, N = {
+        ...X,
+        emStrongRDelimAst: Ne,
+        emStrongLDelim: Ze,
+        delLDelim: je,
+        delRDelim: Ue,
+        url: d(/^((?:protocol):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/).replace("protocol", se).replace("email", /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/).getRegex(),
         _backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/,
         del: /^(~~?)(?=[^\s~])((?:\\[\s\S]|[^\\])*?(?:\\[\s\S]|[^\s~\\]))\1(?=[^~]|$)/,
-        text: k(/^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|protocol:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/).replace("protocol", ne).getRegex()
-    }, We = {
-        ...G,
-        br: k(oe).replace("{2,}", "*").getRegex(),
-        text: k(G.text).replace("\\b_", "\\b_| {2,}\\n").replace(/\{2,\}/g, "*").getRegex()
-    }, E = {
-        normal: U,
-        gfm: _e,
-        pedantic: Le
-    }, M = {
-        normal: W,
-        gfm: G,
-        breaks: We,
-        pedantic: Ke
+        text: d(/^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|protocol:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/).replace("protocol", se).getRegex()
+    }, tt = {
+        ...N,
+        br: d(le).replace("{2,}", "*").getRegex(),
+        text: d(N.text).replace("\\b_", "\\b_| {2,}\\n").replace(/\{2,\}/g, "*").getRegex()
+    }, B = {
+        normal: K,
+        gfm: ze,
+        pedantic: Ee
+    }, A = {
+        normal: X,
+        gfm: N,
+        breaks: tt,
+        pedantic: et
     };
-    var Xe = {
+    var nt = {
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#39;"
-    }, ke = u => Xe[u];
-    function w(u, e) {
+    }, de = l => nt[l];
+    function O(l, e) {
         if (e) {
-            if (m.escapeTest.test(u)) return u.replace(m.escapeReplace, ke);
-        } else if (m.escapeTestNoEncode.test(u)) return u.replace(m.escapeReplaceNoEncode, ke);
-        return u;
+            if (m.escapeTest.test(l)) return l.replace(m.escapeReplace, de);
+        } else if (m.escapeTestNoEncode.test(l)) return l.replace(m.escapeReplaceNoEncode, de);
+        return l;
     }
-    function X(u) {
+    function J(l) {
         try {
-            u = encodeURI(u).replace(m.percentDecode, "%");
+            l = encodeURI(l).replace(m.percentDecode, "%");
         } catch {
             return null;
         }
-        return u;
+        return l;
     }
-    function J(u, e) {
-        let t = u.replace(m.findPipe, ((i, s, a) => {
-            let o = false, l = s;
-            for (;--l >= 0 && a[l] === "\\"; ) o = !o;
-            return o ? "|" : " |";
-        })), n = t.split(m.splitPipe), r = 0;
+    function V(l, e) {
+        let t = l.replace(m.findPipe, ((r, i, o) => {
+            let u = false, a = i;
+            for (;--a >= 0 && o[a] === "\\"; ) u = !u;
+            return u ? "|" : " |";
+        })), n = t.split(m.splitPipe), s = 0;
         if (n[0].trim() || n.shift(), n.length > 0 && !n.at(-1)?.trim() && n.pop(), e) if (n.length > e) n.splice(e); else for (;n.length < e; ) n.push("");
-        for (;r < n.length; r++) n[r] = n[r].trim().replace(m.slashPipe, "|");
+        for (;s < n.length; s++) n[s] = n[s].trim().replace(m.slashPipe, "|");
         return n;
     }
-    function z(u, e, t) {
-        let n = u.length;
+    function $(l, e, t) {
+        let n = l.length;
         if (n === 0) return "";
-        let r = 0;
-        for (;r < n; ) {
-            let i = u.charAt(n - r - 1);
-            if (i === e && true) r++; else break;
+        let s = 0;
+        for (;s < n; ) {
+            let r = l.charAt(n - s - 1);
+            if (r === e && true) s++; else break;
         }
-        return u.slice(0, n - r);
+        return l.slice(0, n - s);
     }
-    function de(u, e) {
-        if (u.indexOf(e[1]) === -1) return -1;
+    function Y(l) {
+        let e = l.split(`\n`), t = e.length - 1;
+        for (;t >= 0 && m.blankLine.test(e[t]); ) t--;
+        return e.length - t <= 2 ? l : e.slice(0, t + 1).join(`\n`);
+    }
+    function ge(l, e) {
+        if (l.indexOf(e[1]) === -1) return -1;
         let t = 0;
-        for (let n = 0; n < u.length; n++) if (u[n] === "\\") n++; else if (u[n] === e[0]) t++; else if (u[n] === e[1] && (t--, 
+        for (let n = 0; n < l.length; n++) if (l[n] === "\\") n++; else if (l[n] === e[0]) t++; else if (l[n] === e[1] && (t--, 
         t < 0)) return n;
         return t > 0 ? -2 : -1;
     }
-    function ge(u, e, t, n, r) {
-        let i = e.href, s = e.title || null, a = u[1].replace(r.other.outputLinkReplace, "$1");
-        n.state.inLink = true;
-        let o = {
-            type: u[0].charAt(0) === "!" ? "image" : "link",
-            raw: t,
-            href: i,
-            title: s,
-            text: a,
-            tokens: n.inlineTokens(a)
-        };
-        return n.state.inLink = false, o;
+    function fe(l, e = 0) {
+        let t = e, n = "";
+        for (let s of l) if (s === "\t") {
+            let r = 4 - t % 4;
+            n += " ".repeat(r), t += r;
+        } else n += s, t++;
+        return n;
     }
-    function Je(u, e, t) {
-        let n = u.match(t.other.indentCodeCompensation);
+    function me(l, e, t, n, s) {
+        let r = e.href, i = e.title || null, o = l[1].replace(s.other.outputLinkReplace, "$1");
+        n.state.inLink = true;
+        let u = {
+            type: l[0].charAt(0) === "!" ? "image" : "link",
+            raw: t,
+            href: r,
+            title: i,
+            text: o,
+            tokens: n.inlineTokens(o)
+        };
+        return n.state.inLink = false, u;
+    }
+    function rt(l, e, t) {
+        let n = l.match(t.other.indentCodeCompensation);
         if (n === null) return e;
-        let r = n[1];
-        return e.split(`\n`).map((i => {
-            let s = i.match(t.other.beginningSpace);
-            if (s === null) return i;
-            let [a] = s;
-            return a.length >= r.length ? i.slice(r.length) : i;
+        let s = n[1];
+        return e.split(`\n`).map((r => {
+            let i = r.match(t.other.beginningSpace);
+            if (i === null) return r;
+            let [o] = i;
+            return o.length >= s.length ? r.slice(s.length) : r;
         })).join(`\n`);
     }
-    var y = class {
+    var w = class {
         options;
         rules;
         lexer;
@@ -1727,24 +1743,24 @@
         code(e) {
             let t = this.rules.block.code.exec(e);
             if (t) {
-                let n = t[0].replace(this.rules.other.codeRemoveIndent, "");
+                let n = this.options.pedantic ? t[0] : Y(t[0]), s = n.replace(this.rules.other.codeRemoveIndent, "");
                 return {
                     type: "code",
-                    raw: t[0],
+                    raw: n,
                     codeBlockStyle: "indented",
-                    text: this.options.pedantic ? n : z(n, `\n`)
+                    text: s
                 };
             }
         }
         fences(e) {
             let t = this.rules.block.fences.exec(e);
             if (t) {
-                let n = t[0], r = Je(n, t[3] || "", this.rules);
+                let n = t[0], s = rt(n, t[3] || "", this.rules);
                 return {
                     type: "code",
                     raw: n,
                     lang: t[2] ? t[2].trim().replace(this.rules.inline.anyPunctuation, "$1") : t[2],
-                    text: r
+                    text: s
                 };
             }
         }
@@ -1753,12 +1769,12 @@
             if (t) {
                 let n = t[2].trim();
                 if (this.rules.other.endingHash.test(n)) {
-                    let r = z(n, "#");
-                    (this.options.pedantic || !r || this.rules.other.endingSpaceChar.test(r)) && (n = r.trim());
+                    let s = $(n, "#");
+                    (this.options.pedantic || !s || this.rules.other.endingSpaceChar.test(s)) && (n = s.trim());
                 }
                 return {
                     type: "heading",
-                    raw: t[0],
+                    raw: $(t[0], `\n`),
                     depth: t[1].length,
                     text: n,
                     tokens: this.lexer.inline(n)
@@ -1769,188 +1785,193 @@
             let t = this.rules.block.hr.exec(e);
             if (t) return {
                 type: "hr",
-                raw: z(t[0], `\n`)
+                raw: $(t[0], `\n`)
             };
         }
         blockquote(e) {
             let t = this.rules.block.blockquote.exec(e);
             if (t) {
-                let n = z(t[0], `\n`).split(`\n`), r = "", i = "", s = [];
+                let n = $(t[0], `\n`).split(`\n`), s = "", r = "", i = [];
                 for (;n.length > 0; ) {
-                    let a = false, o = [], l;
-                    for (l = 0; l < n.length; l++) if (this.rules.other.blockquoteStart.test(n[l])) o.push(n[l]), 
-                    a = true; else if (!a) o.push(n[l]); else break;
-                    n = n.slice(l);
-                    let p = o.join(`\n`), c = p.replace(this.rules.other.blockquoteSetextReplace, `\n    $1`).replace(this.rules.other.blockquoteSetextReplace2, "");
-                    r = r ? `${r}\n${p}` : p, i = i ? `${i}\n${c}` : c;
-                    let g = this.lexer.state.top;
-                    if (this.lexer.state.top = true, this.lexer.blockTokens(c, s, true), this.lexer.state.top = g, 
+                    let o = false, u = [], a;
+                    for (a = 0; a < n.length; a++) if (this.rules.other.blockquoteStart.test(n[a])) u.push(n[a]), 
+                    o = true; else if (!o) u.push(n[a]); else break;
+                    n = n.slice(a);
+                    let c = u.join(`\n`), p = c.replace(this.rules.other.blockquoteSetextReplace, `\n    $1`).replace(this.rules.other.blockquoteSetextReplace2, "");
+                    s = s ? `${s}\n${c}` : c, r = r ? `${r}\n${p}` : p;
+                    let k = this.lexer.state.top;
+                    if (this.lexer.state.top = true, this.lexer.blockTokens(p, i, true), this.lexer.state.top = k, 
                     n.length === 0) break;
-                    let h = s.at(-1);
+                    let h = i.at(-1);
                     if (h?.type === "code") break;
                     if (h?.type === "blockquote") {
-                        let R = h, f = R.raw + `\n` + n.join(`\n`), O = this.blockquote(f);
-                        s[s.length - 1] = O, r = r.substring(0, r.length - R.raw.length) + O.raw, i = i.substring(0, i.length - R.text.length) + O.text;
+                        let R = h, f = R.raw + `\n` + n.join(`\n`), S = this.blockquote(f);
+                        i[i.length - 1] = S, s = s.substring(0, s.length - R.raw.length) + S.raw, r = r.substring(0, r.length - R.text.length) + S.text;
                         break;
                     } else if (h?.type === "list") {
-                        let R = h, f = R.raw + `\n` + n.join(`\n`), O = this.list(f);
-                        s[s.length - 1] = O, r = r.substring(0, r.length - h.raw.length) + O.raw, i = i.substring(0, i.length - R.raw.length) + O.raw, 
-                        n = f.substring(s.at(-1).raw.length).split(`\n`);
+                        let R = h, f = R.raw + `\n` + n.join(`\n`), S = this.list(f);
+                        i[i.length - 1] = S, s = s.substring(0, s.length - h.raw.length) + S.raw, r = r.substring(0, r.length - R.raw.length) + S.raw, 
+                        n = f.substring(i.at(-1).raw.length).split(`\n`);
                         continue;
                     }
                 }
                 return {
                     type: "blockquote",
-                    raw: r,
-                    tokens: s,
-                    text: i
+                    raw: s,
+                    tokens: i,
+                    text: r
                 };
             }
         }
         list(e) {
             let t = this.rules.block.list.exec(e);
             if (t) {
-                let n = t[1].trim(), r = n.length > 1, i = {
+                let n = t[1].trim(), s = n.length > 1, r = {
                     type: "list",
                     raw: "",
-                    ordered: r,
-                    start: r ? +n.slice(0, -1) : "",
+                    ordered: s,
+                    start: s ? +n.slice(0, -1) : "",
                     loose: false,
                     items: []
                 };
-                n = r ? `\\d{1,9}\\${n.slice(-1)}` : `\\${n}`, this.options.pedantic && (n = r ? n : "[*+-]");
-                let s = this.rules.other.listItemRegex(n), a = false;
+                n = s ? `\\d{1,9}\\${n.slice(-1)}` : `\\${n}`, this.options.pedantic && (n = s ? n : "[*+-]");
+                let i = this.rules.other.listItemRegex(n), o = false;
                 for (;e; ) {
-                    let l = false, p = "", c = "";
-                    if (!(t = s.exec(e)) || this.rules.block.hr.test(e)) break;
-                    p = t[0], e = e.substring(p.length);
-                    let g = t[2].split(`\n`, 1)[0].replace(this.rules.other.listReplaceTabs, (O => " ".repeat(3 * O.length))), h = e.split(`\n`, 1)[0], R = !g.trim(), f = 0;
-                    if (this.options.pedantic ? (f = 2, c = g.trimStart()) : R ? f = t[1].length + 1 : (f = t[2].search(this.rules.other.nonSpaceChar), 
-                    f = f > 4 ? 1 : f, c = g.slice(f), f += t[1].length), R && this.rules.other.blankLine.test(h) && (p += h + `\n`, 
-                    e = e.substring(h.length + 1), l = true), !l) {
-                        let O = this.rules.other.nextBulletRegex(f), V = this.rules.other.hrRegex(f), Y = this.rules.other.fencesBeginRegex(f), ee = this.rules.other.headingBeginRegex(f), fe = this.rules.other.htmlBeginRegex(f);
+                    let a = false, c = "", p = "";
+                    if (!(t = i.exec(e)) || this.rules.block.hr.test(e)) break;
+                    c = t[0], e = e.substring(c.length);
+                    let k = fe(t[2].split(`\n`, 1)[0], t[1].length), h = e.split(`\n`, 1)[0], R = !k.trim(), f = 0;
+                    if (this.options.pedantic ? (f = 2, p = k.trimStart()) : R ? f = t[1].length + 1 : (f = k.search(this.rules.other.nonSpaceChar), 
+                    f = f > 4 ? 1 : f, p = k.slice(f), f += t[1].length), R && this.rules.other.blankLine.test(h) && (c += h + `\n`, 
+                    e = e.substring(h.length + 1), a = true), !a) {
+                        let S = this.rules.other.nextBulletRegex(f), ee = this.rules.other.hrRegex(f), te = this.rules.other.fencesBeginRegex(f), ne = this.rules.other.headingBeginRegex(f), xe = this.rules.other.htmlBeginRegex(f), be = this.rules.other.blockquoteBeginRegex(f);
                         for (;e; ) {
-                            let H = e.split(`\n`, 1)[0], A;
-                            if (h = H, this.options.pedantic ? (h = h.replace(this.rules.other.listReplaceNesting, "  "), 
-                            A = h) : A = h.replace(this.rules.other.tabCharGlobal, "    "), Y.test(h) || ee.test(h) || fe.test(h) || O.test(h) || V.test(h)) break;
-                            if (A.search(this.rules.other.nonSpaceChar) >= f || !h.trim()) c += `\n` + A.slice(f); else {
-                                if (R || g.replace(this.rules.other.tabCharGlobal, "    ").search(this.rules.other.nonSpaceChar) >= 4 || Y.test(g) || ee.test(g) || V.test(g)) break;
-                                c += `\n` + h;
+                            let Z = e.split(`\n`, 1)[0], C;
+                            if (h = Z, this.options.pedantic ? (h = h.replace(this.rules.other.listReplaceNesting, "  "), 
+                            C = h) : C = h.replace(this.rules.other.tabCharGlobal, "    "), te.test(h) || ne.test(h) || xe.test(h) || be.test(h) || S.test(h) || ee.test(h)) break;
+                            if (C.search(this.rules.other.nonSpaceChar) >= f || !h.trim()) p += `\n` + C.slice(f); else {
+                                if (R || k.replace(this.rules.other.tabCharGlobal, "    ").search(this.rules.other.nonSpaceChar) >= 4 || te.test(k) || ne.test(k) || ee.test(k)) break;
+                                p += `\n` + h;
                             }
-                            !R && !h.trim() && (R = true), p += H + `\n`, e = e.substring(H.length + 1), g = A.slice(f);
+                            R = !h.trim(), c += Z + `\n`, e = e.substring(Z.length + 1), k = C.slice(f);
                         }
                     }
-                    i.loose || (a ? i.loose = true : this.rules.other.doubleBlankLine.test(p) && (a = true)), 
-                    i.items.push({
+                    r.loose || (o ? r.loose = true : this.rules.other.doubleBlankLine.test(c) && (o = true)), 
+                    r.items.push({
                         type: "list_item",
-                        raw: p,
-                        task: !!this.options.gfm && this.rules.other.listIsTask.test(c),
+                        raw: c,
+                        task: !!this.options.gfm && this.rules.other.listIsTask.test(p),
                         loose: false,
-                        text: c,
+                        text: p,
                         tokens: []
-                    }), i.raw += p;
+                    }), r.raw += c;
                 }
-                let o = i.items.at(-1);
-                if (o) o.raw = o.raw.trimEnd(), o.text = o.text.trimEnd(); else return;
-                i.raw = i.raw.trimEnd();
-                for (let l of i.items) {
-                    if (this.lexer.state.top = false, l.tokens = this.lexer.blockTokens(l.text, []), 
-                    l.task) {
-                        if (l.text = l.text.replace(this.rules.other.listReplaceTask, ""), l.tokens[0]?.type === "text" || l.tokens[0]?.type === "paragraph") {
-                            l.tokens[0].raw = l.tokens[0].raw.replace(this.rules.other.listReplaceTask, ""), 
-                            l.tokens[0].text = l.tokens[0].text.replace(this.rules.other.listReplaceTask, "");
-                            for (let c = this.lexer.inlineQueue.length - 1; c >= 0; c--) if (this.rules.other.listIsTask.test(this.lexer.inlineQueue[c].src)) {
-                                this.lexer.inlineQueue[c].src = this.lexer.inlineQueue[c].src.replace(this.rules.other.listReplaceTask, "");
-                                break;
-                            }
+                let u = r.items.at(-1);
+                if (u) u.raw = u.raw.trimEnd(), u.text = u.text.trimEnd(); else return;
+                r.raw = r.raw.trimEnd();
+                for (let a of r.items) {
+                    this.lexer.state.top = false, a.tokens = this.lexer.blockTokens(a.text, []);
+                    let c = a.tokens[0];
+                    if (a.task && (c?.type === "text" || c?.type === "paragraph")) {
+                        a.text = a.text.replace(this.rules.other.listReplaceTask, ""), c.raw = c.raw.replace(this.rules.other.listReplaceTask, ""), 
+                        c.text = c.text.replace(this.rules.other.listReplaceTask, "");
+                        for (let k = this.lexer.inlineQueue.length - 1; k >= 0; k--) if (this.rules.other.listIsTask.test(this.lexer.inlineQueue[k].src)) {
+                            this.lexer.inlineQueue[k].src = this.lexer.inlineQueue[k].src.replace(this.rules.other.listReplaceTask, "");
+                            break;
                         }
-                        let p = this.rules.other.listTaskCheckbox.exec(l.raw);
+                        let p = this.rules.other.listTaskCheckbox.exec(a.raw);
                         if (p) {
-                            let c = {
+                            let k = {
                                 type: "checkbox",
                                 raw: p[0] + " ",
                                 checked: p[0] !== "[ ]"
                             };
-                            l.checked = c.checked, i.loose ? l.tokens[0] && [ "paragraph", "text" ].includes(l.tokens[0].type) && "tokens" in l.tokens[0] && l.tokens[0].tokens ? (l.tokens[0].raw = c.raw + l.tokens[0].raw, 
-                            l.tokens[0].text = c.raw + l.tokens[0].text, l.tokens[0].tokens.unshift(c)) : l.tokens.unshift({
+                            a.checked = k.checked, r.loose ? a.tokens[0] && [ "paragraph", "text" ].includes(a.tokens[0].type) && "tokens" in a.tokens[0] && a.tokens[0].tokens ? (a.tokens[0].raw = k.raw + a.tokens[0].raw, 
+                            a.tokens[0].text = k.raw + a.tokens[0].text, a.tokens[0].tokens.unshift(k)) : a.tokens.unshift({
                                 type: "paragraph",
-                                raw: c.raw,
-                                text: c.raw,
-                                tokens: [ c ]
-                            }) : l.tokens.unshift(c);
+                                raw: k.raw,
+                                text: k.raw,
+                                tokens: [ k ]
+                            }) : a.tokens.unshift(k);
                         }
-                    }
-                    if (!i.loose) {
-                        let p = l.tokens.filter((g => g.type === "space")), c = p.length > 0 && p.some((g => this.rules.other.anyLine.test(g.raw)));
-                        i.loose = c;
+                    } else a.task && (a.task = false);
+                    if (!r.loose) {
+                        let p = a.tokens.filter((h => h.type === "space")), k = p.length > 0 && p.some((h => this.rules.other.anyLine.test(h.raw)));
+                        r.loose = k;
                     }
                 }
-                if (i.loose) for (let l of i.items) {
-                    l.loose = true;
-                    for (let p of l.tokens) p.type === "text" && (p.type = "paragraph");
+                if (r.loose) for (let a of r.items) {
+                    a.loose = true;
+                    for (let c of a.tokens) c.type === "text" && (c.type = "paragraph");
                 }
-                return i;
+                return r;
             }
         }
         html(e) {
             let t = this.rules.block.html.exec(e);
-            if (t) return {
-                type: "html",
-                block: true,
-                raw: t[0],
-                pre: t[1] === "pre" || t[1] === "script" || t[1] === "style",
-                text: t[0]
-            };
+            if (t) {
+                let n = Y(t[0]);
+                return {
+                    type: "html",
+                    block: true,
+                    raw: n,
+                    pre: t[1] === "pre" || t[1] === "script" || t[1] === "style",
+                    text: n
+                };
+            }
         }
         def(e) {
             let t = this.rules.block.def.exec(e);
             if (t) {
-                let n = t[1].toLowerCase().replace(this.rules.other.multipleSpaceGlobal, " "), r = t[2] ? t[2].replace(this.rules.other.hrefBrackets, "$1").replace(this.rules.inline.anyPunctuation, "$1") : "", i = t[3] ? t[3].substring(1, t[3].length - 1).replace(this.rules.inline.anyPunctuation, "$1") : t[3];
+                let n = t[1].toLowerCase().replace(this.rules.other.multipleSpaceGlobal, " "), s = t[2] ? t[2].replace(this.rules.other.hrefBrackets, "$1").replace(this.rules.inline.anyPunctuation, "$1") : "", r = t[3] ? t[3].substring(1, t[3].length - 1).replace(this.rules.inline.anyPunctuation, "$1") : t[3];
                 return {
                     type: "def",
                     tag: n,
-                    raw: t[0],
-                    href: r,
-                    title: i
+                    raw: $(t[0], `\n`),
+                    href: s,
+                    title: r
                 };
             }
         }
         table(e) {
             let t = this.rules.block.table.exec(e);
             if (!t || !this.rules.other.tableDelimiter.test(t[2])) return;
-            let n = J(t[1]), r = t[2].replace(this.rules.other.tableAlignChars, "").split("|"), i = t[3]?.trim() ? t[3].replace(this.rules.other.tableRowBlankLine, "").split(`\n`) : [], s = {
+            let n = V(t[1]), s = t[2].replace(this.rules.other.tableAlignChars, "").split("|"), r = t[3]?.trim() ? t[3].replace(this.rules.other.tableRowBlankLine, "").split(`\n`) : [], i = {
                 type: "table",
-                raw: t[0],
+                raw: $(t[0], `\n`),
                 header: [],
                 align: [],
                 rows: []
             };
-            if (n.length === r.length) {
-                for (let a of r) this.rules.other.tableAlignRight.test(a) ? s.align.push("right") : this.rules.other.tableAlignCenter.test(a) ? s.align.push("center") : this.rules.other.tableAlignLeft.test(a) ? s.align.push("left") : s.align.push(null);
-                for (let a = 0; a < n.length; a++) s.header.push({
-                    text: n[a],
-                    tokens: this.lexer.inline(n[a]),
+            if (n.length === s.length) {
+                for (let o of s) this.rules.other.tableAlignRight.test(o) ? i.align.push("right") : this.rules.other.tableAlignCenter.test(o) ? i.align.push("center") : this.rules.other.tableAlignLeft.test(o) ? i.align.push("left") : i.align.push(null);
+                for (let o = 0; o < n.length; o++) i.header.push({
+                    text: n[o],
+                    tokens: this.lexer.inline(n[o]),
                     header: true,
-                    align: s.align[a]
+                    align: i.align[o]
                 });
-                for (let a of i) s.rows.push(J(a, s.header.length).map(((o, l) => ({
-                    text: o,
-                    tokens: this.lexer.inline(o),
+                for (let o of r) i.rows.push(V(o, i.header.length).map(((u, a) => ({
+                    text: u,
+                    tokens: this.lexer.inline(u),
                     header: false,
-                    align: s.align[l]
+                    align: i.align[a]
                 }))));
-                return s;
+                return i;
             }
         }
         lheading(e) {
             let t = this.rules.block.lheading.exec(e);
-            if (t) return {
-                type: "heading",
-                raw: t[0],
-                depth: t[2].charAt(0) === "=" ? 1 : 2,
-                text: t[1],
-                tokens: this.lexer.inline(t[1])
-            };
+            if (t) {
+                let n = t[1].trim();
+                return {
+                    type: "heading",
+                    raw: $(t[0], `\n`),
+                    depth: t[2].charAt(0) === "=" ? 1 : 2,
+                    text: n,
+                    tokens: this.lexer.inline(n)
+                };
+            }
         }
         paragraph(e) {
             let t = this.rules.block.paragraph.exec(e);
@@ -2000,61 +2021,61 @@
                 let n = t[2].trim();
                 if (!this.options.pedantic && this.rules.other.startAngleBracket.test(n)) {
                     if (!this.rules.other.endAngleBracket.test(n)) return;
-                    let s = z(n.slice(0, -1), "\\");
-                    if ((n.length - s.length) % 2 === 0) return;
+                    let i = $(n.slice(0, -1), "\\");
+                    if ((n.length - i.length) % 2 === 0) return;
                 } else {
-                    let s = de(t[2], "()");
-                    if (s === -2) return;
-                    if (s > -1) {
-                        let o = (t[0].indexOf("!") === 0 ? 5 : 4) + t[1].length + s;
-                        t[2] = t[2].substring(0, s), t[0] = t[0].substring(0, o).trim(), t[3] = "";
+                    let i = ge(t[2], "()");
+                    if (i === -2) return;
+                    if (i > -1) {
+                        let u = (t[0].indexOf("!") === 0 ? 5 : 4) + t[1].length + i;
+                        t[2] = t[2].substring(0, i), t[0] = t[0].substring(0, u).trim(), t[3] = "";
                     }
                 }
-                let r = t[2], i = "";
+                let s = t[2], r = "";
                 if (this.options.pedantic) {
-                    let s = this.rules.other.pedanticHrefTitle.exec(r);
-                    s && (r = s[1], i = s[3]);
-                } else i = t[3] ? t[3].slice(1, -1) : "";
-                return r = r.trim(), this.rules.other.startAngleBracket.test(r) && (this.options.pedantic && !this.rules.other.endAngleBracket.test(n) ? r = r.slice(1) : r = r.slice(1, -1)), 
-                ge(t, {
-                    href: r && r.replace(this.rules.inline.anyPunctuation, "$1"),
-                    title: i && i.replace(this.rules.inline.anyPunctuation, "$1")
+                    let i = this.rules.other.pedanticHrefTitle.exec(s);
+                    i && (s = i[1], r = i[3]);
+                } else r = t[3] ? t[3].slice(1, -1) : "";
+                return s = s.trim(), this.rules.other.startAngleBracket.test(s) && (this.options.pedantic && !this.rules.other.endAngleBracket.test(n) ? s = s.slice(1) : s = s.slice(1, -1)), 
+                me(t, {
+                    href: s && s.replace(this.rules.inline.anyPunctuation, "$1"),
+                    title: r && r.replace(this.rules.inline.anyPunctuation, "$1")
                 }, t[0], this.lexer, this.rules);
             }
         }
         reflink(e, t) {
             let n;
             if ((n = this.rules.inline.reflink.exec(e)) || (n = this.rules.inline.nolink.exec(e))) {
-                let r = (n[2] || n[1]).replace(this.rules.other.multipleSpaceGlobal, " "), i = t[r.toLowerCase()];
-                if (!i) {
-                    let s = n[0].charAt(0);
+                let s = (n[2] || n[1]).replace(this.rules.other.multipleSpaceGlobal, " "), r = t[s.toLowerCase()];
+                if (!r) {
+                    let i = n[0].charAt(0);
                     return {
                         type: "text",
-                        raw: s,
-                        text: s
+                        raw: i,
+                        text: i
                     };
                 }
-                return ge(n, i, n[0], this.lexer, this.rules);
+                return me(n, r, n[0], this.lexer, this.rules);
             }
         }
         emStrong(e, t, n = "") {
-            let r = this.rules.inline.emStrongLDelim.exec(e);
-            if (!r || r[3] && n.match(this.rules.other.unicodeAlphaNumeric)) return;
-            if (!(r[1] || r[2] || "") || !n || this.rules.inline.punctuation.exec(n)) {
-                let s = [ ...r[0] ].length - 1, a, o, l = s, p = 0, c = r[0][0] === "*" ? this.rules.inline.emStrongRDelimAst : this.rules.inline.emStrongRDelimUnd;
-                for (c.lastIndex = 0, t = t.slice(-1 * e.length + s); (r = c.exec(t)) != null; ) {
-                    if (a = r[1] || r[2] || r[3] || r[4] || r[5] || r[6], !a) continue;
-                    if (o = [ ...a ].length, r[3] || r[4]) {
-                        l += o;
+            let s = this.rules.inline.emStrongLDelim.exec(e);
+            if (!s || !s[1] && !s[2] && !s[3] && !s[4] || s[4] && n.match(this.rules.other.unicodeAlphaNumeric)) return;
+            if (!(s[1] || s[3] || "") || !n || this.rules.inline.punctuation.exec(n)) {
+                let i = [ ...s[0] ].length - 1, o, u, a = i, c = 0, p = s[0][0] === "*" ? this.rules.inline.emStrongRDelimAst : this.rules.inline.emStrongRDelimUnd;
+                for (p.lastIndex = 0, t = t.slice(-1 * e.length + i); (s = p.exec(t)) !== null; ) {
+                    if (o = s[1] || s[2] || s[3] || s[4] || s[5] || s[6], !o) continue;
+                    if (u = [ ...o ].length, s[3] || s[4]) {
+                        a += u;
                         continue;
-                    } else if ((r[5] || r[6]) && s % 3 && !((s + o) % 3)) {
-                        p += o;
+                    } else if ((s[5] || s[6]) && i % 3 && !((i + u) % 3)) {
+                        c += u;
                         continue;
                     }
-                    if (l -= o, l > 0) continue;
-                    o = Math.min(o, o + l + p);
-                    let g = [ ...r[0] ][0].length, h = e.slice(0, s + r.index + g + o);
-                    if (Math.min(s, o) % 2) {
+                    if (a -= u, a > 0) continue;
+                    u = Math.min(u, u + a + c);
+                    let k = [ ...s[0] ][0].length, h = e.slice(0, i + s.index + k + u);
+                    if (Math.min(i, u) % 2) {
                         let f = h.slice(1, -1);
                         return {
                             type: "em",
@@ -2076,8 +2097,8 @@
         codespan(e) {
             let t = this.rules.inline.code.exec(e);
             if (t) {
-                let n = t[2].replace(this.rules.other.newLineCharGlobal, " "), r = this.rules.other.nonSpaceChar.test(n), i = this.rules.other.startingSpaceChar.test(n) && this.rules.other.endingSpaceChar.test(n);
-                return r && i && (n = n.substring(1, n.length - 1)), {
+                let n = t[2].replace(this.rules.other.newLineCharGlobal, " "), s = this.rules.other.nonSpaceChar.test(n), r = this.rules.other.startingSpaceChar.test(n) && this.rules.other.endingSpaceChar.test(n);
+                return s && r && (n = n.substring(1, n.length - 1)), {
                     type: "codespan",
                     raw: t[0],
                     text: n
@@ -2091,24 +2112,39 @@
                 raw: t[0]
             };
         }
-        del(e) {
-            let t = this.rules.inline.del.exec(e);
-            if (t) return {
-                type: "del",
-                raw: t[0],
-                text: t[2],
-                tokens: this.lexer.inlineTokens(t[2])
-            };
+        del(e, t, n = "") {
+            let s = this.rules.inline.delLDelim.exec(e);
+            if (!s) return;
+            if (!(s[1] || "") || !n || this.rules.inline.punctuation.exec(n)) {
+                let i = [ ...s[0] ].length - 1, o, u, a = i, c = this.rules.inline.delRDelim;
+                for (c.lastIndex = 0, t = t.slice(-1 * e.length + i); (s = c.exec(t)) !== null; ) {
+                    if (o = s[1] || s[2] || s[3] || s[4] || s[5] || s[6], !o || (u = [ ...o ].length, 
+                    u !== i)) continue;
+                    if (s[3] || s[4]) {
+                        a += u;
+                        continue;
+                    }
+                    if (a -= u, a > 0) continue;
+                    u = Math.min(u, u + a);
+                    let p = [ ...s[0] ][0].length, k = e.slice(0, i + s.index + p + u), h = k.slice(i, -i);
+                    return {
+                        type: "del",
+                        raw: k,
+                        text: h,
+                        tokens: this.lexer.inlineTokens(h)
+                    };
+                }
+            }
         }
         autolink(e) {
             let t = this.rules.inline.autolink.exec(e);
             if (t) {
-                let n, r;
-                return t[2] === "@" ? (n = t[1], r = "mailto:" + n) : (n = t[1], r = n), {
+                let n, s;
+                return t[2] === "@" ? (n = t[1], s = "mailto:" + n) : (n = t[1], s = n), {
                     type: "link",
                     raw: t[0],
                     text: n,
-                    href: r,
+                    href: s,
                     tokens: [ {
                         type: "text",
                         raw: n,
@@ -2120,19 +2156,19 @@
         url(e) {
             let t;
             if (t = this.rules.inline.url.exec(e)) {
-                let n, r;
-                if (t[2] === "@") n = t[0], r = "mailto:" + n; else {
-                    let i;
+                let n, s;
+                if (t[2] === "@") n = t[0], s = "mailto:" + n; else {
+                    let r;
                     do {
-                        i = t[0], t[0] = this.rules.inline._backpedal.exec(t[0])?.[0] ?? "";
-                    } while (i !== t[0]);
-                    n = t[0], t[1] === "www." ? r = "http://" + t[0] : r = t[0];
+                        r = t[0], t[0] = this.rules.inline._backpedal.exec(t[0])?.[0] ?? "";
+                    } while (r !== t[0]);
+                    n = t[0], t[1] === "www." ? s = "http://" + t[0] : s = t[0];
                 }
                 return {
                     type: "link",
                     raw: t[0],
                     text: n,
-                    href: r,
+                    href: s,
                     tokens: [ {
                         type: "text",
                         raw: n,
@@ -2154,7 +2190,7 @@
             }
         }
     };
-    var x = class u {
+    var x = class l {
         tokens;
         options;
         state;
@@ -2162,7 +2198,7 @@
         tokenizer;
         constructor(e) {
             this.tokens = [], this.tokens.links = Object.create(null), this.options = e || T, 
-            this.options.tokenizer = this.options.tokenizer || new y, this.tokenizer = this.options.tokenizer, 
+            this.options.tokenizer = this.options.tokenizer || new w, this.tokenizer = this.options.tokenizer, 
             this.tokenizer.options = this.options, this.tokenizer.lexer = this, this.inlineQueue = [], 
             this.state = {
                 inLink: false,
@@ -2171,23 +2207,23 @@
             };
             let t = {
                 other: m,
-                block: E.normal,
-                inline: M.normal
+                block: B.normal,
+                inline: A.normal
             };
-            this.options.pedantic ? (t.block = E.pedantic, t.inline = M.pedantic) : this.options.gfm && (t.block = E.gfm, 
-            this.options.breaks ? t.inline = M.breaks : t.inline = M.gfm), this.tokenizer.rules = t;
+            this.options.pedantic ? (t.block = B.pedantic, t.inline = A.pedantic) : this.options.gfm && (t.block = B.gfm, 
+            this.options.breaks ? t.inline = A.breaks : t.inline = A.gfm), this.tokenizer.rules = t;
         }
         static get rules() {
             return {
-                block: E,
-                inline: M
+                block: B,
+                inline: A
             };
         }
         static lex(e, t) {
-            return new u(t).lex(e);
+            return new l(t).lex(e);
         }
         static lexInline(e, t) {
-            return new u(t).inlineTokens(e);
+            return new l(t).inlineTokens(e);
         }
         lex(e) {
             e = e.replace(m.carriageReturn, `\n`), this.blockTokens(e, this.tokens);
@@ -2198,22 +2234,28 @@
             return this.inlineQueue = [], this.tokens;
         }
         blockTokens(e, t = [], n = false) {
-            for (this.options.pedantic && (e = e.replace(m.tabCharGlobal, "    ").replace(m.spaceLine, "")); e; ) {
+            this.tokenizer.lexer = this, this.options.pedantic && (e = e.replace(m.tabCharGlobal, "    ").replace(m.spaceLine, ""));
+            let s = 1 / 0;
+            for (;e; ) {
+                if (e.length < s) s = e.length; else {
+                    this.infiniteLoopError(e.charCodeAt(0));
+                    break;
+                }
                 let r;
-                if (this.options.extensions?.block?.some((s => (r = s.call({
+                if (this.options.extensions?.block?.some((o => (r = o.call({
                     lexer: this
                 }, e, t)) ? (e = e.substring(r.raw.length), t.push(r), true) : false))) continue;
                 if (r = this.tokenizer.space(e)) {
                     e = e.substring(r.raw.length);
-                    let s = t.at(-1);
-                    r.raw.length === 1 && s !== void 0 ? s.raw += `\n` : t.push(r);
+                    let o = t.at(-1);
+                    r.raw.length === 1 && o !== void 0 ? o.raw += `\n` : t.push(r);
                     continue;
                 }
                 if (r = this.tokenizer.code(e)) {
                     e = e.substring(r.raw.length);
-                    let s = t.at(-1);
-                    s?.type === "paragraph" || s?.type === "text" ? (s.raw += (s.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, 
-                    s.text += `\n` + r.text, this.inlineQueue.at(-1).src = s.text) : t.push(r);
+                    let o = t.at(-1);
+                    o?.type === "paragraph" || o?.type === "text" ? (o.raw += (o.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, 
+                    o.text += `\n` + r.text, this.inlineQueue.at(-1).src = o.text) : t.push(r);
                     continue;
                 }
                 if (r = this.tokenizer.fences(e)) {
@@ -2242,9 +2284,9 @@
                 }
                 if (r = this.tokenizer.def(e)) {
                     e = e.substring(r.raw.length);
-                    let s = t.at(-1);
-                    s?.type === "paragraph" || s?.type === "text" ? (s.raw += (s.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, 
-                    s.text += `\n` + r.raw, this.inlineQueue.at(-1).src = s.text) : this.tokens.links[r.tag] || (this.tokens.links[r.tag] = {
+                    let o = t.at(-1);
+                    o?.type === "paragraph" || o?.type === "text" ? (o.raw += (o.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, 
+                    o.text += `\n` + r.raw, this.inlineQueue.at(-1).src = o.text) : this.tokens.links[r.tag] || (this.tokens.links[r.tag] = {
                         href: r.href,
                         title: r.title
                     }, t.push(r));
@@ -2260,33 +2302,30 @@
                 }
                 let i = e;
                 if (this.options.extensions?.startBlock) {
-                    let s = 1 / 0, a = e.slice(1), o;
-                    this.options.extensions.startBlock.forEach((l => {
-                        o = l.call({
+                    let o = 1 / 0, u = e.slice(1), a;
+                    this.options.extensions.startBlock.forEach((c => {
+                        a = c.call({
                             lexer: this
-                        }, a), typeof o == "number" && o >= 0 && (s = Math.min(s, o));
-                    })), s < 1 / 0 && s >= 0 && (i = e.substring(0, s + 1));
+                        }, u), typeof a == "number" && a >= 0 && (o = Math.min(o, a));
+                    })), o < 1 / 0 && o >= 0 && (i = e.substring(0, o + 1));
                 }
                 if (this.state.top && (r = this.tokenizer.paragraph(i))) {
-                    let s = t.at(-1);
-                    n && s?.type === "paragraph" ? (s.raw += (s.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, 
-                    s.text += `\n` + r.text, this.inlineQueue.pop(), this.inlineQueue.at(-1).src = s.text) : t.push(r), 
+                    let o = t.at(-1);
+                    n && o?.type === "paragraph" ? (o.raw += (o.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, 
+                    o.text += `\n` + r.text, this.inlineQueue.pop(), this.inlineQueue.at(-1).src = o.text) : t.push(r), 
                     n = i.length !== e.length, e = e.substring(r.raw.length);
                     continue;
                 }
                 if (r = this.tokenizer.text(e)) {
                     e = e.substring(r.raw.length);
-                    let s = t.at(-1);
-                    s?.type === "text" ? (s.raw += (s.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, s.text += `\n` + r.text, 
-                    this.inlineQueue.pop(), this.inlineQueue.at(-1).src = s.text) : t.push(r);
+                    let o = t.at(-1);
+                    o?.type === "text" ? (o.raw += (o.raw.endsWith(`\n`) ? "" : `\n`) + r.raw, o.text += `\n` + r.text, 
+                    this.inlineQueue.pop(), this.inlineQueue.at(-1).src = o.text) : t.push(r);
                     continue;
                 }
                 if (e) {
-                    let s = "Infinite loop on byte: " + e.charCodeAt(0);
-                    if (this.options.silent) {
-                        console.error(s);
-                        break;
-                    } else throw new Error(s);
+                    this.infiniteLoopError(e.charCodeAt(0));
+                    break;
                 }
             }
             return this.state.top = true, t;
@@ -2298,95 +2337,101 @@
             }), t;
         }
         inlineTokens(e, t = []) {
-            let n = e, r = null;
+            this.tokenizer.lexer = this;
+            let n = e, s = null;
             if (this.tokens.links) {
-                let o = Object.keys(this.tokens.links);
-                if (o.length > 0) for (;(r = this.tokenizer.rules.inline.reflinkSearch.exec(n)) != null; ) o.includes(r[0].slice(r[0].lastIndexOf("[") + 1, -1)) && (n = n.slice(0, r.index) + "[" + "a".repeat(r[0].length - 2) + "]" + n.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex));
+                let a = Object.keys(this.tokens.links);
+                if (a.length > 0) for (;(s = this.tokenizer.rules.inline.reflinkSearch.exec(n)) !== null; ) a.includes(s[0].slice(s[0].lastIndexOf("[") + 1, -1)) && (n = n.slice(0, s.index) + "[" + "a".repeat(s[0].length - 2) + "]" + n.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex));
             }
-            for (;(r = this.tokenizer.rules.inline.anyPunctuation.exec(n)) != null; ) n = n.slice(0, r.index) + "++" + n.slice(this.tokenizer.rules.inline.anyPunctuation.lastIndex);
-            let i;
-            for (;(r = this.tokenizer.rules.inline.blockSkip.exec(n)) != null; ) i = r[2] ? r[2].length : 0, 
-            n = n.slice(0, r.index + i) + "[" + "a".repeat(r[0].length - i - 2) + "]" + n.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);
+            for (;(s = this.tokenizer.rules.inline.anyPunctuation.exec(n)) !== null; ) n = n.slice(0, s.index) + "++" + n.slice(this.tokenizer.rules.inline.anyPunctuation.lastIndex);
+            let r;
+            for (;(s = this.tokenizer.rules.inline.blockSkip.exec(n)) !== null; ) r = s[2] ? s[2].length : 0, 
+            n = n.slice(0, s.index + r) + "[" + "a".repeat(s[0].length - r - 2) + "]" + n.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);
             n = this.options.hooks?.emStrongMask?.call({
                 lexer: this
             }, n) ?? n;
-            let s = false, a = "";
+            let i = false, o = "", u = 1 / 0;
             for (;e; ) {
-                s || (a = ""), s = false;
-                let o;
-                if (this.options.extensions?.inline?.some((p => (o = p.call({
+                if (e.length < u) u = e.length; else {
+                    this.infiniteLoopError(e.charCodeAt(0));
+                    break;
+                }
+                i || (o = ""), i = false;
+                let a;
+                if (this.options.extensions?.inline?.some((p => (a = p.call({
                     lexer: this
-                }, e, t)) ? (e = e.substring(o.raw.length), t.push(o), true) : false))) continue;
-                if (o = this.tokenizer.escape(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                }, e, t)) ? (e = e.substring(a.raw.length), t.push(a), true) : false))) continue;
+                if (a = this.tokenizer.escape(e)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.tag(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.tag(e)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.link(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.link(e)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.reflink(e, this.tokens.links)) {
-                    e = e.substring(o.raw.length);
+                if (a = this.tokenizer.reflink(e, this.tokens.links)) {
+                    e = e.substring(a.raw.length);
                     let p = t.at(-1);
-                    o.type === "text" && p?.type === "text" ? (p.raw += o.raw, p.text += o.text) : t.push(o);
+                    a.type === "text" && p?.type === "text" ? (p.raw += a.raw, p.text += a.text) : t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.emStrong(e, n, a)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.emStrong(e, n, o)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.codespan(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.codespan(e)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.br(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.br(e)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.del(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.del(e, n, o)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (o = this.tokenizer.autolink(e)) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (a = this.tokenizer.autolink(e)) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                if (!this.state.inLink && (o = this.tokenizer.url(e))) {
-                    e = e.substring(o.raw.length), t.push(o);
+                if (!this.state.inLink && (a = this.tokenizer.url(e))) {
+                    e = e.substring(a.raw.length), t.push(a);
                     continue;
                 }
-                let l = e;
+                let c = e;
                 if (this.options.extensions?.startInline) {
-                    let p = 1 / 0, c = e.slice(1), g;
-                    this.options.extensions.startInline.forEach((h => {
-                        g = h.call({
+                    let p = 1 / 0, k = e.slice(1), h;
+                    this.options.extensions.startInline.forEach((R => {
+                        h = R.call({
                             lexer: this
-                        }, c), typeof g == "number" && g >= 0 && (p = Math.min(p, g));
-                    })), p < 1 / 0 && p >= 0 && (l = e.substring(0, p + 1));
+                        }, k), typeof h == "number" && h >= 0 && (p = Math.min(p, h));
+                    })), p < 1 / 0 && p >= 0 && (c = e.substring(0, p + 1));
                 }
-                if (o = this.tokenizer.inlineText(l)) {
-                    e = e.substring(o.raw.length), o.raw.slice(-1) !== "_" && (a = o.raw.slice(-1)), 
-                    s = true;
+                if (a = this.tokenizer.inlineText(c)) {
+                    e = e.substring(a.raw.length), a.raw.slice(-1) !== "_" && (o = a.raw.slice(-1)), 
+                    i = true;
                     let p = t.at(-1);
-                    p?.type === "text" ? (p.raw += o.raw, p.text += o.text) : t.push(o);
+                    p?.type === "text" ? (p.raw += a.raw, p.text += a.text) : t.push(a);
                     continue;
                 }
                 if (e) {
-                    let p = "Infinite loop on byte: " + e.charCodeAt(0);
-                    if (this.options.silent) {
-                        console.error(p);
-                        break;
-                    } else throw new Error(p);
+                    this.infiniteLoopError(e.charCodeAt(0));
+                    break;
                 }
             }
             return t;
         }
+        infiniteLoopError(e) {
+            let t = "Infinite loop on byte: " + e;
+            if (this.options.silent) console.error(t); else throw new Error(t);
+        }
     };
-    var P = class {
+    var y = class {
         options;
         parser;
         constructor(e) {
@@ -2396,8 +2441,8 @@
             return "";
         }
         code({text: e, lang: t, escaped: n}) {
-            let r = (t || "").match(m.notSpaceStart)?.[0], i = e.replace(m.endingNewline, "") + `\n`;
-            return r ? '<pre><code class="language-' + w(r) + '">' + (n ? i : w(i, true)) + `</code></pre>\n` : "<pre><code>" + (n ? i : w(i, true)) + `</code></pre>\n`;
+            let s = (t || "").match(m.notSpaceStart)?.[0], r = e.replace(m.endingNewline, "") + `\n`;
+            return s ? '<pre><code class="language-' + O(s) + '">' + (n ? r : O(r, true)) + `</code></pre>\n` : "<pre><code>" + (n ? r : O(r, true)) + `</code></pre>\n`;
         }
         blockquote({tokens: e}) {
             return `<blockquote>\n${this.parser.parse(e)}</blockquote>\n`;
@@ -2415,13 +2460,13 @@
             return `<hr>\n`;
         }
         list(e) {
-            let t = e.ordered, n = e.start, r = "";
-            for (let a = 0; a < e.items.length; a++) {
-                let o = e.items[a];
-                r += this.listitem(o);
+            let t = e.ordered, n = e.start, s = "";
+            for (let o = 0; o < e.items.length; o++) {
+                let u = e.items[o];
+                s += this.listitem(u);
             }
-            let i = t ? "ol" : "ul", s = t && n !== 1 ? ' start="' + n + '"' : "";
-            return "<" + i + s + `>\n` + r + "</" + i + `>\n`;
+            let r = t ? "ol" : "ul", i = t && n !== 1 ? ' start="' + n + '"' : "";
+            return "<" + r + i + `>\n` + s + "</" + r + `>\n`;
         }
         listitem(e) {
             return `<li>${this.parser.parse(e.tokens)}</li>\n`;
@@ -2434,20 +2479,20 @@
         }
         table(e) {
             let t = "", n = "";
-            for (let i = 0; i < e.header.length; i++) n += this.tablecell(e.header[i]);
+            for (let r = 0; r < e.header.length; r++) n += this.tablecell(e.header[r]);
             t += this.tablerow({
                 text: n
             });
-            let r = "";
-            for (let i = 0; i < e.rows.length; i++) {
-                let s = e.rows[i];
+            let s = "";
+            for (let r = 0; r < e.rows.length; r++) {
+                let i = e.rows[r];
                 n = "";
-                for (let a = 0; a < s.length; a++) n += this.tablecell(s[a]);
-                r += this.tablerow({
+                for (let o = 0; o < i.length; o++) n += this.tablecell(i[o]);
+                s += this.tablerow({
                     text: n
                 });
             }
-            return r && (r = `<tbody>${r}</tbody>`), `<table>\n<thead>\n` + t + `</thead>\n` + r + `</table>\n`;
+            return s && (s = `<tbody>${s}</tbody>`), `<table>\n<thead>\n` + t + `</thead>\n` + s + `</table>\n`;
         }
         tablerow({text: e}) {
             return `<tr>\n${e}</tr>\n`;
@@ -2463,7 +2508,7 @@
             return `<em>${this.parser.parseInline(e)}</em>`;
         }
         codespan({text: e}) {
-            return `<code>${w(e, true)}</code>`;
+            return `<code>${O(e, true)}</code>`;
         }
         br(e) {
             return "<br>";
@@ -2472,25 +2517,25 @@
             return `<del>${this.parser.parseInline(e)}</del>`;
         }
         link({href: e, title: t, tokens: n}) {
-            let r = this.parser.parseInline(n), i = X(e);
-            if (i === null) return r;
-            e = i;
-            let s = '<a href="' + e + '"';
-            return t && (s += ' title="' + w(t) + '"'), s += ">" + r + "</a>", s;
+            let s = this.parser.parseInline(n), r = J(e);
+            if (r === null) return s;
+            e = r;
+            let i = '<a href="' + e + '"';
+            return t && (i += ' title="' + O(t) + '"'), i += ">" + s + "</a>", i;
         }
-        image({href: e, title: t, text: n, tokens: r}) {
-            r && (n = this.parser.parseInline(r, this.parser.textRenderer));
-            let i = X(e);
-            if (i === null) return w(n);
-            e = i;
-            let s = `<img src="${e}" alt="${n}"`;
-            return t && (s += ` title="${w(t)}"`), s += ">", s;
+        image({href: e, title: t, text: n, tokens: s}) {
+            s && (n = this.parser.parseInline(s, this.parser.textRenderer));
+            let r = J(e);
+            if (r === null) return O(n);
+            e = r;
+            let i = `<img src="${e}" alt="${O(n)}"`;
+            return t && (i += ` title="${O(t)}"`), i += ">", i;
         }
         text(e) {
-            return "tokens" in e && e.tokens ? this.parser.parseInline(e.tokens) : "escaped" in e && e.escaped ? e.text : w(e.text);
+            return "tokens" in e && e.tokens ? this.parser.parseInline(e.tokens) : "escaped" in e && e.escaped ? e.text : O(e.text);
         }
     };
-    var $ = class {
+    var L = class {
         strong({text: e}) {
             return e;
         }
@@ -2522,210 +2567,212 @@
             return e;
         }
     };
-    var b = class u {
+    var b = class l {
         options;
         renderer;
         textRenderer;
         constructor(e) {
-            this.options = e || T, this.options.renderer = this.options.renderer || new P, this.renderer = this.options.renderer, 
-            this.renderer.options = this.options, this.renderer.parser = this, this.textRenderer = new $;
+            this.options = e || T, this.options.renderer = this.options.renderer || new y, this.renderer = this.options.renderer, 
+            this.renderer.options = this.options, this.renderer.parser = this, this.textRenderer = new L;
         }
         static parse(e, t) {
-            return new u(t).parse(e);
+            return new l(t).parse(e);
         }
         static parseInline(e, t) {
-            return new u(t).parseInline(e);
+            return new l(t).parseInline(e);
         }
         parse(e) {
+            this.renderer.parser = this;
             let t = "";
             for (let n = 0; n < e.length; n++) {
-                let r = e[n];
-                if (this.options.extensions?.renderers?.[r.type]) {
-                    let s = r, a = this.options.extensions.renderers[s.type].call({
+                let s = e[n];
+                if (this.options.extensions?.renderers?.[s.type]) {
+                    let i = s, o = this.options.extensions.renderers[i.type].call({
                         parser: this
-                    }, s);
-                    if (a !== false || ![ "space", "hr", "heading", "code", "table", "blockquote", "list", "html", "def", "paragraph", "text" ].includes(s.type)) {
-                        t += a || "";
+                    }, i);
+                    if (o !== false || ![ "space", "hr", "heading", "code", "table", "blockquote", "list", "html", "def", "paragraph", "text" ].includes(i.type)) {
+                        t += o || "";
                         continue;
                     }
                 }
-                let i = r;
-                switch (i.type) {
+                let r = s;
+                switch (r.type) {
                   case "space":
                     {
-                        t += this.renderer.space(i);
+                        t += this.renderer.space(r);
                         break;
                     }
 
                   case "hr":
                     {
-                        t += this.renderer.hr(i);
+                        t += this.renderer.hr(r);
                         break;
                     }
 
                   case "heading":
                     {
-                        t += this.renderer.heading(i);
+                        t += this.renderer.heading(r);
                         break;
                     }
 
                   case "code":
                     {
-                        t += this.renderer.code(i);
+                        t += this.renderer.code(r);
                         break;
                     }
 
                   case "table":
                     {
-                        t += this.renderer.table(i);
+                        t += this.renderer.table(r);
                         break;
                     }
 
                   case "blockquote":
                     {
-                        t += this.renderer.blockquote(i);
+                        t += this.renderer.blockquote(r);
                         break;
                     }
 
                   case "list":
                     {
-                        t += this.renderer.list(i);
+                        t += this.renderer.list(r);
                         break;
                     }
 
                   case "checkbox":
                     {
-                        t += this.renderer.checkbox(i);
+                        t += this.renderer.checkbox(r);
                         break;
                     }
 
                   case "html":
                     {
-                        t += this.renderer.html(i);
+                        t += this.renderer.html(r);
                         break;
                     }
 
                   case "def":
                     {
-                        t += this.renderer.def(i);
+                        t += this.renderer.def(r);
                         break;
                     }
 
                   case "paragraph":
                     {
-                        t += this.renderer.paragraph(i);
+                        t += this.renderer.paragraph(r);
                         break;
                     }
 
                   case "text":
                     {
-                        t += this.renderer.text(i);
+                        t += this.renderer.text(r);
                         break;
                     }
 
                   default:
                     {
-                        let s = 'Token with "' + i.type + '" type was not found.';
-                        if (this.options.silent) return console.error(s), "";
-                        throw new Error(s);
+                        let i = 'Token with "' + r.type + '" type was not found.';
+                        if (this.options.silent) return console.error(i), "";
+                        throw new Error(i);
                     }
                 }
             }
             return t;
         }
         parseInline(e, t = this.renderer) {
+            this.renderer.parser = this;
             let n = "";
-            for (let r = 0; r < e.length; r++) {
-                let i = e[r];
-                if (this.options.extensions?.renderers?.[i.type]) {
-                    let a = this.options.extensions.renderers[i.type].call({
+            for (let s = 0; s < e.length; s++) {
+                let r = e[s];
+                if (this.options.extensions?.renderers?.[r.type]) {
+                    let o = this.options.extensions.renderers[r.type].call({
                         parser: this
-                    }, i);
-                    if (a !== false || ![ "escape", "html", "link", "image", "strong", "em", "codespan", "br", "del", "text" ].includes(i.type)) {
-                        n += a || "";
+                    }, r);
+                    if (o !== false || ![ "escape", "html", "link", "image", "strong", "em", "codespan", "br", "del", "text" ].includes(r.type)) {
+                        n += o || "";
                         continue;
                     }
                 }
-                let s = i;
-                switch (s.type) {
+                let i = r;
+                switch (i.type) {
                   case "escape":
                     {
-                        n += t.text(s);
+                        n += t.text(i);
                         break;
                     }
 
                   case "html":
                     {
-                        n += t.html(s);
+                        n += t.html(i);
                         break;
                     }
 
                   case "link":
                     {
-                        n += t.link(s);
+                        n += t.link(i);
                         break;
                     }
 
                   case "image":
                     {
-                        n += t.image(s);
+                        n += t.image(i);
                         break;
                     }
 
                   case "checkbox":
                     {
-                        n += t.checkbox(s);
+                        n += t.checkbox(i);
                         break;
                     }
 
                   case "strong":
                     {
-                        n += t.strong(s);
+                        n += t.strong(i);
                         break;
                     }
 
                   case "em":
                     {
-                        n += t.em(s);
+                        n += t.em(i);
                         break;
                     }
 
                   case "codespan":
                     {
-                        n += t.codespan(s);
+                        n += t.codespan(i);
                         break;
                     }
 
                   case "br":
                     {
-                        n += t.br(s);
+                        n += t.br(i);
                         break;
                     }
 
                   case "del":
                     {
-                        n += t.del(s);
+                        n += t.del(i);
                         break;
                     }
 
                   case "text":
                     {
-                        n += t.text(s);
+                        n += t.text(i);
                         break;
                     }
 
                   default:
                     {
-                        let a = 'Token with "' + s.type + '" type was not found.';
-                        if (this.options.silent) return console.error(a), "";
-                        throw new Error(a);
+                        let o = 'Token with "' + i.type + '" type was not found.';
+                        if (this.options.silent) return console.error(o), "";
+                        throw new Error(o);
                     }
                 }
             }
             return n;
         }
     };
-    var S = class {
+    var P = class {
         options;
         block;
         constructor(e) {
@@ -2745,52 +2792,52 @@
         emStrongMask(e) {
             return e;
         }
-        provideLexer() {
-            return this.block ? x.lex : x.lexInline;
+        provideLexer(e = this.block) {
+            return e ? x.lex : x.lexInline;
         }
-        provideParser() {
-            return this.block ? b.parse : b.parseInline;
+        provideParser(e = this.block) {
+            return e ? b.parse : b.parseInline;
         }
     };
-    var B = class {
-        defaults=L();
+    var D = class {
+        defaults=z();
         options=this.setOptions;
         parse=this.parseMarkdown(true);
         parseInline=this.parseMarkdown(false);
         Parser=b;
-        Renderer=P;
-        TextRenderer=$;
+        Renderer=y;
+        TextRenderer=L;
         Lexer=x;
-        Tokenizer=y;
-        Hooks=S;
+        Tokenizer=w;
+        Hooks=P;
         constructor(...e) {
             this.use(...e);
         }
         walkTokens(e, t) {
             let n = [];
-            for (let r of e) switch (n = n.concat(t.call(this, r)), r.type) {
+            for (let s of e) switch (n = n.concat(t.call(this, s)), s.type) {
               case "table":
                 {
-                    let i = r;
-                    for (let s of i.header) n = n.concat(this.walkTokens(s.tokens, t));
-                    for (let s of i.rows) for (let a of s) n = n.concat(this.walkTokens(a.tokens, t));
+                    let r = s;
+                    for (let i of r.header) n = n.concat(this.walkTokens(i.tokens, t));
+                    for (let i of r.rows) for (let o of i) n = n.concat(this.walkTokens(o.tokens, t));
                     break;
                 }
 
               case "list":
                 {
-                    let i = r;
-                    n = n.concat(this.walkTokens(i.items, t));
+                    let r = s;
+                    n = n.concat(this.walkTokens(r.items, t));
                     break;
                 }
 
               default:
                 {
-                    let i = r;
-                    this.defaults.extensions?.childTokens?.[i.type] ? this.defaults.extensions.childTokens[i.type].forEach((s => {
-                        let a = i[s].flat(1 / 0);
-                        n = n.concat(this.walkTokens(a, t));
-                    })) : i.tokens && (n = n.concat(this.walkTokens(i.tokens, t)));
+                    let r = s;
+                    this.defaults.extensions?.childTokens?.[r.type] ? this.defaults.extensions.childTokens[r.type].forEach((i => {
+                        let o = r[i].flat(1 / 0);
+                        n = n.concat(this.walkTokens(o, t));
+                    })) : r.tokens && (n = n.concat(this.walkTokens(r.tokens, t)));
                 }
             }
             return n;
@@ -2801,84 +2848,84 @@
                 childTokens: {}
             };
             return e.forEach((n => {
-                let r = {
+                let s = {
                     ...n
                 };
-                if (r.async = this.defaults.async || r.async || false, n.extensions && (n.extensions.forEach((i => {
-                    if (!i.name) throw new Error("extension name required");
-                    if ("renderer" in i) {
-                        let s = t.renderers[i.name];
-                        s ? t.renderers[i.name] = function(...a) {
-                            let o = i.renderer.apply(this, a);
-                            return o === false && (o = s.apply(this, a)), o;
-                        } : t.renderers[i.name] = i.renderer;
+                if (s.async = this.defaults.async || s.async || false, n.extensions && (n.extensions.forEach((r => {
+                    if (!r.name) throw new Error("extension name required");
+                    if ("renderer" in r) {
+                        let i = t.renderers[r.name];
+                        i ? t.renderers[r.name] = function(...o) {
+                            let u = r.renderer.apply(this, o);
+                            return u === false && (u = i.apply(this, o)), u;
+                        } : t.renderers[r.name] = r.renderer;
                     }
-                    if ("tokenizer" in i) {
-                        if (!i.level || i.level !== "block" && i.level !== "inline") throw new Error("extension level must be 'block' or 'inline'");
-                        let s = t[i.level];
-                        s ? s.unshift(i.tokenizer) : t[i.level] = [ i.tokenizer ], i.start && (i.level === "block" ? t.startBlock ? t.startBlock.push(i.start) : t.startBlock = [ i.start ] : i.level === "inline" && (t.startInline ? t.startInline.push(i.start) : t.startInline = [ i.start ]));
+                    if ("tokenizer" in r) {
+                        if (!r.level || r.level !== "block" && r.level !== "inline") throw new Error("extension level must be 'block' or 'inline'");
+                        let i = t[r.level];
+                        i ? i.unshift(r.tokenizer) : t[r.level] = [ r.tokenizer ], r.start && (r.level === "block" ? t.startBlock ? t.startBlock.push(r.start) : t.startBlock = [ r.start ] : r.level === "inline" && (t.startInline ? t.startInline.push(r.start) : t.startInline = [ r.start ]));
                     }
-                    "childTokens" in i && i.childTokens && (t.childTokens[i.name] = i.childTokens);
-                })), r.extensions = t), n.renderer) {
-                    let i = this.defaults.renderer || new P(this.defaults);
-                    for (let s in n.renderer) {
-                        if (!(s in i)) throw new Error(`renderer '${s}' does not exist`);
-                        if ([ "options", "parser" ].includes(s)) continue;
-                        let a = s, o = n.renderer[a], l = i[a];
-                        i[a] = (...p) => {
-                            let c = o.apply(i, p);
-                            return c === false && (c = l.apply(i, p)), c || "";
+                    "childTokens" in r && r.childTokens && (t.childTokens[r.name] = r.childTokens);
+                })), s.extensions = t), n.renderer) {
+                    let r = this.defaults.renderer || new y(this.defaults);
+                    for (let i in n.renderer) {
+                        if (!(i in r)) throw new Error(`renderer '${i}' does not exist`);
+                        if ([ "options", "parser" ].includes(i)) continue;
+                        let o = i, u = n.renderer[o], a = r[o];
+                        r[o] = (...c) => {
+                            let p = u.apply(r, c);
+                            return p === false && (p = a.apply(r, c)), p || "";
                         };
                     }
-                    r.renderer = i;
+                    s.renderer = r;
                 }
                 if (n.tokenizer) {
-                    let i = this.defaults.tokenizer || new y(this.defaults);
-                    for (let s in n.tokenizer) {
-                        if (!(s in i)) throw new Error(`tokenizer '${s}' does not exist`);
-                        if ([ "options", "rules", "lexer" ].includes(s)) continue;
-                        let a = s, o = n.tokenizer[a], l = i[a];
-                        i[a] = (...p) => {
-                            let c = o.apply(i, p);
-                            return c === false && (c = l.apply(i, p)), c;
+                    let r = this.defaults.tokenizer || new w(this.defaults);
+                    for (let i in n.tokenizer) {
+                        if (!(i in r)) throw new Error(`tokenizer '${i}' does not exist`);
+                        if ([ "options", "rules", "lexer" ].includes(i)) continue;
+                        let o = i, u = n.tokenizer[o], a = r[o];
+                        r[o] = (...c) => {
+                            let p = u.apply(r, c);
+                            return p === false && (p = a.apply(r, c)), p;
                         };
                     }
-                    r.tokenizer = i;
+                    s.tokenizer = r;
                 }
                 if (n.hooks) {
-                    let i = this.defaults.hooks || new S;
-                    for (let s in n.hooks) {
-                        if (!(s in i)) throw new Error(`hook '${s}' does not exist`);
-                        if ([ "options", "block" ].includes(s)) continue;
-                        let a = s, o = n.hooks[a], l = i[a];
-                        S.passThroughHooks.has(s) ? i[a] = p => {
-                            if (this.defaults.async && S.passThroughHooksRespectAsync.has(s)) return (async () => {
-                                let g = await o.call(i, p);
-                                return l.call(i, g);
+                    let r = this.defaults.hooks || new P;
+                    for (let i in n.hooks) {
+                        if (!(i in r)) throw new Error(`hook '${i}' does not exist`);
+                        if ([ "options", "block" ].includes(i)) continue;
+                        let o = i, u = n.hooks[o], a = r[o];
+                        P.passThroughHooks.has(i) ? r[o] = c => {
+                            if (this.defaults.async && P.passThroughHooksRespectAsync.has(i)) return (async () => {
+                                let k = await u.call(r, c);
+                                return a.call(r, k);
                             })();
-                            let c = o.call(i, p);
-                            return l.call(i, c);
-                        } : i[a] = (...p) => {
+                            let p = u.call(r, c);
+                            return a.call(r, p);
+                        } : r[o] = (...c) => {
                             if (this.defaults.async) return (async () => {
-                                let g = await o.apply(i, p);
-                                return g === false && (g = await l.apply(i, p)), g;
+                                let k = await u.apply(r, c);
+                                return k === false && (k = await a.apply(r, c)), k;
                             })();
-                            let c = o.apply(i, p);
-                            return c === false && (c = l.apply(i, p)), c;
+                            let p = u.apply(r, c);
+                            return p === false && (p = a.apply(r, c)), p;
                         };
                     }
-                    r.hooks = i;
+                    s.hooks = r;
                 }
                 if (n.walkTokens) {
-                    let i = this.defaults.walkTokens, s = n.walkTokens;
-                    r.walkTokens = function(a) {
-                        let o = [];
-                        return o.push(s.call(this, a)), i && (o = o.concat(i.call(this, a))), o;
+                    let r = this.defaults.walkTokens, i = n.walkTokens;
+                    s.walkTokens = function(o) {
+                        let u = [];
+                        return u.push(i.call(this, o)), r && (u = u.concat(r.call(this, o))), u;
                     };
                 }
                 this.defaults = {
                     ...this.defaults,
-                    ...r
+                    ...s
                 };
             })), this;
         }
@@ -2895,30 +2942,30 @@
             return b.parse(e, t ?? this.defaults);
         }
         parseMarkdown(e) {
-            return (n, r) => {
-                let i = {
-                    ...r
-                }, s = {
+            return (n, s) => {
+                let r = {
+                    ...s
+                }, i = {
                     ...this.defaults,
-                    ...i
-                }, a = this.onError(!!s.silent, !!s.async);
-                if (this.defaults.async === true && i.async === false) return a(new Error("marked(): The async option was set to true by an extension. Remove async: false from the parse options object to return a Promise."));
-                if (typeof n > "u" || n === null) return a(new Error("marked(): input parameter is undefined or null"));
-                if (typeof n != "string") return a(new Error("marked(): input parameter is of type " + Object.prototype.toString.call(n) + ", string expected"));
-                if (s.hooks && (s.hooks.options = s, s.hooks.block = e), s.async) return (async () => {
-                    let o = s.hooks ? await s.hooks.preprocess(n) : n, p = await (s.hooks ? await s.hooks.provideLexer() : e ? x.lex : x.lexInline)(o, s), c = s.hooks ? await s.hooks.processAllTokens(p) : p;
-                    s.walkTokens && await Promise.all(this.walkTokens(c, s.walkTokens));
-                    let h = await (s.hooks ? await s.hooks.provideParser() : e ? b.parse : b.parseInline)(c, s);
-                    return s.hooks ? await s.hooks.postprocess(h) : h;
-                })().catch(a);
+                    ...r
+                }, o = this.onError(!!i.silent, !!i.async);
+                if (this.defaults.async === true && r.async === false) return o(new Error("marked(): The async option was set to true by an extension. Remove async: false from the parse options object to return a Promise."));
+                if (typeof n > "u" || n === null) return o(new Error("marked(): input parameter is undefined or null"));
+                if (typeof n != "string") return o(new Error("marked(): input parameter is of type " + Object.prototype.toString.call(n) + ", string expected"));
+                if (i.hooks && (i.hooks.options = i, i.hooks.block = e), i.async) return (async () => {
+                    let u = i.hooks ? await i.hooks.preprocess(n) : n, c = await (i.hooks ? await i.hooks.provideLexer(e) : e ? x.lex : x.lexInline)(u, i), p = i.hooks ? await i.hooks.processAllTokens(c) : c;
+                    i.walkTokens && await Promise.all(this.walkTokens(p, i.walkTokens));
+                    let h = await (i.hooks ? await i.hooks.provideParser(e) : e ? b.parse : b.parseInline)(p, i);
+                    return i.hooks ? await i.hooks.postprocess(h) : h;
+                })().catch(o);
                 try {
-                    s.hooks && (n = s.hooks.preprocess(n));
-                    let l = (s.hooks ? s.hooks.provideLexer() : e ? x.lex : x.lexInline)(n, s);
-                    s.hooks && (l = s.hooks.processAllTokens(l)), s.walkTokens && this.walkTokens(l, s.walkTokens);
-                    let c = (s.hooks ? s.hooks.provideParser() : e ? b.parse : b.parseInline)(l, s);
-                    return s.hooks && (c = s.hooks.postprocess(c)), c;
-                } catch (o) {
-                    return a(o);
+                    i.hooks && (n = i.hooks.preprocess(n));
+                    let a = (i.hooks ? i.hooks.provideLexer(e) : e ? x.lex : x.lexInline)(n, i);
+                    i.hooks && (a = i.hooks.processAllTokens(a)), i.walkTokens && this.walkTokens(a, i.walkTokens);
+                    let p = (i.hooks ? i.hooks.provideParser(e) : e ? b.parse : b.parseInline)(a, i);
+                    return i.hooks && (p = i.hooks.postprocess(p)), p;
+                } catch (u) {
+                    return o(u);
                 }
             };
         }
@@ -2926,44 +2973,44 @@
             return n => {
                 if (n.message += `\nPlease report this to https://github.com/markedjs/marked.`, 
                 e) {
-                    let r = "<p>An error occurred:</p><pre>" + w(n.message + "", true) + "</pre>";
-                    return t ? Promise.resolve(r) : r;
+                    let s = "<p>An error occurred:</p><pre>" + O(n.message + "", true) + "</pre>";
+                    return t ? Promise.resolve(s) : s;
                 }
                 if (t) return Promise.reject(n);
                 throw n;
             };
         }
     };
-    var _ = new B;
-    function d(u, e) {
-        return _.parse(u, e);
+    var M = new D;
+    function g(l, e) {
+        return M.parse(l, e);
     }
-    d.options = d.setOptions = function(u) {
-        return _.setOptions(u), d.defaults = _.defaults, Z(d.defaults), d;
+    g.options = g.setOptions = function(l) {
+        return M.setOptions(l), g.defaults = M.defaults, G(g.defaults), g;
     };
-    d.getDefaults = L;
-    d.defaults = T;
-    d.use = function(...u) {
-        return _.use(...u), d.defaults = _.defaults, Z(d.defaults), d;
+    g.getDefaults = z;
+    g.defaults = T;
+    g.use = function(...l) {
+        return M.use(...l), g.defaults = M.defaults, G(g.defaults), g;
     };
-    d.walkTokens = function(u, e) {
-        return _.walkTokens(u, e);
+    g.walkTokens = function(l, e) {
+        return M.walkTokens(l, e);
     };
-    d.parseInline = _.parseInline;
-    d.Parser = b;
-    d.parser = b.parse;
-    d.Renderer = P;
-    d.TextRenderer = $;
-    d.Lexer = x;
-    d.lexer = x.lex;
-    d.Tokenizer = y;
-    d.Hooks = S;
-    d.parse = d;
-    d.options;
-    d.setOptions;
-    d.use;
-    d.walkTokens;
-    d.parseInline;
+    g.parseInline = M.parseInline;
+    g.Parser = b;
+    g.parser = b.parse;
+    g.Renderer = y;
+    g.TextRenderer = L;
+    g.Lexer = x;
+    g.lexer = x.lex;
+    g.Tokenizer = w;
+    g.Hooks = P;
+    g.parse = g;
+    g.options;
+    g.setOptions;
+    g.use;
+    g.walkTokens;
+    g.parseInline;
     b.parse;
     x.lex;
     function corner(data, cornerExternalLinkTarget) {
@@ -5706,12 +5753,12 @@
             let compile;
             const mdConf = config.markdown || {};
             if (isFn(mdConf)) {
-                compile = mdConf(d, this.renderer);
+                compile = mdConf(g, this.renderer);
             } else {
-                d.setOptions(Object.assign(mdConf, {
+                g.setOptions(Object.assign(mdConf, {
                     renderer: Object.assign(this.renderer, mdConf.renderer)
                 }));
-                compile = d;
+                compile = g;
             }
             this._marked = compile;
             this.compile = text => {
@@ -5783,7 +5830,7 @@
             }
         }
         _initRenderer() {
-            const renderer = new d.Renderer;
+            const renderer = new g.Renderer;
             const {linkTarget: linkTarget, linkRel: linkRel, router: router, contentBase: contentBase} = this;
             const origin = {};
             origin.heading = headingCompiler({
@@ -7535,7 +7582,7 @@
             version: "5.0.0-rc.4"
         };
         window.DocsifyCompiler = Compiler;
-        window.marked = d;
+        window.marked = g;
         window.Prism = prism$1;
     }
     initGlobalAPI();
