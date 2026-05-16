@@ -4,6 +4,7 @@ export class Compiler {
     router: any;
     cacheTree: {};
     toc: any[];
+    blockquoteDepth: number;
     cacheTOC: {};
     linkTarget: any;
     linkRel: any;

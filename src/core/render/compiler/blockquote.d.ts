@@ -1,5 +1,6 @@
-export function blockquoteCompiler({ renderer }: {
+export function blockquoteCompiler({ renderer, compiler }: {
     renderer: any;
+    compiler: any;
 }): ({ tokens }: {
     tokens: any;
 }) => string;

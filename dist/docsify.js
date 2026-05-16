@@ -5162,7 +5162,9 @@
             id: slug
         });
         nextToc.slug = stripUrlExceptId(url);
-        compiler.toc.push(nextToc);
+        if (compiler.blockquoteDepth === 0) {
+            compiler.toc.push(nextToc);
+        }
         return `<h${depth} id="${slug}" tabindex="-1"><a href="${url}" data-id="${slug}" class="anchor"><span>${str}</span></a></h${depth}>`;
     };
     (function(Prism) {
@@ -5560,7 +5562,7 @@
         }
         return result;
     };
-    const blockquoteCompiler = ({renderer: renderer}) => renderer.blockquote = function({tokens: tokens}) {
+    const blockquoteCompiler = ({renderer: renderer, compiler: compiler}) => renderer.blockquote = function({tokens: tokens}) {
         let openTag = "<blockquote>";
         let closeTag = "</blockquote>";
         const firstParagraphIndex = tokens.findIndex((t => t.type === "paragraph"));
@@ -5588,7 +5590,13 @@
                 closeTag = `</div>`;
             }
         }
-        const body = this.parser.parse(tokens);
+        compiler.blockquoteDepth++;
+        let body = "";
+        try {
+            body = this.parser.parse(tokens);
+        } finally {
+            compiler.blockquoteDepth--;
+        }
         return `${openTag}${body}${closeTag}`;
     };
     const taskListCompiler = ({renderer: renderer}) => renderer.list = function(token) {
@@ -5745,6 +5753,7 @@
             this.router = router;
             this.cacheTree = {};
             this.toc = [];
+            this.blockquoteDepth = 0;
             this.cacheTOC = {};
             this.linkTarget = config.externalLinkTarget || "_blank";
             this.linkRel = this.linkTarget === "_blank" ? config.externalLinkRel || "noopener" : "";
@@ -5796,9 +5805,10 @@
                     href = getPath(this.contentBase, getParentPath(this.router.getCurrentPath()), href);
                 }
                 let media;
-                if (config.type && (media = compileMedia[config.type])) {
+                const mediaType = Array.isArray(config.type) ? config.type[0] : config.type;
+                if (mediaType && (media = compileMedia[mediaType])) {
                     embed = media.call(this, href, title);
-                    embed.type = config.type;
+                    embed.type = mediaType;
                 } else {
                     let type = "code";
                     if (/\.(md|markdown)/.test(href)) {
@@ -5839,7 +5849,8 @@
                 compiler: this
             });
             origin.blockquoteCompiler = blockquoteCompiler({
-                renderer: renderer
+                renderer: renderer,
+                compiler: this
             });
             origin.code = highlightCodeCompiler({
                 renderer: renderer

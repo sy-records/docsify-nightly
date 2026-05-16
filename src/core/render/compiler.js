@@ -25,6 +25,7 @@ export class Compiler {
     this.router = router;
     this.cacheTree = {};
     this.toc = [];
+    this.blockquoteDepth = 0;
     this.cacheTOC = {};
     this.linkTarget = config.externalLinkTarget || '_blank';
     this.linkRel =
@@ -113,9 +114,13 @@ export class Compiler {
       }
 
       let media;
-      if (config.type && (media = compileMedia[config.type])) {
+      const mediaType = Array.isArray(config.type)
+        ? config.type[0]
+        : config.type;
+
+      if (mediaType && (media = compileMedia[mediaType])) {
         embed = media.call(this, href, title);
-        embed.type = config.type;
+        embed.type = mediaType;
       } else {
         let type = 'code';
         if (/\.(md|markdown)/.test(href)) {
@@ -165,7 +170,10 @@ export class Compiler {
       router,
       compiler: this,
     });
-    origin.blockquoteCompiler = blockquoteCompiler({ renderer });
+    origin.blockquoteCompiler = blockquoteCompiler({
+      renderer,
+      compiler: this,
+    });
     origin.code = highlightCodeCompiler({ renderer });
     origin.link = linkCompiler({
       renderer,
