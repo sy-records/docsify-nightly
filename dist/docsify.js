@@ -6985,6 +6985,7 @@
         return class Events extends Base {
             #intersectionObserver=new IntersectionObserver((() => {}));
             #isScrolling=false;
+            #cancelAnchorScroll=noop;
             #title=$$1.title;
             initEvent() {
                 const {topMargin: topMargin} = this.config;
@@ -7161,11 +7162,7 @@
                     if (query.id) {
                         const headingElm = find(`.markdown-section :where(h1, h2, h3, h4, h5, h6)[id="${query.id}"]`);
                         if (headingElm) {
-                            this.#watchNextScroll();
-                            headingElm.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start"
-                            });
+                            this.#scrollToHeading(headingElm);
                         }
                     } else if (source === "navigate") {
                         if (auto2top) {
@@ -7279,6 +7276,182 @@
                     }
                 }
             }
+            #scrollToHeading(headingElm) {
+                this.#cancelAnchorScroll();
+                const contentElm = find(".markdown-section");
+                const userEvents = [ "keydown", "mousedown", "touchstart", "wheel" ];
+                const timers = {};
+                let animationFrame = 0;
+                let correctionFrame = 0;
+                let cancelled = false;
+                let cancel = noop;
+                let hasScrolled = false;
+                let scrollScheduled = false;
+                let remainingImages = 0;
+                let cleanup = () => {};
+                const imageListeners = [];
+                const pendingImageCorrections = [];
+                const removeUserListeners = () => {
+                    userEvents.forEach((eventName => {
+                        window.removeEventListener(eventName, cancel);
+                    }));
+                };
+                const removeImageListeners = () => {
+                    imageListeners.forEach((({image: image, eventName: eventName, listener: listener}) => {
+                        image.removeEventListener(eventName, listener);
+                    }));
+                    imageListeners.length = 0;
+                };
+                const scrollToHeading = () => {
+                    if (cancelled) {
+                        return;
+                    }
+                    if (!document.contains(headingElm)) {
+                        cancel();
+                        return;
+                    }
+                    hasScrolled = true;
+                    this.#watchNextScroll();
+                    headingElm.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                    if (remainingImages === 0) {
+                        cleanup();
+                    }
+                };
+                const scheduleScroll = () => {
+                    if (hasScrolled || scrollScheduled) {
+                        return;
+                    }
+                    scrollScheduled = true;
+                    clearTimeout(timers.wait);
+                    animationFrame = requestAnimationFrame(scrollToHeading);
+                };
+                const scheduleCorrection = (image, previousHeight) => {
+                    if (cancelled || !hasScrolled) {
+                        return;
+                    }
+                    pendingImageCorrections.push({
+                        image: image,
+                        previousHeight: previousHeight
+                    });
+                    if (correctionFrame) {
+                        return;
+                    }
+                    correctionFrame = requestAnimationFrame((() => {
+                        correctionFrame = 0;
+                        if (cancelled) {
+                            return;
+                        }
+                        if (!document.contains(headingElm)) {
+                            cleanup();
+                            return;
+                        }
+                        let heightChange = 0;
+                        for (const {image: image, previousHeight: previousHeight} of pendingImageCorrections) {
+                            const isBeforeHeading = image.compareDocumentPosition(headingElm) & Node.DOCUMENT_POSITION_FOLLOWING;
+                            const currentHeight = image.getBoundingClientRect().height;
+                            if (isBeforeHeading) {
+                                heightChange += currentHeight - previousHeight;
+                            }
+                        }
+                        pendingImageCorrections.length = 0;
+                        if (Math.abs(heightChange) < 1) {
+                            if (remainingImages === 0) {
+                                cleanup();
+                            }
+                            return;
+                        }
+                        const scrollingElm = document.scrollingElement;
+                        if (!scrollingElm) {
+                            cleanup();
+                            return;
+                        }
+                        const scrollPaddingTop = parseFloat(getComputedStyle(scrollingElm).scrollPaddingTop) || 0;
+                        const headingTop = headingElm.getBoundingClientRect().top;
+                        const scrollAdjustment = headingTop - scrollPaddingTop;
+                        if (Math.abs(scrollAdjustment) < 1) {
+                            if (remainingImages === 0) {
+                                cleanup();
+                            }
+                            return;
+                        }
+                        this.#watchNextScroll();
+                        scrollingElm.scrollTop += scrollAdjustment;
+                        if (remainingImages === 0) {
+                            cleanup();
+                        }
+                    }));
+                };
+                cleanup = () => {
+                    if (cancelled) {
+                        return;
+                    }
+                    cancelled = true;
+                    cancelAnimationFrame(animationFrame);
+                    cancelAnimationFrame(correctionFrame);
+                    clearTimeout(timers.wait);
+                    removeImageListeners();
+                    removeUserListeners();
+                    this.#cancelAnchorScroll = noop;
+                };
+                cancel = cleanup;
+                const waitForImages = () => {
+                    const images = (contentElm ? Array.from(contentElm.querySelectorAll("img")) : []).filter((image => !image.complete && image.compareDocumentPosition(headingElm) & Node.DOCUMENT_POSITION_FOLLOWING));
+                    if (!images.length) {
+                        scheduleScroll();
+                        return;
+                    }
+                    remainingImages = images.length;
+                    const onImageSettled = (image, previousHeight) => {
+                        remainingImages -= 1;
+                        if (hasScrolled) {
+                            scheduleCorrection(image, previousHeight);
+                        } else if (remainingImages === 0) {
+                            scheduleScroll();
+                        }
+                        if (remainingImages === 0 && hasScrolled && !correctionFrame) {
+                            cleanup();
+                        }
+                    };
+                    images.forEach((image => {
+                        let settled = false;
+                        const previousHeight = image.getBoundingClientRect().height;
+                        const listener = () => {
+                            if (settled) {
+                                return;
+                            }
+                            settled = true;
+                            onImageSettled(image, previousHeight);
+                        };
+                        image.addEventListener("load", listener, {
+                            once: true
+                        });
+                        image.addEventListener("error", listener, {
+                            once: true
+                        });
+                        imageListeners.push({
+                            image: image,
+                            eventName: "load",
+                            listener: listener
+                        }, {
+                            image: image,
+                            eventName: "error",
+                            listener: listener
+                        });
+                    }));
+                    timers.wait = setTimeout(scheduleScroll, 300);
+                };
+                userEvents.forEach((eventName => {
+                    window.addEventListener(eventName, cancel, {
+                        once: true,
+                        passive: true
+                    });
+                }));
+                waitForImages();
+                this.#cancelAnchorScroll = cancel;
+            }
             #watchNextScroll() {
                 document.addEventListener("scroll", (() => {
                     this.#isScrolling = true;
@@ -7296,6 +7469,7 @@
                             }), 100);
                         };
                         document.addEventListener("scroll", callback, false);
+                        callback();
                     }
                 }), {
                     once: true

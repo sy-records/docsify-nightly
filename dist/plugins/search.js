@@ -67,6 +67,32 @@
         };
         return String(string).replace(/[&<>"']/g, (s => entityMap[s]));
     }
+    function cached(fn) {
+        const cache = Object.create(null);
+        return function(str) {
+            const key = isPrimitive(str) ? str : JSON.stringify(str);
+            const hit = cache[key];
+            return hit || (cache[key] = fn(str));
+        };
+    }
+    function isPrimitive(value) {
+        return typeof value === "string" || typeof value === "number";
+    }
+    const isAbsolutePath = cached((path => /(:|(\/{2}))/g.test(path)));
+    const getParentPath = cached((path => {
+        if (/\/$/g.test(path)) {
+            return path;
+        }
+        const matchingParts = path.match(/(\S*\/)[^/]+$/);
+        return matchingParts ? matchingParts[1] : "";
+    }));
+    const cleanPath = cached((path => path.replace(/^\/+/, "/").replace(/([^:])\/{2,}/g, "$1/")));
+    function normaliseFragment(path) {
+        return path.split("/").filter((p => p.indexOf("#") === -1)).join("/");
+    }
+    function getPath(...args) {
+        return cleanPath(args.map(normaliseFragment).join("/"));
+    }
     function z() {
         return {
             async: false,
@@ -5702,8 +5728,23 @@
         expires: "key, value"
     });
     async function saveData(maxAge, expireKey) {
-        INDEXES = Object.values(INDEXES).flatMap((innerData => Object.values(innerData)));
-        await db.search.bulkPut(INDEXES);
+        const records = [];
+        Object.values(INDEXES).forEach((entry => {
+            if (!entry || typeof entry !== "object") {
+                return;
+            }
+            if ("slug" in entry) {
+                records.push(entry);
+                return;
+            }
+            Object.values(entry).forEach((item => {
+                if (item && typeof item === "object" && "slug" in item) {
+                    records.push(item);
+                }
+            }));
+        }));
+        INDEXES = records;
+        await db.search.bulkPut(records);
         await db.expires.put({
             key: expireKey,
             value: Date.now() + maxAge
@@ -5753,6 +5794,75 @@
             token.text = token.raw;
         }
         return token.text;
+    }
+    function extractFragmentContent(text, fragment, fullLine) {
+        if (!fragment) {
+            return text;
+        }
+        let fragmentRegex = `(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`;
+        if (fullLine) {
+            fragmentRegex = `.*${fragmentRegex}.*\n`;
+        }
+        const pattern = new RegExp(`(?:${fragmentRegex})([\\s\\S]*?)(?:${fragmentRegex})`);
+        const match = text.match(pattern);
+        return ((match || [])[1] || "").trim();
+    }
+    function collectEmbedRequests(raw = "", path, vm) {
+        const tokens = window.marked.lexer(raw);
+        const requests = [];
+        const maybePushEmbed = inlineToken => {
+            if (!inlineToken || inlineToken.type !== "link" && inlineToken.type !== "image") {
+                return;
+            }
+            const {config: config} = getAndRemoveConfig(inlineToken.title || "");
+            if (!config.include || !inlineToken.href) {
+                return;
+            }
+            const href = isAbsolutePath(inlineToken.href) ? inlineToken.href : getPath(vm.router.getBasePath(), getParentPath(path), inlineToken.href);
+            let type = "code";
+            if (/\.(md|markdown)/.test(href)) {
+                type = "markdown";
+            } else if (/\.mmd/.test(href)) {
+                type = "mermaid";
+            }
+            requests.push({
+                url: href,
+                type: type,
+                fragment: config.fragment,
+                omitFragmentLine: config.omitFragmentLine
+            });
+        };
+        tokens.forEach((token => {
+            if (token.type === "paragraph") {
+                (token.tokens || []).forEach(maybePushEmbed);
+            } else if (token.type === "table") {
+                (token.header || []).forEach((cell => {
+                    (cell.tokens || []).forEach(maybePushEmbed);
+                }));
+                (token.rows || []).forEach((row => {
+                    row.forEach((cell => {
+                        (cell.tokens || []).forEach(maybePushEmbed);
+                    }));
+                }));
+            }
+        }));
+        return requests;
+    }
+    async function getEmbeddedContent(raw = "", path, vm) {
+        const requests = collectEmbedRequests(raw, path, vm);
+        if (!requests.length) {
+            return "";
+        }
+        const results = await Promise.all(requests.map((request => new Promise((resolve => {
+            Docsify.get(request.url, false, vm.config.requestHeaders).then((text => {
+                let content = text || "";
+                if (request.fragment) {
+                    content = extractFragmentContent(content, request.fragment, request.omitFragmentLine);
+                }
+                resolve(request.type === "markdown" ? content : markdownToTxt(content));
+            }), (() => resolve("")));
+        })))));
+        return results.filter(Boolean).join("\n");
     }
     function genIndex(path, content = "", router, depth, indexKey) {
         const tokens = window.marked.lexer(content);
@@ -5837,21 +5947,17 @@
             if (postTitle) {
                 keywords.forEach((keyword => {
                     const regEx = new RegExp(escapeHtml(ignoreDiacriticalMarks(keyword)).replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"), "gi");
-                    let indexTitle = -1;
-                    let indexContent = -1;
                     handlePostTitle = postTitle ? escapeHtml(ignoreDiacriticalMarks(postTitle)) : postTitle;
                     handlePostContent = postContent ? escapeHtml(ignoreDiacriticalMarks(postContent)) : postContent;
-                    indexTitle = postTitle ? handlePostTitle.search(regEx) : -1;
-                    indexContent = postContent ? handlePostContent.search(regEx) : -1;
+                    const indexTitle = postTitle ? handlePostTitle.search(regEx) : -1;
+                    let indexContent = postContent ? handlePostContent.search(regEx) : -1;
                     if (indexTitle >= 0 || indexContent >= 0) {
                         matchesScore += indexTitle >= 0 ? 3 : indexContent >= 0 ? 2 : 0;
                         if (indexContent < 0) {
                             indexContent = 0;
                         }
-                        let start = 0;
-                        let end = 0;
-                        start = indexContent < 11 ? 0 : indexContent - 10;
-                        end = start === 0 ? 100 : indexContent + keyword.length + 90;
+                        const start = indexContent < 11 ? 0 : indexContent - 10;
+                        let end = start === 0 ? 100 : indexContent + keyword.length + 90;
                         if (handlePostContent && end > handlePostContent.length) {
                             end = handlePostContent.length;
                         }
@@ -5905,17 +6011,23 @@
         }
         const len = paths.length;
         let count = 0;
+        const markComplete = async () => {
+            if (len === ++count) {
+                await saveData(config.maxAge, expireKey);
+            }
+        };
         paths.forEach((path => {
             const pathExists = Array.isArray(INDEXES) ? INDEXES.some((obj => obj.path === path)) : false;
             if (pathExists) {
-                return count++;
+                void markComplete();
+                return;
             }
             Docsify.get(vm.router.getFile(path), false, vm.config.requestHeaders).then((async result => {
-                INDEXES[path] = genIndex(path, result, vm.router, config.depth, indexKey);
-                if (len === ++count) {
-                    await saveData(config.maxAge, expireKey);
-                }
-            }));
+                const embeddedContent = await getEmbeddedContent(result, path, vm);
+                const contentToIndex = embeddedContent ? `${result}\n${embeddedContent}` : result;
+                INDEXES[path] = genIndex(path, contentToIndex, vm.router, config.depth, indexKey);
+                return markComplete();
+            }), (() => markComplete()));
         }));
     }
     var cssText = "/* prettier-ignore */\n:root {\n  --plugin-search-input-bg           : var(--form-element-bg);\n  --plugin-search-input-border-color : var(--sidebar-border-color);\n  --plugin-search-input-border-radius: var(--form-element-border-radius);\n  --plugin-search-input-color        : var(--form-element-color);\n  --plugin-search-kbd-bg             : var(--color-bg);\n  --plugin-search-kbd-border         : 1px solid var(--color-mono-3);\n  --plugin-search-kbd-border-radius  : 4px;\n  --plugin-search-kbd-color          : var(--color-mono-5);\n  --plugin-search-margin             : 10px;\n  --plugin-search-reset-bg           : var(--theme-color);\n  --plugin-search-reset-border       : transparent;\n  --plugin-search-reset-border-radius: var(--border-radius);\n  --plugin-search-reset-color        : #fff;\n}\n\n.search {\n  margin: var(--plugin-search-margin);\n}\n\n/* Input */\n/* ================================== */\n.search .input-wrap {\n  position: relative;\n}\n\n.search input {\n  width: 100%;\n  padding-inline-end: 36px;\n  border: 1px solid var(--plugin-search-input-border-color);\n  border-radius: var(--plugin-search-input-border-radius);\n  background: var(--plugin-search-input-bg);\n  color: var(--plugin-search-input-color);\n}\n\n.search input::-webkit-search-decoration,\n.search input::-webkit-search-cancel-button {\n  appearance: none;\n}\n\n.search .clear-button,\n.search .kbd-group {\n  visibility: hidden;\n  display: flex;\n  gap: 0.15em;\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  opacity: 0;\n  translate: 0 -50%;\n  transition-property: opacity, visibility;\n  transition-duration: var(--duration-medium);\n}\n\n/* Note: invalid = empty, valid = not empty */\n.search input:valid ~ .clear-button,\n.search input:invalid:where(:focus, :hover) ~ .kbd-group,\n.search .kbd-group:hover {\n  visibility: visible;\n  opacity: 1;\n}\n\n.search .clear-button {\n  --_button-size: 20px;\n  --_content-size: 12px;\n\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: var(--_button-size);\n  width: var(--_button-size);\n  border: var(--plugin-search-reset-border);\n  border-radius: var(--plugin-search-reset-border-radius);\n  background: var(--plugin-search-reset-bg);\n  cursor: pointer;\n}\n\n.search .clear-button::before,\n.search .clear-button::after {\n  content: '';\n  position: absolute;\n  height: 2px;\n  width: var(--_content-size);\n  color: var(--plugin-search-reset-color);\n  background: var(--plugin-search-reset-color);\n}\n\n.search .clear-button::before {\n  rotate: 45deg;\n}\n\n.search .clear-button::after {\n  rotate: -45deg;\n}\n\n.search kbd {\n  border: var(--plugin-search-kbd-border);\n  border-radius: var(--plugin-search-kbd-border-radius);\n  background: var(--plugin-search-kbd-bg);\n  color: var(--plugin-search-kbd-color);\n  font-size: var(--font-size-s);\n}\n\n/* Results */\n/* ================================== */\n.search a:hover {\n  color: var(--theme-color);\n}\n\n.search .results-panel:empty {\n  display: none;\n}\n\n/* Hide other sidebar items when results are shown */\n.search:has(.results-panel:not(:empty)) ~ * {\n  display: none;\n}\n\n/* Dim other sidebar items when no results are found */\n.search:where(:has(input:valid:focus), :has(.results-panel::empty)) ~ * {\n  opacity: 0.2;\n}\n\n.search .matching-post {\n  overflow: hidden;\n  padding: 1em 0 1.2em 0;\n  border-bottom: 1px solid var(--color-mono-2);\n}\n\n.search .matching-post:hover a {\n  text-decoration-color: transparent;\n}\n\n.search .matching-post:hover .title {\n  text-decoration: inherit;\n  text-decoration-color: var(--link-underline-color-hover);\n}\n\n.search .matching-post .title {\n  margin: 0 0 0.5em 0;\n  line-height: 1.4;\n}\n\n.search .matching-post .content {\n  margin: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status {\n  margin-bottom: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status:empty {\n  display: none;\n}\n";

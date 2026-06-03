@@ -29,6 +29,7 @@ declare const Docsify_base: {
         [x: string]: any;
         "__#private@#intersectionObserver": IntersectionObserver;
         "__#private@#isScrolling": boolean;
+        "__#private@#cancelAnchorScroll": typeof import("./util/core.js").noop;
         "__#private@#title": string;
         initEvent(): void;
         "__#private@#initCover"(): void;
@@ -44,6 +45,7 @@ declare const Docsify_base: {
         "__#private@#markSidebarActiveElm"(href?: string): HTMLLIElement | null | undefined;
         "__#private@#markSidebarCurrentPage"(href?: string): HTMLLIElement | null | undefined;
         "__#private@#toggleSidebar"(force?: boolean): void;
+        "__#private@#scrollToHeading"(headingElm: Element): void;
         "__#private@#watchNextScroll"(): void;
     };
 } & {

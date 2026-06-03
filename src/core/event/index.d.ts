@@ -8,6 +8,7 @@ export function Events<T extends Constructor>(Base: T): {
         [x: string]: any;
         "__#private@#intersectionObserver": IntersectionObserver;
         "__#private@#isScrolling": boolean;
+        "__#private@#cancelAnchorScroll": typeof noop;
         "__#private@#title": string;
         /**
          * Initialize Docsify events
@@ -99,6 +100,14 @@ export function Events<T extends Constructor>(Base: T): {
          */
         "__#private@#toggleSidebar"(force?: boolean): void;
         /**
+         * Scroll an anchor target into view and keep it aligned while late-loading
+         * content above the target changes the page height.
+         *
+         * @param {Element} headingElm Heading element to scroll to
+         * @void
+         */
+        "__#private@#scrollToHeading"(headingElm: Element): void;
+        /**
          * Monitor next scroll start/end and set #isScrolling to true/false
          * accordingly. Listeners are removed after the start/end events are fired.
          * @void
@@ -107,4 +116,5 @@ export function Events<T extends Constructor>(Base: T): {
     };
 } & T;
 export type Constructor = import("../Docsify.js").Constructor;
+import { noop } from '../util/core.js';
 //# sourceMappingURL=index.d.ts.map
