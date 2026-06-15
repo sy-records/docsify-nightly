@@ -26,8 +26,10 @@
         const cache = Object.create(null);
         return function(str) {
             const key = isPrimitive(str) ? str : JSON.stringify(str);
-            const hit = cache[key];
-            return hit || (cache[key] = fn(str));
+            if (key in cache) {
+                return cache[key];
+            }
+            return cache[key] = fn(str);
         };
     }
     const hyphenate = cached$1((str => str.replace(/([A-Z])/g, (m => "-" + m.toLowerCase()))));
@@ -6365,7 +6367,7 @@
                 }
             };
             if (currentToken.embed.url) {
-                get(currentToken.embed.url).then(next);
+                get(currentToken.embed.url).then(next, (() => next()));
             } else {
                 next(currentToken.embed.html);
             }
@@ -6429,7 +6431,7 @@
             embedTokens: embedTokens,
             fetch: fetch
         }, (({embedToken: embedToken, token: token, rowIndex: rowIndex, cellIndex: cellIndex, tokenRef: tokenRef}) => {
-            if (token) {
+            if (token && embedToken) {
                 Object.assign(links, embedToken.links);
                 if (typeof rowIndex === "number" && typeof cellIndex === "number") {
                     const cell = tokenRef.rows[rowIndex][cellIndex];
@@ -6481,7 +6483,7 @@
                         });
                     }
                 }
-            } else {
+            } else if (!token) {
                 cached[raw] = tokens.concat();
                 tokens.links = cached[raw].links = links;
                 done(tokens);

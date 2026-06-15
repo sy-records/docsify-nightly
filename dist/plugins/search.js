@@ -71,8 +71,10 @@
         const cache = Object.create(null);
         return function(str) {
             const key = isPrimitive(str) ? str : JSON.stringify(str);
-            const hit = cache[key];
-            return hit || (cache[key] = fn(str));
+            if (key in cache) {
+                return cache[key];
+            }
+            return cache[key] = fn(str);
         };
     }
     function isPrimitive(value) {
