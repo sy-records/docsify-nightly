@@ -6306,7 +6306,7 @@
         const match = text.match(pattern);
         return stripIndent((match || [])[1] || "").trim();
     }
-    function walkFetchEmbed({embedTokens: embedTokens, compile: compile, fetch: fetch}, cb) {
+    function walkFetchEmbed({embedTokens: embedTokens, compile: compile, fetch: fetch, frontMatter: frontMatter}, cb) {
         if (!embedTokens.length) {
             return cb({});
         }
@@ -6326,9 +6326,9 @@
                             }
                             return x;
                         }));
-                        const frontMatterInstalled = $docsify?.frontMatter?.installed;
+                        const frontMatterInstalled = frontMatter?.installed;
                         if (frontMatterInstalled) {
-                            text = $docsify.frontMatter?.parseMarkdown(text);
+                            text = frontMatter?.parseMarkdown(text);
                         }
                         if (currentToken.embed.fragment) {
                             text = extractFragmentContent(text, currentToken.embed.fragment, currentToken.embed.omitFragmentLine);
@@ -6382,6 +6382,7 @@
             return done(copy);
         }
         const compile = compiler._marked;
+        const frontMatter = compiler.config.frontMatter;
         let tokens = compile.lexer(raw);
         const embedTokens = [];
         const links = tokens.links;
@@ -6429,7 +6430,8 @@
         walkFetchEmbed({
             compile: compile,
             embedTokens: embedTokens,
-            fetch: fetch
+            fetch: fetch,
+            frontMatter: frontMatter
         }, (({embedToken: embedToken, token: token, rowIndex: rowIndex, cellIndex: cellIndex, tokenRef: tokenRef}) => {
             if (token && embedToken) {
                 Object.assign(links, embedToken.links);
