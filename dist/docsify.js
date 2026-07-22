@@ -5574,9 +5574,19 @@
             if (calloutData) {
                 const calloutMark = calloutData[1];
                 const calloutType = calloutData[2].toLowerCase();
-                firstParagraph.raw = firstParagraph.raw.replace(calloutMark, "").trimStart();
-                if (firstParagraph.tokens && firstParagraph.tokens.length > 0) {
-                    firstParagraph.tokens.forEach((t => {
+                tokens = tokens.slice();
+                const paragraph = {
+                    ...firstParagraph
+                };
+                if (firstParagraph.tokens) {
+                    paragraph.tokens = firstParagraph.tokens.map((t => ({
+                        ...t
+                    })));
+                }
+                tokens[firstParagraphIndex] = paragraph;
+                paragraph.raw = paragraph.raw.replace(calloutMark, "").trimStart();
+                if (paragraph.tokens && paragraph.tokens.length > 0) {
+                    paragraph.tokens.forEach((t => {
                         if (t.raw) {
                             t.raw = t.raw.replace(calloutMark, "");
                         }
@@ -5585,7 +5595,7 @@
                         }
                     }));
                 }
-                if (!firstParagraph.raw.trim()) {
+                if (!paragraph.raw.trim()) {
                     tokens.splice(firstParagraphIndex, 1);
                 }
                 openTag = `<div class="callout ${calloutType}">`;
