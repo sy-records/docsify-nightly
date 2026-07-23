@@ -1,5 +1,5 @@
 /*!
- * Docsify v5.0.0-rc.4
+ * Docsify v5.0.0
  * https://docsify.js.org
  * (c) 2017-2026
  * MIT license
@@ -7778,7 +7778,7 @@
             dom: dom,
             get: get,
             slugify: slugify,
-            version: "5.0.0-rc.4"
+            version: "5.0.0"
         };
         window.DocsifyCompiler = Compiler;
         window.marked = g;
