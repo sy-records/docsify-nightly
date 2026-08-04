@@ -64,6 +64,7 @@ declare function defaultDocsifyConfig(): {
     routerMode: string;
     routes: Record<string, string | RouteHandler>;
     skipLink: false | string | Record<string, string>;
+    sidebarPosition: "left" | "right";
     subMaxLevel: number;
     vueComponents: Record<string, TODO>;
     vueGlobalOptions: Record<string, TODO>;

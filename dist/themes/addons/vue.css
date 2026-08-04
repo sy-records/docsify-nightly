@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
 
 /* prettier-ignore */
-
 :root {
   /* Color */
   --color-text : #34495e;
@@ -35,13 +34,10 @@
 }
 
 /* Sidebar */
-
 /* ========================================================================== */
-
 .sidebar-nav li.active > a {
     position: relative;
   }
-
 :is(.sidebar-nav li.active > a)::after {
       content: '';
       position: absolute;
@@ -51,7 +47,6 @@
       width: 3px;
       background: var(--theme-color);
     }
-
 :is(.sidebar-nav .app-sub-sidebar) li::before {
       content: '-';
       margin-right: 0.25em;

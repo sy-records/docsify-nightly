@@ -5872,6 +5872,7 @@
         const index = {};
         let slug;
         let title = "";
+        let pageTitle = "";
         tokens.forEach(((token, tokenIndex) => {
             if (token.type === "heading" && token.depth <= depth) {
                 const {str: str, config: config} = getAndRemoveConfig(token.text);
@@ -5881,6 +5882,9 @@
                 if (str) {
                     title = getAndRemoveDocsifyIgnoreConfig(str).content;
                     title = removeAtag(title.trim());
+                }
+                if (!pageTitle && title) {
+                    pageTitle = title;
                 }
                 index[slug] = {
                     slug: slug,
@@ -5923,6 +5927,9 @@
             }
         }));
         slugify.clear();
+        Object.values(index).forEach((item => {
+            item.pageTitle = pageTitle;
+        }));
         return index;
     }
     function ignoreDiacriticalMarks(keyword) {
@@ -5968,11 +5975,13 @@
                     }
                 }));
                 if (matchesScore > 0) {
+                    const postPageTitle = post.pageTitle && post.pageTitle.trim();
                     const matchingPost = {
                         title: handlePostTitle,
                         content: postContent ? resultStr : "",
                         url: postUrl,
-                        score: matchesScore
+                        score: matchesScore,
+                        page: postPageTitle ? escapeHtml(ignoreDiacriticalMarks(postPageTitle)) : ""
                     };
                     matchingResults.push(matchingPost);
                 }
@@ -6032,8 +6041,77 @@
             }), (() => markComplete()));
         }));
     }
-    var cssText = "/* prettier-ignore */\n:root {\n  --plugin-search-input-bg           : var(--form-element-bg);\n  --plugin-search-input-border-color : var(--sidebar-border-color);\n  --plugin-search-input-border-radius: var(--form-element-border-radius);\n  --plugin-search-input-color        : var(--form-element-color);\n  --plugin-search-kbd-bg             : var(--color-bg);\n  --plugin-search-kbd-border         : 1px solid var(--color-mono-3);\n  --plugin-search-kbd-border-radius  : 4px;\n  --plugin-search-kbd-color          : var(--color-mono-5);\n  --plugin-search-margin             : 10px;\n  --plugin-search-reset-bg           : var(--theme-color);\n  --plugin-search-reset-border       : transparent;\n  --plugin-search-reset-border-radius: var(--border-radius);\n  --plugin-search-reset-color        : #fff;\n}\n\n.search {\n  margin: var(--plugin-search-margin);\n}\n\n/* Input */\n/* ================================== */\n.search .input-wrap {\n  position: relative;\n}\n\n.search input {\n  width: 100%;\n  padding-inline-end: 36px;\n  border: 1px solid var(--plugin-search-input-border-color);\n  border-radius: var(--plugin-search-input-border-radius);\n  background: var(--plugin-search-input-bg);\n  color: var(--plugin-search-input-color);\n}\n\n.search input::-webkit-search-decoration,\n.search input::-webkit-search-cancel-button {\n  appearance: none;\n}\n\n.search .clear-button,\n.search .kbd-group {\n  visibility: hidden;\n  display: flex;\n  gap: 0.15em;\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  opacity: 0;\n  translate: 0 -50%;\n  transition-property: opacity, visibility;\n  transition-duration: var(--duration-medium);\n}\n\n/* Note: invalid = empty, valid = not empty */\n.search input:valid ~ .clear-button,\n.search input:invalid:where(:focus, :hover) ~ .kbd-group,\n.search .kbd-group:hover {\n  visibility: visible;\n  opacity: 1;\n}\n\n.search .clear-button {\n  --_button-size: 20px;\n  --_content-size: 12px;\n\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: var(--_button-size);\n  width: var(--_button-size);\n  border: var(--plugin-search-reset-border);\n  border-radius: var(--plugin-search-reset-border-radius);\n  background: var(--plugin-search-reset-bg);\n  cursor: pointer;\n}\n\n.search .clear-button::before,\n.search .clear-button::after {\n  content: '';\n  position: absolute;\n  height: 2px;\n  width: var(--_content-size);\n  color: var(--plugin-search-reset-color);\n  background: var(--plugin-search-reset-color);\n}\n\n.search .clear-button::before {\n  rotate: 45deg;\n}\n\n.search .clear-button::after {\n  rotate: -45deg;\n}\n\n.search kbd {\n  border: var(--plugin-search-kbd-border);\n  border-radius: var(--plugin-search-kbd-border-radius);\n  background: var(--plugin-search-kbd-bg);\n  color: var(--plugin-search-kbd-color);\n  font-size: var(--font-size-s);\n}\n\n/* Results */\n/* ================================== */\n.search a:hover {\n  color: var(--theme-color);\n}\n\n.search .results-panel:empty {\n  display: none;\n}\n\n/* Hide other sidebar items when results are shown */\n.search:has(.results-panel:not(:empty)) ~ * {\n  display: none;\n}\n\n/* Dim other sidebar items when no results are found */\n.search:where(:has(input:valid:focus), :has(.results-panel::empty)) ~ * {\n  opacity: 0.2;\n}\n\n.search .matching-post {\n  overflow: hidden;\n  padding: 1em 0 1.2em 0;\n  border-bottom: 1px solid var(--color-mono-2);\n}\n\n.search .matching-post:hover a {\n  text-decoration-color: transparent;\n}\n\n.search .matching-post:hover .title {\n  text-decoration: inherit;\n  text-decoration-color: var(--link-underline-color-hover);\n}\n\n.search .matching-post .title {\n  margin: 0 0 0.5em 0;\n  line-height: 1.4;\n}\n\n.search .matching-post .content {\n  margin: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status {\n  margin-bottom: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status:empty {\n  display: none;\n}\n";
+    var cssText = "/* prettier-ignore */\n:root {\n  --plugin-search-input-bg           : var(--form-element-bg);\n  --plugin-search-input-border-color : var(--sidebar-border-color);\n  --plugin-search-input-border-radius: var(--form-element-border-radius);\n  --plugin-search-input-color        : var(--form-element-color);\n  --plugin-search-kbd-bg             : var(--color-bg);\n  --plugin-search-kbd-border         : 1px solid var(--color-mono-3);\n  --plugin-search-kbd-border-radius  : 4px;\n  --plugin-search-kbd-color          : var(--color-mono-5);\n  --plugin-search-margin             : 10px;\n  --plugin-search-reset-bg           : var(--theme-color);\n  --plugin-search-reset-border       : transparent;\n  --plugin-search-reset-border-radius: var(--border-radius);\n  --plugin-search-reset-color        : #fff;\n}\n\n.search {\n  margin: var(--plugin-search-margin);\n}\n\n/* Input */\n/* ================================== */\n.search .input-wrap {\n  position: relative;\n}\n\n.search input {\n  width: 100%;\n  padding-inline-end: 36px;\n  border: 1px solid var(--plugin-search-input-border-color);\n  border-radius: var(--plugin-search-input-border-radius);\n  background: var(--plugin-search-input-bg);\n  color: var(--plugin-search-input-color);\n}\n\n.search input::-webkit-search-decoration,\n.search input::-webkit-search-cancel-button {\n  appearance: none;\n}\n\n.search .clear-button,\n.search .kbd-group {\n  visibility: hidden;\n  display: flex;\n  gap: 0.15em;\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  opacity: 0;\n  translate: 0 -50%;\n  transition-property: opacity, visibility;\n  transition-duration: var(--duration-medium);\n}\n\n/* Note: invalid = empty, valid = not empty */\n.search input:valid ~ .clear-button,\n.search input:invalid:where(:focus, :hover) ~ .kbd-group,\n.search .kbd-group:hover {\n  visibility: visible;\n  opacity: 1;\n}\n\n.search .clear-button {\n  --_button-size: 20px;\n  --_content-size: 12px;\n\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: var(--_button-size);\n  width: var(--_button-size);\n  border: var(--plugin-search-reset-border);\n  border-radius: var(--plugin-search-reset-border-radius);\n  background: var(--plugin-search-reset-bg);\n  cursor: pointer;\n}\n\n.search .clear-button::before,\n.search .clear-button::after {\n  content: '';\n  position: absolute;\n  height: 2px;\n  width: var(--_content-size);\n  color: var(--plugin-search-reset-color);\n  background: var(--plugin-search-reset-color);\n}\n\n.search .clear-button::before {\n  rotate: 45deg;\n}\n\n.search .clear-button::after {\n  rotate: -45deg;\n}\n\n.search kbd {\n  border: var(--plugin-search-kbd-border);\n  border-radius: var(--plugin-search-kbd-border-radius);\n  background: var(--plugin-search-kbd-bg);\n  color: var(--plugin-search-kbd-color);\n  font-size: var(--font-size-s);\n}\n\n/* Results */\n/* ================================== */\n.search a:hover {\n  color: var(--theme-color);\n}\n\n.search .results-panel:empty {\n  display: none;\n}\n\n/* Hide other sidebar items when results are shown */\n.search:has(.results-panel:not(:empty)) ~ * {\n  display: none;\n}\n\n/* Dim other sidebar items when no results are found */\n.search:where(:has(input:valid:focus), :has(.results-panel::empty)) ~ * {\n  opacity: 0.2;\n}\n\n.search .matching-post {\n  overflow: hidden;\n  padding: 1em 0 1.2em 0;\n  border-bottom: 1px solid var(--color-mono-2);\n}\n\n.search .matching-post:hover a {\n  text-decoration-color: transparent;\n}\n\n.search .matching-post:hover .title {\n  text-decoration: inherit;\n  text-decoration-color: var(--link-underline-color-hover);\n}\n\n.search .matching-post .title {\n  margin: 0 0 0.5em 0;\n  line-height: 1.4;\n}\n\n.search .matching-post .content {\n  margin: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .matching-post .search-breadcrumb {\n  margin: 0.35em 0 0 0;\n  color: var(--color-mono-7);\n  font-size: var(--font-size-s);\n  text-align: right;\n}\n\n.search .results-status {\n  margin-bottom: 0;\n  color: var(--color-mono-6);\n  font-size: var(--font-size-s);\n}\n\n.search .results-status:empty {\n  display: none;\n}\n";
     let NO_DATA_TEXT = "";
+    let RESULT_SOURCE = "none";
+    function stripEmoji(text) {
+        return (text || "").replace(/(?:[\uD83C-\uD83E][\uDC00-\uDFFF])|[\u2600-\u27BF\u2B00-\u2BFF]|\uFE0E|\uFE0F|\u200D|\u20E3/g, "").replace(/\s+/g, " ").trim();
+    }
+    function safeDecode(uri) {
+        try {
+            return decodeURIComponent(uri);
+        } catch {
+            return uri;
+        }
+    }
+    function findSidebarLink(url) {
+        const base = safeDecode((url || "").split("?")[0]);
+        return Docsify.dom.findAll(".sidebar-nav a").find((a => safeDecode((a.getAttribute("href") || "").split("?")[0]) === base));
+    }
+    function groupLabel(li) {
+        for (const node of li.childNodes) {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                return node.textContent.trim();
+            }
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.tagName === "UL") {
+                    break;
+                }
+                const text = node.textContent.trim();
+                if (text) {
+                    return text;
+                }
+            }
+        }
+        return "";
+    }
+    function getBreadcrumb(url) {
+        const link = findSidebarLink(url);
+        if (!link) {
+            return null;
+        }
+        const parts = [ link.textContent.trim() ];
+        let li = link.closest("li");
+        while (li) {
+            const parentLi = li.parentElement ? li.parentElement.closest("li") : null;
+            if (parentLi) {
+                const label = groupLabel(parentLi);
+                if (label) {
+                    parts.unshift(label);
+                }
+            }
+            li = parentLi;
+        }
+        return parts;
+    }
+    function resultSourceHtml(post) {
+        if (RESULT_SOURCE === "breadcrumb") {
+            const parts = getBreadcrumb(post.url);
+            if (parts && parts.length) {
+                const crumbs = parts.map(((part, i) => {
+                    const label = escapeHtml(stripEmoji(part));
+                    return i === parts.length - 1 ? `<strong>${label}</strong>` : label;
+                })).join(" › ");
+                return `<p class="search-breadcrumb clamp-1">${crumbs}</p>`;
+            }
+            return post.page ? `<p class="search-breadcrumb clamp-1"><strong>${stripEmoji(post.page)}</strong></p>` : "";
+        }
+        if (RESULT_SOURCE === "page") {
+            const page = post.page && post.page !== post.title ? post.page : "";
+            return page ? `<p class="search-breadcrumb clamp-1"><strong>${stripEmoji(page)}</strong></p>` : "";
+        }
+        return "";
+    }
     function tpl(vm, defaultValue = "") {
         const {insertAfter: insertAfter, insertBefore: insertBefore} = vm.config?.search || {};
         const html = `\n    <div class="input-wrap">\n      <input type="search" value="${defaultValue}" required aria-keyshortcuts="/ control+k meta+k" />\n      <button class="clear-button" title="Clear search">\n        <span class="visually-hidden">Clear search</span>\n      </button>\n      <div class="kbd-group">\n        <kbd title="Press / to search">/</kbd>\n        <kbd title="Press Control+K to search">⌃K</kbd>\n      </div>\n    </div>\n    <p class="results-status" aria-live="polite"></p>\n    <div class="results-panel"></div>\n  `;
@@ -6058,7 +6136,7 @@
         matches.forEach(((post, i) => {
             const content = post.content ? `...${post.content}...` : "";
             const title = (post.title || "").replace(/<[^>]+>/g, "");
-            html += `\n      <div class="matching-post" aria-label="search result ${i + 1}">\n        <a href="${post.url}" title="${title}">\n          <p class="title clamp-1">${post.title}</p>\n          <p class="content clamp-2">${content}</p>\n        </a>\n      </div>\n    `;
+            html += `\n      <div class="matching-post" aria-label="search result ${i + 1}">\n        <a href="${post.url}" title="${title}">\n          <p class="title clamp-1">${post.title}</p>\n          <p class="content clamp-2">${content}</p>\n          ${resultSourceHtml(post)}\n        </a>\n      </div>\n    `;
         }));
         $panel.innerHTML = html || "";
         $status.textContent = matches.length ? `Found ${matches.length} results` : NO_DATA_TEXT;
@@ -6104,12 +6182,14 @@
             return;
         }
         const keywords = vm.router.parse().query.s || "";
+        RESULT_SOURCE = opts.resultSource || RESULT_SOURCE;
         Docsify.dom.style(cssText);
         tpl(vm, escapeHtml(keywords));
         bindEvents();
         keywords && setTimeout((_ => doSearch(keywords)), 500);
     }
     function update(opts, vm) {
+        RESULT_SOURCE = opts.resultSource || RESULT_SOURCE;
         updatePlaceholder(opts.placeholder, vm.route.path);
         updateNoData(opts.noData, vm.route.path);
     }
@@ -6123,7 +6203,8 @@
         pathNamespaces: undefined,
         keyBindings: [ "/", "meta+k", "ctrl+k" ],
         insertAfter: undefined,
-        insertBefore: undefined
+        insertBefore: undefined,
+        resultSource: "none"
     };
     const install = function(hook, vm) {
         const {util: util} = Docsify;
@@ -6139,6 +6220,7 @@
             CONFIG.namespace = opts.namespace || CONFIG.namespace;
             CONFIG.pathNamespaces = opts.pathNamespaces || CONFIG.pathNamespaces;
             CONFIG.keyBindings = opts.keyBindings || CONFIG.keyBindings;
+            CONFIG.resultSource = opts.resultSource || CONFIG.resultSource;
         }
         const isAuto = CONFIG.paths === "auto";
         hook.init((() => {

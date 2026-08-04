@@ -27,12 +27,14 @@
 
   color-scheme: dark;
 }
+
 /* Cover */
 /* ========================================================================== */
 .cover-main a.button.secondary {
     color: var(--color-text);
     border-color: rgba(255, 255, 255, 0.5);
   }
+
 /* Markdown */
 /* ========================================================================== */
 [class]:is(.markdown-section .callout) {
@@ -56,6 +58,7 @@
 :is(.markdown-section .callout) code,:is(.markdown-section .callout) pre:where([data-lang]) {
       background: var(--color-mono-min);
     }
+
 /* Force light mode for iframes in dark theme */
 iframe,
 iframe *,
