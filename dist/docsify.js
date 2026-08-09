@@ -7240,7 +7240,8 @@
                 }
                 href = stripUrlExceptId(href);
                 const oldActive = find(sidebar, "li.active");
-                const newActive = find(sidebar, `a[href="${href}"], a[href="${decodeURIComponent(href)}"]`)?.closest("li");
+                const sidebarSelector = `.sidebar-nav a[href="${href}"], .sidebar-nav a[href="${decodeURIComponent(href)}"]`;
+                const newActive = find(sidebar, sidebarSelector)?.closest("li");
                 if (newActive && newActive !== oldActive) {
                     oldActive?.classList.remove("active");
                     newActive.classList.add("active");
