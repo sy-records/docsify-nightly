@@ -3086,7 +3086,7 @@
         }
         let slug = str.trim().normalize("NFC").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\uFE0F/g, "").replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").replace(/[A-Z]+/g, lower).replace(/<[^>]+>/g, "").replace(re, "").replace(/\s/g, "-").replace(/^(\d)/, "_$1");
         let count = cache$1[slug];
-        count = Object.keys(cache$1).includes(slug) ? count + 1 : 0;
+        count = Object.prototype.hasOwnProperty.call(cache$1, slug) ? count + 1 : 0;
         cache$1[slug] = count;
         if (count) {
             slug = slug + "-" + count;
