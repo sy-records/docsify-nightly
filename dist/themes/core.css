@@ -1231,6 +1231,9 @@ body:has(.app-nav) .markdown-section {
 .markdown-section blockquote,.markdown-section details,.markdown-section figure,.markdown-section form,.markdown-section iframe,.markdown-section ol,.markdown-section output,.markdown-section p,.markdown-section pre,.markdown-section table,.markdown-section ul {
     margin-block: var(--margin-block);
   }
+.markdown-section a {
+    overflow-wrap: anywhere;
+  }
 .anchor:is(.markdown-section a) {
       color: inherit;
     }
