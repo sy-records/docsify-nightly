@@ -6659,8 +6659,7 @@
                 const activeEl = find(`.sidebar-nav a[href="${activeElmHref}"]`);
                 this.#addTextAsTitleAttribute(".sidebar-nav a");
                 if (loadSidebar && activeEl) {
-                    const parent = activeEl.parentElement;
-                    parent.innerHTML += this.compiler.subSidebar(subMaxLevel) || "";
+                    activeEl.closest("li")?.insertAdjacentHTML("beforeend", this.compiler.subSidebar(subMaxLevel) || "");
                 } else {
                     this.compiler.resetToc();
                 }

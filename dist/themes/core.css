@@ -1006,7 +1006,7 @@ li:last-child :is(:is(.app-nav li) ul) {
         color: var(--sidebar-link-color-active);
       }
 
-.collapse:is(:is(.app-nav-merged,.sidebar-nav) li)  > :not(a) {
+.collapse:is(:is(.app-nav-merged,.sidebar-nav) li)  > :not(a,p:has( > a.page-link)) {
         display: none;
       }
 
