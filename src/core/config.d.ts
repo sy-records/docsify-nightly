@@ -23,6 +23,7 @@ declare function defaultDocsifyConfig(): {
     autoHeader: boolean;
     basePath: string;
     catchPluginErrors: boolean;
+    collapseSidebarGroups: boolean;
     cornerExternalLinkTarget: "_blank" | "_self" | "_parent" | "_top" | "_unfencedTop";
     coverpage: boolean | string;
     el: string;

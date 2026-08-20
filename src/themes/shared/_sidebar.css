@@ -67,6 +67,16 @@
         color: var(--sidebar-group-title-color);
         font-size: var(--sidebar-group-title-font-size);
         font-weight: var(--sidebar-group-title-font-weight);
+
+        &[role='button'] {
+          cursor: pointer;
+          user-select: none;
+
+          &:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+          }
+        }
       }
     }
 
@@ -89,7 +99,7 @@
     }
 
     &.collapse {
-      > :not(a, p:has(> a.page-link)) {
+      > :not(a, p:has(> a.page-link)):not(.group-title) {
         display: none;
       }
     }
@@ -175,6 +185,7 @@
   body.sticky & {
     position: fixed;
     overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 }
 
@@ -249,7 +260,7 @@
   }
 
   /* Increase tap target size on touch-only devices */
-  @media screen and not (any-hover) {
+  @media screen and (any-hover: none) {
     width: calc(var(--content-margin-inline) - 10px);
   }
 }

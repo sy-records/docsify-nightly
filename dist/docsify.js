@@ -6641,7 +6641,7 @@
                 }
             }
             _renderSidebar(text) {
-                const {maxLevel: maxLevel, subMaxLevel: subMaxLevel, loadSidebar: loadSidebar, hideSidebar: hideSidebar} = this.config;
+                const {collapseSidebarGroups: collapseSidebarGroups, maxLevel: maxLevel, subMaxLevel: subMaxLevel, loadSidebar: loadSidebar, hideSidebar: hideSidebar} = this.config;
                 const sidebarEl = getNode("aside.sidebar");
                 const sidebarNavEl = getNode(".sidebar-nav");
                 const sidebarToggleEl = getNode("button.sidebar-toggle");
@@ -6653,6 +6653,7 @@
                 if (!this.compiler) {
                     throw new Error("Compiler is not initialized");
                 }
+                const sidebarGroupStates = new Map(findAll(sidebarNavEl, 'li.group > .group-title[role="button"][data-group-id]').map((elm => [ elm.getAttribute("data-group-id"), elm.closest("li")?.classList.contains("collapse") ])));
                 setHTML(".sidebar-nav", this.compiler.sidebar(text, maxLevel));
                 sidebarToggleEl.setAttribute("aria-expanded", String(!isMobile()));
                 const activeElmHref = decodeURIComponent(this.router.toURL(this.route.path));
@@ -6671,7 +6672,34 @@
                 }));
                 pageLinkGroups.forEach((elm => {
                     elm.classList.add("group");
-                    elm.querySelector(":scope > p:not(:has(> *))")?.classList.add("group-title");
+                    let groupTitle = [ ...elm.children ].find((child => child.tagName === "P" && !child.querySelector("a")));
+                    if (!groupTitle) {
+                        const sublist = [ ...elm.children ].find((child => child.tagName === "UL"));
+                        const titleNodes = [];
+                        for (const child of elm.childNodes) {
+                            if (child === sublist) {
+                                break;
+                            }
+                            titleNodes.push(child);
+                        }
+                        if (sublist && titleNodes.some((node => node.textContent?.trim()))) {
+                            const newGroupTitle = document.createElement("p");
+                            titleNodes.forEach((node => newGroupTitle.append(node)));
+                            groupTitle = newGroupTitle;
+                            elm.insertBefore(newGroupTitle, sublist);
+                        }
+                    }
+                    groupTitle?.classList.add("group-title");
+                    const rootList = elm.parentElement;
+                    if (groupTitle && rootList?.parentElement === sidebarNavEl) {
+                        const groupId = `${[ ...sidebarNavEl.children ].indexOf(rootList)}:${[ ...rootList.children ].indexOf(elm)}`;
+                        const isCollapsed = sidebarGroupStates.get(groupId) ?? collapseSidebarGroups;
+                        elm.classList.toggle("collapse", isCollapsed);
+                        groupTitle.setAttribute("data-group-id", groupId);
+                        groupTitle.setAttribute("role", "button");
+                        groupTitle.setAttribute("tabindex", "0");
+                        groupTitle.setAttribute("aria-expanded", String(!isCollapsed));
+                    }
                 }));
             }
             _bindEventOnRendered(activeEl) {
@@ -7118,6 +7146,11 @@
                     this.#toggleSidebar(!evt.matches);
                 }));
                 on(sidebarElm, "click", (({target: target}) => {
+                    const groupTitle = target.closest('.group-title[role="button"]');
+                    if (groupTitle) {
+                        this.#toggleSidebarGroup(groupTitle);
+                        return;
+                    }
                     const linkElm = target.closest("a");
                     const linkParent = linkElm?.closest("li");
                     const hasSubSidebar = linkParent?.querySelector(".app-sub-sidebar");
@@ -7125,6 +7158,21 @@
                         linkParent.classList.toggle("collapse");
                     }
                 }));
+                on(sidebarElm, "keydown", (event => {
+                    const groupTitle = event.target.closest('.group-title[role="button"]');
+                    if (groupTitle && (event.key === "Enter" || event.key === " ")) {
+                        event.preventDefault();
+                        this.#toggleSidebarGroup(groupTitle);
+                    }
+                }));
+            }
+            #toggleSidebarGroup(groupTitle) {
+                const group = groupTitle.closest("li");
+                if (!group) {
+                    return;
+                }
+                const isCollapsed = group.classList.toggle("collapse");
+                groupTitle.setAttribute("aria-expanded", String(!isCollapsed));
             }
             #initSidebarToggle() {
                 const contentElm = find("main > .content");
@@ -7568,6 +7616,7 @@
         autoHeader: false,
         basePath: "",
         catchPluginErrors: true,
+        collapseSidebarGroups: false,
         cornerExternalLinkTarget: "_blank",
         coverpage: "",
         el: "#app",

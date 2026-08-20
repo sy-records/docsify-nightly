@@ -40,6 +40,13 @@ export function Events<T extends Constructor>(Base: T): {
          */
         "__#private@#initSidebar"(): void;
         /**
+         * Toggle a root sidebar group and keep its accessible state in sync.
+         *
+         * @param {HTMLElement} groupTitle
+         * @void
+         */
+        "__#private@#toggleSidebarGroup"(groupTitle: HTMLElement): void;
+        /**
          * Initialize sidebar show/hide toggle behavior
          *
          * @void

@@ -36,6 +36,7 @@ declare const Docsify_base: {
         "__#private@#initHeadings"(): void;
         "__#private@#initKeyBindings"(): void;
         "__#private@#initSidebar"(): void;
+        "__#private@#toggleSidebarGroup"(groupTitle: HTMLElement): void;
         "__#private@#initSidebarToggle"(): void;
         "__#private@#initSkipToContent"(): void;
         onRender(): void;
