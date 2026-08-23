@@ -1,7 +1,6 @@
 name: docsify-nightly
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: '37 3 * * *'
@@ -14,8 +13,8 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "lts/*"
 
@@ -24,6 +23,8 @@ jobs:
           set -e
           git clone https://github.com/docsifyjs/docsify.git
           cd docsify
+          COMMIT_SHA=$(git rev-parse --short=7 HEAD)
+          echo "DOCSIFY_COMMIT=${COMMIT_SHA}" >> "$GITHUB_ENV"
           npm ci --ignore-scripts
           npm run build
 
@@ -35,12 +36,12 @@ jobs:
           git status
 
       - name: Commit
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         id: auto-commit-action
         with:
           commit_user_name: sy-records
           commit_user_email: lufei@docsifyjs.org
-          commit_message: Nightly release for docsify
+          commit_message: Nightly release for docsifyjs/docsify@${{ env.DOCSIFY_COMMIT }}
 
       - name: Trigger publish workflow
         if: steps.auto-commit-action.outputs.changes_detected == 'true'
