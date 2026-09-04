@@ -36,7 +36,7 @@ declare const Docsify_base: {
         "__#private@#initHeadings"(): void;
         "__#private@#initKeyBindings"(): void;
         "__#private@#initSidebar"(): void;
-        "__#private@#toggleSidebarGroup"(groupTitle: HTMLElement): void;
+        "__#private@#toggleSidebarGroup"(groupToggle: HTMLElement): void;
         "__#private@#initSidebarToggle"(): void;
         "__#private@#initSkipToContent"(): void;
         onRender(): void;
@@ -55,6 +55,7 @@ declare const Docsify_base: {
         compiler: import("./render/compiler.js").Compiler | undefined;
         "__#private@#vueGlobalData": any;
         "__#private@#addTextAsTitleAttribute"(cssSelector: any): void;
+        "__#private@#normalizeSidebarPageLinks"(sidebarNavEl: Element): void;
         "__#private@#executeScript"(): false | undefined;
         "__#private@#formatUpdated"(html: any, updated: any, fn: any): any;
         "__#private@#renderMain"(html: any): void;

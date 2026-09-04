@@ -15,6 +15,14 @@ export function Render<T extends Constructor>(Base: T): {
         compiler: Compiler | undefined;
         "__#private@#vueGlobalData": any;
         "__#private@#addTextAsTitleAttribute"(cssSelector: any): void;
+        /**
+         * Normalize links in loose Markdown lists from `<li><p><a>` to
+         * `<li><a>` so sidebar behavior and styling do not depend on list
+         * tightness.
+         *
+         * @param {Element} sidebarNavEl
+         */
+        "__#private@#normalizeSidebarPageLinks"(sidebarNavEl: Element): void;
         "__#private@#executeScript"(): false | undefined;
         "__#private@#formatUpdated"(html: any, updated: any, fn: any): any;
         "__#private@#renderMain"(html: any): void;

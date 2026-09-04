@@ -35,6 +35,32 @@ export function Render(Base) {
       });
     }
 
+    /**
+     * Normalize links in loose Markdown lists from `<li><p><a>` to
+     * `<li><a>` so sidebar behavior and styling do not depend on list
+     * tightness.
+     *
+     * @param {Element} sidebarNavEl
+     */
+    #normalizeSidebarPageLinks(sidebarNavEl) {
+      dom.findAll(sidebarNavEl, 'li > p').forEach(paragraph => {
+        const link = paragraph.firstElementChild;
+        const onlyContainsLink = [...paragraph.childNodes].every(
+          node =>
+            node === link || (node.nodeType === 3 && !node.textContent?.trim()),
+        );
+
+        if (
+          !paragraph.attributes.length &&
+          paragraph.children.length === 1 &&
+          link?.tagName === 'A' &&
+          onlyContainsLink
+        ) {
+          paragraph.replaceWith(link);
+        }
+      });
+    }
+
     #executeScript() {
       const script = dom
         .findAll('.markdown-section>script')
@@ -296,6 +322,7 @@ export function Render(Base) {
     _renderSidebar(text) {
       const {
         collapseSidebarGroups,
+        collapsibleSidebarGroups,
         maxLevel,
         subMaxLevel,
         loadSidebar,
@@ -320,7 +347,7 @@ export function Render(Base) {
         dom
           .findAll(
             sidebarNavEl,
-            'li.group > .group-title[role="button"][data-group-id]',
+            'li.group > .group-toggle[role="button"][data-group-id]',
           )
           .map(elm => [
             elm.getAttribute('data-group-id'),
@@ -329,6 +356,7 @@ export function Render(Base) {
       );
 
       dom.setHTML('.sidebar-nav', this.compiler.sidebar(text, maxLevel));
+      this.#normalizeSidebarPageLinks(sidebarNavEl);
 
       sidebarToggleEl.setAttribute('aria-expanded', String(!isMobile()));
 
@@ -358,18 +386,18 @@ export function Render(Base) {
       // Mark page links and groups
       const pageLinks = dom.findAll(
         sidebarNavEl,
-        'a:is(li > a, li > p > a):not(.section-link, [target="_blank"])',
+        'li > a:not(.section-link, [target="_blank"])',
       );
       const pageLinkGroups = dom
         // NOTE: Using filter() method as a replacement for :has() selector. It
-        // would be preferable to use only 'li:not(:has(> a, > p > a))' selector
+        // would be preferable to use only 'li:not(:has(> a))' selector
         // but the :has() selector is not supported by our Jest test environment
         // See: https://github.com/jsdom/jsdom/issues/3506#issuecomment-1769782333
         .findAll(sidebarEl, 'li')
         .filter(
           elm =>
             elm.querySelector(':scope > ul') &&
-            !elm.querySelectorAll(':scope > a, :scope > p > a').length,
+            !elm.querySelector(':scope > a'),
         );
 
       pageLinks.forEach(elm => {
@@ -382,6 +410,10 @@ export function Render(Base) {
         let groupTitle = [...elm.children].find(
           child => child.tagName === 'P' && !child.querySelector('a'),
         );
+        // Preserve the original styling behavior: only text-only paragraphs
+        // produced by Markdown receive the group-title class.
+        const styledGroupTitle =
+          groupTitle && !groupTitle.children.length ? groupTitle : null;
 
         if (!groupTitle) {
           const sublist = [...elm.children].find(
@@ -405,16 +437,21 @@ export function Render(Base) {
           }
         }
 
-        groupTitle?.classList.add('group-title');
+        styledGroupTitle?.classList.add('group-title');
 
         const rootList = elm.parentElement;
 
-        if (groupTitle && rootList?.parentElement === sidebarNavEl) {
+        if (
+          collapsibleSidebarGroups &&
+          groupTitle &&
+          rootList?.parentElement === sidebarNavEl
+        ) {
           const groupId = `${[...sidebarNavEl.children].indexOf(rootList)}:${[...rootList.children].indexOf(elm)}`;
           const isCollapsed =
             sidebarGroupStates.get(groupId) ?? collapseSidebarGroups;
 
           elm.classList.toggle('collapse', isCollapsed);
+          groupTitle.classList.add('group-toggle');
           groupTitle.setAttribute('data-group-id', groupId);
           groupTitle.setAttribute('role', 'button');
           groupTitle.setAttribute('tabindex', '0');
