@@ -42,6 +42,7 @@ const defaultDocsifyConfig = () => ({
   markdown: null,
   maxLevel: 6,
   mergeNavbar: false,
+  navbarPreservePath: false,
   name: /** @type {boolean | string} */ (''),
   nameLink: window.location.pathname,
   nativeEmoji: false,

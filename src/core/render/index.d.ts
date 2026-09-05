@@ -34,6 +34,7 @@ export function Render<T extends Constructor>(Base: T): {
          */
         _bindEventOnRendered(activeEl: HTMLElement | null): void;
         _renderNav(text: any): void;
+        "__#private@#appendNavbarPath"(selector: any): void;
         _renderMain(text: any, opt: {} | undefined, next: any): void;
         result: any;
         _renderCover(text: any, coverOnly: any): void;

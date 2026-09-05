@@ -6736,7 +6736,43 @@
                 const html = this.compiler.compile(text);
                 [ ".app-nav", ".app-nav-merged" ].forEach((selector => {
                     setHTML(selector, html);
+                    if (this.config.navbarPreservePath) {
+                        this.#appendNavbarPath(selector);
+                    }
                     this.#addTextAsTitleAttribute(`${selector} a`);
+                }));
+            }
+            #appendNavbarPath(selector) {
+                const nav = find(selector);
+                if (!nav) {
+                    return;
+                }
+                const links = findAll(nav, "a").reduce(((links, link) => {
+                    const anchor = link;
+                    const href = anchor.getAttribute("href");
+                    if (!href || isExternal(anchor.href) || href.startsWith("#") && !href.startsWith("#/")) {
+                        return links;
+                    }
+                    const route = this.router.parse(href);
+                    const path = cleanPath(`/${route.path}`);
+                    if (route.query.id || path !== "/" && !path.endsWith("/")) {
+                        return links;
+                    }
+                    links.push({
+                        link: anchor,
+                        path: path,
+                        query: route.query
+                    });
+                    return links;
+                }), []);
+                const currentPath = cleanPath(`/${this.route.path}`);
+                const currentRoot = links.filter((({path: path}) => currentPath.startsWith(path))).sort(((a, b) => b.path.length - a.path.length))[0];
+                if (!currentRoot) {
+                    return;
+                }
+                const suffix = currentPath.slice(currentRoot.path.length);
+                links.forEach((({link: link, path: path, query: query}) => {
+                    link.setAttribute("href", this.router.toURL(`${path}${suffix}`, query));
                 }));
             }
             _renderMain(text, opt = {}, next) {
@@ -7651,6 +7687,7 @@
         markdown: null,
         maxLevel: 6,
         mergeNavbar: false,
+        navbarPreservePath: false,
         name: "",
         nameLink: window.location.pathname,
         nativeEmoji: false,

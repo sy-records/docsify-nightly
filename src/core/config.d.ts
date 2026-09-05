@@ -52,6 +52,7 @@ declare function defaultDocsifyConfig(): {
     markdown: null;
     maxLevel: number;
     mergeNavbar: boolean;
+    navbarPreservePath: boolean;
     name: boolean | string;
     nameLink: string;
     nativeEmoji: boolean;
