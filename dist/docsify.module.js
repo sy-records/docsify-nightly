@@ -1154,6 +1154,42 @@ const decode = decodeURIComponent;
 
 const encode = encodeURIComponent;
 
+const sidebarNavigationClassNames = [ "app-name-link", "page-link", "section-link" ];
+
+function resolveHref(href) {
+    try {
+        return new URL(href, location.href).href;
+    } catch {
+        return href;
+    }
+}
+
+function findLinkByHref(rootElm, href, selector = "a") {
+    const resolvedHref = resolveHref(href);
+    return Array.from(rootElm.querySelectorAll(selector)).find((linkElm => linkElm.href === resolvedHref)) || null;
+}
+
+function getClickedLink(event) {
+    const target = event.target;
+    return target instanceof Element ? target.closest("a") : null;
+}
+
+function isCurrentContextNavigation(event, linkElm) {
+    return !(event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || linkElm.hasAttribute("download") || linkElm.target && linkElm.target !== "_self");
+}
+
+function getSidebarNavigationTarget(linkElm) {
+    const sidebarElm = linkElm.closest(".sidebar");
+    const className = sidebarNavigationClassNames.find((className => linkElm.classList.contains(className)));
+    if (!sidebarElm || !className) {
+        return;
+    }
+    return {
+        className: className,
+        href: linkElm.href
+    };
+}
+
 function parseQuery(query) {
     const res = {};
     query = query.trim().replace(/^(\?|#|&)/, "");
@@ -1315,26 +1351,36 @@ class HashHistory extends History {
     }
     onchange(cb = noop) {
         let navigating = false;
+        let navigatingFocusTarget;
         on("click", (e => {
-            const el = e.target.tagName === "A" ? e.target : e.target.parentNode;
-            if (el && el.tagName === "A" && !isExternal(el.href)) {
+            const el = getClickedLink(e);
+            if (el && isCurrentContextNavigation(e, el) && !isExternal(el.href)) {
                 navigating = true;
-                if ([ "app-name-link", "page-link" ].includes(el.className)) {
+                navigatingFocusTarget = getSidebarNavigationTarget(el);
+                if (el.matches(".app-name-link, .page-link")) {
+                    if (el.hash === location.hash) {
+                        navigating = false;
+                        navigatingFocusTarget = undefined;
+                    }
                     return;
                 }
                 if (el.hash === location.hash) {
                     cb({
-                        event: e,
+                        focusTarget: navigatingFocusTarget,
                         source: "navigate"
                     });
+                    navigating = false;
+                    navigatingFocusTarget = undefined;
                 }
             }
         }));
-        on("hashchange", (e => {
+        on("hashchange", (() => {
             const source = navigating ? "navigate" : "history";
+            const focusTarget = navigating ? navigatingFocusTarget : undefined;
             navigating = false;
+            navigatingFocusTarget = undefined;
             cb({
-                event: e,
+                focusTarget: focusTarget,
                 source: source
             });
         }));
@@ -1382,22 +1428,21 @@ class HTML5History extends History {
     }
     onchange(cb = noop) {
         on("click", (e => {
-            const el = e.target.tagName === "A" ? e.target : e.target.parentNode;
-            if (el && el.tagName === "A" && !isExternal(el.href)) {
+            const el = getClickedLink(e);
+            if (el && isCurrentContextNavigation(e, el) && !isExternal(el.href)) {
                 e.preventDefault();
                 const url = el.href;
                 window.history.pushState({
                     key: url
                 }, "", url);
                 cb({
-                    event: e,
+                    focusTarget: getSidebarNavigationTarget(el),
                     source: "navigate"
                 });
             }
         }));
-        on("popstate", (e => {
+        on("popstate", (() => {
             cb({
-                event: e,
                 source: "history"
             });
         }));
@@ -1450,10 +1495,10 @@ function Router(Base) {
                 this.updateRender();
                 this._updateRender();
                 if (lastRoute.path === this.route.path) {
-                    this.onNavigate(params.source);
+                    this.onNavigate(params.source, params.focusTarget);
                     return;
                 }
-                this.$fetch(noop, this.onNavigate.bind(this, params.source));
+                this.$fetch(noop, this.onNavigate.bind(this, params.source, params.focusTarget));
                 lastRoute = this.route;
             }));
         }
@@ -6824,8 +6869,7 @@ function Render(Base) {
             setHTML(".sidebar-nav", this.compiler.sidebar(text, maxLevel));
             this.#normalizeSidebarPageLinks(sidebarNavEl);
             sidebarToggleEl.setAttribute("aria-expanded", String(!isMobile()));
-            const activeElmHref = decodeURIComponent(this.router.toURL(this.route.path));
-            const activeEl = find(`.sidebar-nav a[href="${activeElmHref}"]`);
+            const activeEl = findLinkByHref(sidebarNavEl, this.router.toURL(this.route.path), "a");
             this.#addTextAsTitleAttribute(".sidebar-nav a");
             if (loadSidebar && activeEl) {
                 activeEl.closest("li")?.insertAdjacentHTML("beforeend", this.compiler.subSidebar(subMaxLevel) || "");
@@ -7424,7 +7468,7 @@ function Events(Base) {
             this.#markSidebarCurrentPage();
             this.#initHeadings();
         }
-        onNavigate(source) {
+        onNavigate(source, focusTarget) {
             const {auto2top: auto2top, topMargin: topMargin} = this.config;
             const {path: path, query: query} = this.route;
             const activeSidebarElm = this.#markSidebarActiveElm();
@@ -7448,7 +7492,10 @@ function Events(Base) {
                 this.#toggleSidebar(false);
             }
             if (hasId || isNavigate) {
-                this.#focusContent();
+                const sidebarFocused = isNavigate && this.#focusSidebarNavigation(focusTarget);
+                if (!sidebarFocused) {
+                    this.#focusContent();
+                }
             }
         }
         #focusContent(options = {}) {
@@ -7472,14 +7519,31 @@ function Events(Base) {
             }
             return focusEl;
         }
+        #focusSidebarNavigation(target) {
+            if (!target || isMobile()) {
+                return false;
+            }
+            const sidebarElm = find(".sidebar");
+            if (!sidebarElm) {
+                return false;
+            }
+            const focusElm = findAll(sidebarElm, "a").find((linkElm => linkElm.classList.contains(target.className) && linkElm.href === target.href));
+            if (!focusElm) {
+                return false;
+            }
+            focusElm.focus({
+                preventScroll: true
+            });
+            return true;
+        }
         #markAppNavActiveElm() {
-            const href = decodeURIComponent(this.router.toURL(this.route.path));
+            const href = resolveHref(this.router.toURL(this.route.path));
             [ ".app-nav", ".app-nav-merged" ].forEach((selector => {
                 const navElm = find(selector);
                 if (!navElm) {
                     return;
                 }
-                const newActive = findAll(navElm, "a").sort(((a, b) => b.href.length - a.href.length)).find((a => href.includes(a.getAttribute("href")) || href.includes(decodeURI(a.getAttribute("href")))))?.closest("li");
+                const newActive = findAll(navElm, "a").sort(((a, b) => b.href.length - a.href.length)).find((a => href.includes(a.href)))?.closest("li");
                 const oldActive = find(navElm, "li.active");
                 if (newActive && newActive !== oldActive) {
                     oldActive?.classList.remove("active");
@@ -7493,10 +7557,9 @@ function Events(Base) {
             if (!sidebar) {
                 return;
             }
-            href = stripUrlExceptId(href);
+            const matchingHref = stripUrlExceptId(href);
             const oldActive = find(sidebar, "li.active");
-            const sidebarSelector = `.sidebar-nav a[href="${href}"], .sidebar-nav a[href="${decodeURIComponent(href)}"]`;
-            const newActive = find(sidebar, sidebarSelector)?.closest("li");
+            const newActive = findLinkByHref(sidebar, matchingHref, ".sidebar-nav a")?.closest("li");
             if (newActive && newActive !== oldActive) {
                 oldActive?.classList.remove("active");
                 newActive.classList.add("active");
@@ -7511,7 +7574,7 @@ function Events(Base) {
             }
             const path = href?.split("?")[0];
             const oldPage = find(sidebar, "li[aria-current]");
-            const newPage = find(sidebar, `a[href="${path}"], a[href="${decodeURIComponent(path)}"]`)?.closest("li");
+            const newPage = path ? findLinkByHref(sidebar, path, ".sidebar-nav a")?.closest("li") : undefined;
             if (newPage && newPage !== oldPage) {
                 oldPage?.removeAttribute("aria-current");
                 newPage.setAttribute("aria-current", "page");
@@ -7995,10 +8058,14 @@ var index = Object.freeze({
     __proto__: null,
     cached: cached$1,
     cleanPath: cleanPath,
+    findLinkByHref: findLinkByHref,
+    getClickedLink: getClickedLink,
     getParentPath: getParentPath,
     getPath: getPath,
+    getSidebarNavigationTarget: getSidebarNavigationTarget,
     hyphenate: hyphenate,
     isAbsolutePath: isAbsolutePath,
+    isCurrentContextNavigation: isCurrentContextNavigation,
     isExternal: isExternal,
     isFn: isFn,
     isMobile: isMobile,
@@ -8008,6 +8075,7 @@ var index = Object.freeze({
     parseQuery: parseQuery,
     removeParams: removeParams,
     replaceSlug: replaceSlug,
+    resolveHref: resolveHref,
     resolvePath: resolvePath,
     stringifyQuery: stringifyQuery,
     stripUrlExceptId: stripUrlExceptId

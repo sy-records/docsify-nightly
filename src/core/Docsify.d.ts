@@ -40,8 +40,9 @@ declare const Docsify_base: {
         "__#private@#initSidebarToggle"(): void;
         "__#private@#initSkipToContent"(): void;
         onRender(): void;
-        onNavigate(source: undefined | "history" | "navigate"): void;
+        onNavigate(source: undefined | "history" | "navigate", focusTarget?: import("./router/util.js").SidebarNavigationTarget): void;
         "__#private@#focusContent"(options?: any): HTMLElement | null;
+        "__#private@#focusSidebarNavigation"(target?: import("./router/util.js").SidebarNavigationTarget): boolean;
         "__#private@#markAppNavActiveElm"(): void;
         "__#private@#markSidebarActiveElm"(href?: string): HTMLLIElement | null | undefined;
         "__#private@#markSidebarCurrentPage"(href?: string): HTMLLIElement | null | undefined;

@@ -69,9 +69,11 @@ export function Events<T extends Constructor>(Base: T): {
          * @param {undefined|"history"|"navigate"} source Type of navigation where
          * undefined is initial load, "history" is forward/back, and "navigate" is
          * user click/tap
+         * @param {import('../router/util.js').SidebarNavigationTarget} [focusTarget]
+         * Sidebar link to restore after rendering
          * @void
          */
-        onNavigate(source: undefined | "history" | "navigate"): void;
+        onNavigate(source: undefined | "history" | "navigate", focusTarget?: import("../router/util.js").SidebarNavigationTarget): void;
         /**
          * Set focus on the main content area: current route ID, first heading, or
          * the main content container
@@ -82,6 +84,14 @@ export function Events<T extends Constructor>(Base: T): {
          * @void
          */
         "__#private@#focusContent"(options?: any): HTMLElement | null;
+        /**
+         * Restore focus to the rendered sidebar link that initiated navigation.
+         *
+         * @param {import('../router/util.js').SidebarNavigationTarget} [target]
+         * Sidebar navigation target
+         * @returns {boolean} True when focus was restored
+         */
+        "__#private@#focusSidebarNavigation"(target?: import("../router/util.js").SidebarNavigationTarget): boolean;
         /**
          * Marks the active app nav item
          */

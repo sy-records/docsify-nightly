@@ -1,9 +1,9 @@
 export class HashHistory extends History {
     mode: string;
-    /** @param {(params: {source: any, event?: any}) => void} [cb] */
+    /** @param {(params: {source: any, focusTarget?: import('../util.js').SidebarNavigationTarget}) => void} [cb] */
     onchange(cb?: (params: {
         source: any;
-        event?: any;
+        focusTarget?: import("../util.js").SidebarNavigationTarget;
     }) => void): void;
     /**
      * Parse the url
