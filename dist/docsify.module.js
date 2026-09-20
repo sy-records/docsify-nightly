@@ -6062,7 +6062,7 @@ class Compiler {
         const {toc: toc} = this;
         const currentPath = this.router.getCurrentPath();
         let html = "";
-        if (text) {
+        if (typeof text === "string") {
             return this.compile(text);
         }
         for (let i = 0; i < toc.length; i++) {
@@ -7122,6 +7122,7 @@ function Fetch(Base) {
             path = first ? path : path.replace(/\/$/, "");
             path = getParentPath(path);
             if (!path) {
+                next("");
                 return;
             }
             get(vm.router.getFile(path + file) + qs, false, vm.config.requestHeaders).then(next, (_error => this.#loadNested(path, qs, file, next, vm)));
