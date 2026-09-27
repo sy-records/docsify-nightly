@@ -1753,8 +1753,8 @@
         tablecell(token) {
             return this.parser?.parseInline(token.tokens) || "";
         },
-        strong({text: text}) {
-            return text;
+        strong({tokens: tokens}) {
+            return this.parser?.parseInline(tokens) || "";
         },
         em({tokens: tokens}) {
             return this.parser?.parseInline(tokens) || "";
