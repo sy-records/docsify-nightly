@@ -6872,7 +6872,11 @@ function Render(Base) {
             const activeEl = findLinkByHref(sidebarNavEl, this.router.toURL(this.route.path), "a");
             this.#addTextAsTitleAttribute(".sidebar-nav a");
             if (loadSidebar && activeEl) {
-                activeEl.closest("li")?.insertAdjacentHTML("beforeend", this.compiler.subSidebar(subMaxLevel) || "");
+                const activeItem = activeEl.closest("li");
+                activeItem?.insertAdjacentHTML("beforeend", this.compiler.subSidebar(subMaxLevel) || "");
+                if (activeItem?.querySelector(":scope > .app-sub-sidebar")) {
+                    activeEl.setAttribute("aria-expanded", "true");
+                }
             } else {
                 this.compiler.resetToc();
             }
@@ -7408,7 +7412,8 @@ function Events(Base) {
                 const linkParent = linkElm?.closest("li");
                 const hasSubSidebar = linkParent?.querySelector(".app-sub-sidebar");
                 if (hasSubSidebar) {
-                    linkParent.classList.toggle("collapse");
+                    const isCollapsed = linkParent.classList.toggle("collapse");
+                    linkElm?.setAttribute("aria-expanded", String(!isCollapsed));
                 }
             }));
             on(sidebarElm, "keydown", (event => {
