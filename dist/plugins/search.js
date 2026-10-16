@@ -5729,7 +5729,7 @@
         search: "slug, title, body, path, indexKey",
         expires: "key, value"
     });
-    async function saveData(maxAge, expireKey) {
+    async function saveData(maxAge, expireKey, indexKey) {
         const records = [];
         Object.values(INDEXES).forEach((entry => {
             if (!entry || typeof entry !== "object") {
@@ -5746,11 +5746,18 @@
             }));
         }));
         INDEXES = records;
-        await db.search.bulkPut(records);
-        await db.expires.put({
-            key: expireKey,
-            value: Date.now() + maxAge
-        });
+        const searchTable = db.table("search");
+        const expiresTable = db.table("expires");
+        await db.transaction("rw", searchTable, expiresTable, (async () => {
+            await searchTable.where({
+                indexKey: indexKey
+            }).delete();
+            await searchTable.bulkPut(records);
+            await expiresTable.put({
+                key: expireKey,
+                value: Date.now() + maxAge
+            });
+        }));
     }
     async function getData(key, isExpireKey = false) {
         if (isExpireKey) {
@@ -6025,7 +6032,7 @@
         let count = 0;
         const markComplete = async () => {
             if (len === ++count) {
-                await saveData(config.maxAge, expireKey);
+                await saveData(config.maxAge, expireKey, indexKey);
             }
         };
         paths.forEach((path => {
