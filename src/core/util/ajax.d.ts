@@ -24,6 +24,7 @@ export type CacheOpt = {
 export type CacheItem = {
     content: string;
     opt: CacheOpt;
+    response: ResponseStatus;
 };
 export type ResponseStatus = {
     ok: boolean;

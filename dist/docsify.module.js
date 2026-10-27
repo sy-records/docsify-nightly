@@ -6451,7 +6451,7 @@ function get(url, hasBar = false, headers = {}) {
     const cached = cache[url];
     if (cached) {
         return {
-            then: cb => cb(cached.content, cached.opt),
+            then: cb => cb(cached.content, cached.opt, cached.response),
             abort: noop
         };
     }
@@ -6492,9 +6492,10 @@ function get(url, hasBar = false, headers = {}) {
                         content: target.response,
                         opt: {
                             updatedAt: xhr.getResponseHeader("last-modified") ?? ""
-                        }
+                        },
+                        response: getResponseStatus(event)
                     };
-                    success(result.content, result.opt, getResponseStatus(event));
+                    success(result.content, result.opt, result.response);
                 }
             }));
         },
