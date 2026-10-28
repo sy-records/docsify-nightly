@@ -1,8 +1,7 @@
-export function linkCompiler({ renderer, router, linkTarget, linkRel, compiler, }: {
+export function linkCompiler({ renderer, router, linkTarget: defaultLinkTarget, compiler, }: {
     renderer: any;
     router: any;
     linkTarget: any;
-    linkRel: any;
     compiler: any;
 }): ({ href, title, tokens }: {
     href: any;
