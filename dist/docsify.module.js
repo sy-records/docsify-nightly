@@ -1,5 +1,5 @@
 /*!
- * Docsify v5.0.0
+ * Docsify v5.1.0
  * https://docsify.js.org
  * (c) 2017-2026
  * MIT license
@@ -8117,6 +8117,6 @@ class Docsify extends(Fetch(Events(Render(VirtualRoutes(Router(Lifecycle(Object)
     }
 }
 
-const version = "5.0.0";
+const version = "5.1.0";
 
 export { Compiler, Docsify, dom, get, g as marked, prism, slugify, index as util, version };
