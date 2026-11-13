@@ -5946,6 +5946,18 @@
         }
         return keyword;
     }
+    const preparedPosts = new WeakMap;
+    function preparePost(post, postTitle, postContent) {
+        let prepared = preparedPosts.get(post);
+        if (!prepared) {
+            prepared = {
+                title: escapeHtml(ignoreDiacriticalMarks(postTitle)),
+                content: postContent ? escapeHtml(ignoreDiacriticalMarks(postContent)) : postContent
+            };
+            preparedPosts.set(post, prepared);
+        }
+        return prepared;
+    }
     function search(query) {
         const matchingResults = [];
         query = query.trim();
@@ -5953,19 +5965,17 @@
         if (keywords.length !== 1) {
             keywords = [ query, ...keywords ];
         }
+        const regExps = keywords.map((keyword => new RegExp(escapeHtml(ignoreDiacriticalMarks(keyword)).replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"), "gi")));
         for (const post of INDEXES) {
             let matchesScore = 0;
             let resultStr = "";
-            let handlePostTitle = "";
-            let handlePostContent = "";
             const postTitle = post.title && post.title.trim();
             const postContent = post.body && post.body.trim();
             const postUrl = post.slug || "";
             if (postTitle) {
-                handlePostTitle = escapeHtml(ignoreDiacriticalMarks(postTitle));
-                handlePostContent = postContent ? escapeHtml(ignoreDiacriticalMarks(postContent)) : postContent;
-                keywords.forEach((keyword => {
-                    const regEx = new RegExp(escapeHtml(ignoreDiacriticalMarks(keyword)).replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"), "gi");
+                const {title: handlePostTitle, content: handlePostContent} = preparePost(post, postTitle, postContent);
+                keywords.forEach(((keyword, i) => {
+                    const regEx = regExps[i];
                     const indexTitle = postTitle ? handlePostTitle.search(regEx) : -1;
                     let indexContent = postContent ? handlePostContent.search(regEx) : -1;
                     if (indexTitle >= 0 || indexContent >= 0) {
