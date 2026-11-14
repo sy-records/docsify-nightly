@@ -6502,7 +6502,7 @@ function get(url, hasBar = false, headers = {}) {
     };
 }
 
-const cached = {};
+const cached = new Map;
 
 function extractFragmentContent(text, fragment, fullLine) {
     if (!fragment) {
@@ -6588,9 +6588,15 @@ function walkFetchEmbed({embedTokens: embedTokens, compile: compile, fetch: fetc
 }
 
 function prerenderEmbed({compiler: compiler, raw: raw = "", fetch: fetch}, done) {
-    const hit = cached[raw];
+    const contentDirectory = getPath(compiler.contentBase, getParentPath(compiler.router.getCurrentPath()));
+    let directoryCache = cached.get(contentDirectory);
+    if (!directoryCache) {
+        directoryCache = new Map;
+        cached.set(contentDirectory, directoryCache);
+    }
+    const hit = directoryCache.get(raw);
     if (hit) {
-        const copy = hit.slice();
+        const copy = hit.tokens.slice();
         copy.links = hit.links;
         return done(copy);
     }
@@ -6699,8 +6705,11 @@ function prerenderEmbed({compiler: compiler, raw: raw = "", fetch: fetch}, done)
                 }
             }
         } else if (!token) {
-            cached[raw] = tokens.concat();
-            tokens.links = cached[raw].links = links;
+            directoryCache.set(raw, {
+                tokens: tokens.concat(),
+                links: links
+            });
+            tokens.links = links;
             done(tokens);
         }
     }));
